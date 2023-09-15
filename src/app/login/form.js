@@ -22,7 +22,6 @@ export const LoginForm = () => {
 
     try {
       setLoading(true);
-      console.log("Form Values:", formValues);
 
       const res = await signIn("credentials", {
         redirect: false,
@@ -30,7 +29,6 @@ export const LoginForm = () => {
         password: formValues.password,
         callbackUrl,
       });
-      console.log("🚀 ~ file: form.js:33 ~ onSubmit ~ res:", res);
 
       setLoading(false);
       if (!res?.error) {

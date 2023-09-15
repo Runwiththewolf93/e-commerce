@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
+  console.log("🚀 ~ file: route.js:7 ~ GET ~ session:", session);
 
   if (!session) {
     return new NextResponse(

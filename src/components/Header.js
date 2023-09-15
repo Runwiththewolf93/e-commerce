@@ -12,7 +12,7 @@ export default function Header() {
       <nav className="h-full flex justify-between items-center mx-3">
         <div>
           <Link href="/" className="text-gray-600 text-2xl font-semibold">
-            StevOWeb
+            Nextjs
           </Link>
         </div>
         <ul className="flex items-center gap-4">

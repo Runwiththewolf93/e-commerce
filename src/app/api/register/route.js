@@ -34,5 +34,3 @@ export async function POST(req) {
     );
   }
 }
-
-// {"_id":{"$oid":"6501b425f10ba3cb63a66477"},"username":"stevan","email":"stevan@gmail.com","password":"$2a$12$sgfUAeH/5SMDbHQ73hpK9uZRiV7aOjltc55Yyy2bnw9Xq/eXwtL16","roles":["customer"],"createdAt":{"$date":{"$numberLong":"1694610469392"}},"__v":{"$numberInt":"0"}}

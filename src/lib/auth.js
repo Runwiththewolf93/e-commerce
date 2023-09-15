@@ -33,28 +33,18 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) {
-          console.log("Missing credentials");
           return null;
         }
 
         // Find user by email
         const user = await User.findOne({ email: credentials.email });
-        console.log("🚀 ~ file: auth.js:41 ~ authorize ~ user:", user);
-
-        console.log("🚀 Submitted password:", credentials.password);
-        console.log("🚀 Stored hashed password:", user.password);
 
         const isPasswordValid = user
           ? await bcrypt.compare(credentials.password, user.password)
           : false;
-        console.log(
-          "🚀 ~ file: auth.js:44 ~ authorize ~ isPasswordValid:",
-          isPasswordValid
-        );
 
         // Check if the user exists and the password is correct
         if (!user || !isPasswordValid) {
-          console.log("Authentication failed");
           return null;
         }
 

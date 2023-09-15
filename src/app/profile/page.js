@@ -5,6 +5,7 @@ import { authOptions } from "../../lib/auth";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
+  console.log("🚀 ~ file: page.js:8 ~ Profile ~ session:", session);
   const user = session?.user;
 
   return (

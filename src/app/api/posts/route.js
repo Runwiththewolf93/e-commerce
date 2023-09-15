@@ -6,10 +6,13 @@ export const GET = async request => {
   try {
     await connect();
     const posts = await Post.find();
-    return new NextResponse(JSON.stringify(posts), { status: 200 });
+    return NextResponse.json(posts, { status: 200 });
   } catch (error) {
-    return new NextResponse("Error in fetching posts " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      {
+        message: `Error in fetching posts ${error.message}`,
+      },
+      { status: 500 }
+    );
   }
 };

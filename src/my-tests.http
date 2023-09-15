@@ -1,1 +1,16 @@
-get http://localhost:3000/api/auth/providers
+### Reset Password Test
+POST http://localhost:3000/api/reset HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "stevan@gmail.com",
+    "currentPassword": "secret",
+    "newPassword": "newSecret"
+}
+
+### Session route test
+GET http://localhost:3000/api/session HTTP/1.1
+Authorization: Bearer eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..7VtDtiyy-pYf7YI6.6aZ7TwbG4xK6ZhZkvMyBNtohT-S4ZRscpRculyHN3JhqcCXN7nmCg9c512deykF0bTCq3yLhrhfitdkZcdZmvJTa89cPaJT2mbq5HGEUdfjJx9Bkmt9oF6HlOpkUTahdHEAUw3H3NvDlHSex-vFcIT-myP-5PfemENIMJSWqcbGeC80QbE-ocR8LtbaLt9J1cTv8hN2tBrCV7el4I-lv1lXQgTT0ZVCrhsUa3Xw0aR4VuI7MI8yQjMO72D_M9N09JuU1x5qOiTnVMFsbwVVbZeESkw.YJ3IzG9DTVqGqs18wyglxw
+
+### REST API
+GET http://localhost:3000/api/auth/signin
