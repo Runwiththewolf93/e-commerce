@@ -2,6 +2,8 @@ import User from "../../../../models/Users";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import connect from "../../../../utils/db";
+import checkAuthCookie from "../../../../utils/protect";
+
 /**
  * Updates the user's password.
  *
@@ -9,16 +11,7 @@ import connect from "../../../../utils/db";
  * @return {Promise<Object>} An object containing the response message.
  */
 export async function POST(req) {
-  if (!session) {
-    return NextResponse.json(
-      {
-        status: "fail",
-        message: "You are not logged in",
-      },
-      { status: 401 }
-    );
-  }
-
+  checkAuthCookie();
   connect();
 
   try {

@@ -2,10 +2,16 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 export default function Header() {
   const { data: session } = useSession();
   const user = session?.user;
+
+  const logoutHandler = () => {
+    Cookies.remove("user-auth");
+    signOut();
+  };
 
   return (
     <header className="bg-white h-20">
@@ -42,7 +48,7 @@ export default function Header() {
                   Profile
                 </Link>
               </li>
-              <li className="cursor-pointer" onClick={() => signOut()}>
+              <li className="cursor-pointer" onClick={logoutHandler}>
                 Logout
               </li>
             </>

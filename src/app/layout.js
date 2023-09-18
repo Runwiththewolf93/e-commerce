@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import Providers from "../redux/Provider";
 import { NextAuthProvider } from "./providers";
+import { IsClientCtxProvider } from "../lib/is-client-ctx";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +16,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <NextAuthProvider>{children}</NextAuthProvider>
+          <NextAuthProvider>
+            <IsClientCtxProvider>{children}</IsClientCtxProvider>
+          </NextAuthProvider>
         </Providers>
       </body>
     </html>
