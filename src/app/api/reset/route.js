@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import connect from "../../../../utils/db";
 import validateJWT from "../../../../utils/protect";
 import CustomAPIError from "../errors";
+import Joi from "joi";
 
 /**
  * Updates the user's password.
@@ -18,6 +19,18 @@ export async function POST(req) {
     console.log(req.user);
 
     const { email, currentPassword, newPassword } = await req.json();
+
+    // Joi validation
+    const schema = Joi.object({
+      email: Joi.string().email().required(),
+      currentPassword: Joi.string().min(6).required(),
+      newPassword: Joi.string().min(6).required(),
+    });
+
+    const { error } = schema.validate({ email, currentPassword, newPassword });
+    if (error) {
+      throw new CustomAPIError.BadRequestError(error.details[0].message);
+    }
 
     // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() });

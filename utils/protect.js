@@ -3,18 +3,11 @@ import CustomAPIError from "../src/app/api/errors";
 import jwt from "jsonwebtoken";
 
 export default function validateJWT(req) {
+  // Access the list of headers
   const headersList = headers();
-  console.log(
-    "🚀 ~ file: protect.js:7 ~ validateJWT ~ headersList:",
-    headersList
-  );
 
   // Access the Authorization header
   const authHeader = headersList.get("Authorization");
-  console.log(
-    "🚀 ~ file: protect.js:7 ~ validateJWT ~ authHeader:",
-    authHeader
-  );
 
   if (!authHeader) {
     throw new CustomAPIError.UnauthenticatedError(

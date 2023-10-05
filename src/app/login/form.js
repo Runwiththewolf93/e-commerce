@@ -20,6 +20,11 @@ export const LoginForm = () => {
   const onSubmit = async e => {
     e.preventDefault();
 
+    if (!formValues.email || !formValues.password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
     try {
       setLoading(true);
 

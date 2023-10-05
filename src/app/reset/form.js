@@ -2,19 +2,28 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export function ResetPasswordForm({ token }) {
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const router = useRouter();
 
   const handleSubmit = async e => {
     e.preventDefault();
 
+    if (!email || !currentPassword || !newPassword) {
+      setErrorMessage("Please fill in all fields");
+      return;
+    }
+
     try {
-      const response = await axios.post(
+      setLoading(true);
+      await axios.post(
         "/api/reset",
         {
           email,
@@ -27,12 +36,12 @@ export function ResetPasswordForm({ token }) {
           },
         }
       );
-
-      console.log("Password reset successful:", response.data);
+      setLoading(false);
       setSuccessMessage("Password reset successful");
       setErrorMessage(null);
+      setTimeout(() => router.push("/"), 2000);
     } catch (error) {
-      console.error("An error occurred:", error);
+      setLoading(false);
       setErrorMessage(
         error.response?.data?.message || "An unexpected error occurred"
       );
@@ -63,39 +72,52 @@ export function ResetPasswordForm({ token }) {
         </div>
       )}
       <div>
-        <label className="block text-sm font-medium text-gray-600">Email</label>
+        <label
+          className="block text-sm font-medium text-gray-600"
+          aria-label="Email"
+        >
+          Email
+        </label>
         <input
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="mt-1 p-2 w-full border rounded-md"
+          className="mt-1 p-2 w-full border rounded-md hover:border-blue-400 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-600">
+        <label
+          className="block text-sm font-medium text-gray-600"
+          aria-label="Password"
+        >
           Current Password
         </label>
         <input
           type="password"
           value={currentPassword}
           onChange={e => setCurrentPassword(e.target.value)}
-          className="mt-1 p-2 w-full border rounded-md"
+          className="mt-1 p-2 w-full border rounded-md hover:border-blue-400 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-600">
+        <label
+          className="block text-sm font-medium text-gray-600"
+          aria-label="New Password"
+        >
           New Password
         </label>
         <input
           type="password"
           value={newPassword}
           onChange={e => setNewPassword(e.target.value)}
-          className="mt-1 p-2 w-full border rounded-md"
+          className="mt-1 p-2 w-full border rounded-md hover:border-blue-400 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
         />
       </div>
       <button
         type="submit"
-        className="bg-blue-500 text-white p-2 rounded-md mx-auto block"
+        className={`bg-blue-500 text-white p-2 rounded-md mx-auto block hover:bg-blue-600 focus:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${
+          loading ? "cursor-not-allowed" : ""
+        }`}
       >
         Reset Password
       </button>

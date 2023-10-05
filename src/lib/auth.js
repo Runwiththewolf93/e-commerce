@@ -7,6 +7,8 @@ import GoogleProvider from "next-auth/providers/google";
 import connect from "../../utils/db";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import CustomAPIError from "../app/api/errors";
+import Joi from "joi";
 
 export const authOptions = {
   pages: {
@@ -36,22 +38,30 @@ export const authOptions = {
       },
       async authorize(credentials) {
         await connect();
-        if (!credentials?.email || !credentials.password) {
-          return null;
+
+        // Joi validation
+        const schema = Joi.object({
+          email: Joi.string().email().required(),
+          password: Joi.string().min(6).required(),
+        });
+
+        const { error } = schema.validate(credentials);
+        if (error) {
+          throw new CustomAPIError.BadRequestError(error.details[0].message);
         }
 
         // Find user by email
-        const user = await User.findOne({ email: credentials.email }).catch(
-          err => console.log("Error during User.findOne:", err)
+        const user = await User.findOne({ email: credentials.email });
+        if (!user) {
+          throw new CustomAPIError.NotFoundError("User not found");
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
         );
-
-        const isPasswordValid = user
-          ? await bcrypt.compare(credentials.password, user.password)
-          : false;
-
-        // Check if the user exists and the password is correct
-        if (!user || !isPasswordValid) {
-          return null;
+        if (!isPasswordValid) {
+          throw new CustomAPIError.BadRequestError("Invalid credentials");
         }
 
         // Return user info
@@ -64,20 +74,23 @@ export const authOptions = {
     }),
   ],
   jwt: {
+    maxAge: 86400,
     signingKey: process.env.NEXTAUTH_SECRET,
     sign: async options => {
       const { secret, token, maxAge, user } = options;
+      const issuedAt = Math.floor(Date.now() / 1000);
+      const expiresAt = issuedAt + maxAge; // Using maxAge for consistency
       const jwtClaims = {
         name: user.name,
         email: user.email,
         sub: user.id.toString(),
         id: user.id.toString(),
-        iat: Math.floor(Date.now() / 1000),
+        iat: issuedAt,
+        exp: expiresAt,
         jti: crypto.randomBytes(16).toString("hex"),
       };
       const tokenPayload = jwt.sign(jwtClaims, secret, {
         algorithm: "HS256",
-        expiresIn: "1d",
       });
       return tokenPayload;
     },
@@ -102,12 +115,16 @@ export const authOptions = {
       };
     },
     jwt: async ({ token, user }) => {
-      console.log("🚀 ~ file: auth.js:85 ~ jwt: ~ token:", token);
       if (user) {
+        const issuedAt = Math.floor(Date.now() / 1000);
+        const expiresAt = issuedAt + 86400;
         const u = user;
         return {
           ...token,
           id: u.id,
+          iat: issuedAt,
+          exp: expiresAt,
+          jti: crypto.randomBytes(16).toString("hex"),
         };
       }
       return token;

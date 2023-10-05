@@ -16,6 +16,11 @@ export const RegisterForm = () => {
   const onSubmit = async e => {
     e.preventDefault();
 
+    if (!formValues.name || !formValues.email || !formValues.password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
     try {
       setLoading(true);
 
