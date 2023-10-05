@@ -4,9 +4,9 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import mongoose from "mongoose";
 import connect from "../../utils/db";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 export const authOptions = {
   pages: {
@@ -35,15 +35,7 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log(
-          "🚀 ~ file: auth.js:37 ~ authorize ~ credentials:",
-          credentials
-        );
         await connect();
-        console.log(
-          "MongoDB Connection State:",
-          mongoose.connection.readyState
-        );
         if (!credentials?.email || !credentials.password) {
           return null;
         }
@@ -71,6 +63,25 @@ export const authOptions = {
       },
     }),
   ],
+  jwt: {
+    signingKey: process.env.NEXTAUTH_SECRET,
+    sign: async options => {
+      const { secret, token, maxAge, user } = options;
+      const jwtClaims = {
+        name: user.name,
+        email: user.email,
+        sub: user.id.toString(),
+        id: user.id.toString(),
+        iat: Math.floor(Date.now() / 1000),
+        jti: crypto.randomBytes(16).toString("hex"),
+      };
+      const tokenPayload = jwt.sign(jwtClaims, secret, {
+        algorithm: "HS256",
+        expiresIn: "1d",
+      });
+      return tokenPayload;
+    },
+  },
   callbacks: {
     session: async ({ session, token }) => {
       const customJwtToken = jwt.sign(
@@ -91,6 +102,7 @@ export const authOptions = {
       };
     },
     jwt: async ({ token, user }) => {
+      console.log("🚀 ~ file: auth.js:85 ~ jwt: ~ token:", token);
       if (user) {
         const u = user;
         return {
