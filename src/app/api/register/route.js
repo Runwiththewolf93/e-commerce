@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import connect from "../../../../utils/db";
 
 export async function POST(req) {
-  connect();
+  await connect();
 
   try {
     const { name, email, password } = await req.json();
@@ -28,9 +28,12 @@ export async function POST(req) {
       },
     });
   } catch (error) {
-    return new NextResponse(
-      JSON.stringify({ status: "error", message: error.message }),
-      { status: 500 }
+    return NextResponse.json(
+      {
+        status: "error",
+        message: error.message || "Internal Server Error",
+      },
+      { status: error.statusCode || 500 }
     );
   }
 }

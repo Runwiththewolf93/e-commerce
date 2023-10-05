@@ -4,8 +4,6 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { token } from "../../lib/helper";
-import Cookies from "js-cookie";
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -31,16 +29,10 @@ export const LoginForm = () => {
         password: formValues.password,
         callbackUrl,
       });
+      console.log("🚀 ~ file: form.js:34 ~ onSubmit ~ res:", res);
 
       setLoading(false);
       if (!res?.error) {
-        const userAuthToken = token();
-        Cookies.set("user-auth", userAuthToken, {
-          path: "/",
-          expires: 1,
-          sameSite: "strict",
-          // secure: true, set for https
-        });
         setFormValues({ email: "", password: "" });
         router.push(callbackUrl);
       } else {
@@ -63,7 +55,9 @@ export const LoginForm = () => {
   return (
     <form onSubmit={onSubmit}>
       {error && (
-        <p className="text-center bg-red-300 py-4 mb-6 rounded">{error}</p>
+        <p className="text-center bg-red-300 py-4 mb-6 rounded">
+          {error.message}
+        </p>
       )}
       <div className="mb-6">
         <input

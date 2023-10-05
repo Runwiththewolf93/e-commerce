@@ -1,9 +1,15 @@
-"use client";
+import jwt from "jsonwebtoken";
 
-const rand = () => {
-  return Math.random().toString(36).substr(2);
+export const generateToken = email => {
+  return jwt.sign({ email }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
 };
 
-export const token = () => {
-  return rand() + rand();
+export const validateToken = token => {
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return null;
+  }
 };

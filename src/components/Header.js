@@ -2,15 +2,13 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import Cookies from "js-cookie";
 
 export default function Header() {
   const { data: session } = useSession();
   const user = session?.user;
 
-  const logoutHandler = () => {
-    Cookies.remove("user-auth");
-    signOut();
+  const logoutHandler = async () => {
+    await signOut({ callbackUrl: "http://localhost:3000/login" });
   };
 
   return (

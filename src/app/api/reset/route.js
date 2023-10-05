@@ -2,7 +2,8 @@ import User from "../../../../models/Users";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import connect from "../../../../utils/db";
-import checkAuthCookie from "../../../../utils/protect";
+import validateJWT from "../../../../utils/protect";
+import CustomAPIError from "../errors";
 
 /**
  * Updates the user's password.
@@ -11,19 +12,17 @@ import checkAuthCookie from "../../../../utils/protect";
  * @return {Promise<Object>} An object containing the response message.
  */
 export async function POST(req) {
-  checkAuthCookie();
-  connect();
-
   try {
+    validateJWT(req);
+    await connect();
+    console.log(req.user);
+
     const { email, currentPassword, newPassword } = await req.json();
 
     // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return (
-        NextResponse.json({ status: "error", message: "User not found" }),
-        { status: 404 }
-      );
+      throw new CustomAPIError.NotFoundError("User not found");
     }
 
     // Verify current password
@@ -32,12 +31,17 @@ export async function POST(req) {
       user.password
     );
     if (!isPasswordValid) {
-      return (
-        NextResponse.json({
-          status: "error",
-          message: "Incorrect current password",
-        }),
-        { status: 401 }
+      throw new CustomAPIError.BadRequestError("Incorrect current password");
+    }
+
+    // Check if the new password is the same as the old password
+    const isNewPasswordSameAsOld = await bcrypt.compare(
+      newPassword,
+      user.password
+    );
+    if (isNewPasswordSameAsOld) {
+      throw new CustomAPIError.BadRequestError(
+        "New password must be different from the old password"
       );
     }
 
@@ -48,9 +52,12 @@ export async function POST(req) {
 
     return NextResponse.json({ message: "Password successfully updated!" });
   } catch (error) {
-    return new NextResponse.json(
-      { status: "error", message: error.message },
-      { status: 500 }
+    return NextResponse.json(
+      {
+        status: "error",
+        message: error.message || "Internal Server Error",
+      },
+      { status: error.statusCode || 500 }
     );
   }
 }

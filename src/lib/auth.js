@@ -4,6 +4,9 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import mongoose from "mongoose";
+import connect from "../../utils/db";
+import jwt from "jsonwebtoken";
 
 export const authOptions = {
   pages: {
@@ -32,12 +35,23 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log(
+          "🚀 ~ file: auth.js:37 ~ authorize ~ credentials:",
+          credentials
+        );
+        await connect();
+        console.log(
+          "MongoDB Connection State:",
+          mongoose.connection.readyState
+        );
         if (!credentials?.email || !credentials.password) {
           return null;
         }
 
         // Find user by email
-        const user = await User.findOne({ email: credentials.email });
+        const user = await User.findOne({ email: credentials.email }).catch(
+          err => console.log("Error during User.findOne:", err)
+        );
 
         const isPasswordValid = user
           ? await bcrypt.compare(credentials.password, user.password)
@@ -53,29 +67,35 @@ export const authOptions = {
           id: user._id,
           email: user.email,
           name: user.username,
-          randomKey: "Hey cool",
         };
       },
     }),
   ],
   callbacks: {
-    session: ({ session, token }) => {
+    session: async ({ session, token }) => {
+      const customJwtToken = jwt.sign(
+        { id: token.id, name: token.name, email: token.email },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1d",
+        }
+      );
+
       return {
         ...session,
+        customJwt: customJwtToken,
         user: {
           ...session.user,
           id: token.id,
-          randomKey: token.randomKey,
         },
       };
     },
-    jwt: ({ token, user }) => {
+    jwt: async ({ token, user }) => {
       if (user) {
         const u = user;
         return {
           ...token,
           id: u.id,
-          randomKey: u.randomKey,
         };
       }
       return token;

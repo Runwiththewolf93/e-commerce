@@ -15,9 +15,10 @@ export const RegisterForm = () => {
 
   const onSubmit = async e => {
     e.preventDefault();
-    setLoading(true);
 
     try {
+      setLoading(true);
+
       const res = await fetch("/api/register", {
         method: "POST",
         body: JSON.stringify(formValues),
