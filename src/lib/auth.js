@@ -16,6 +16,7 @@ export const authOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
   providers: [
     GoogleProvider({
@@ -43,6 +44,10 @@ export const authOptions = {
         const schema = Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().min(6).required(),
+          redirect: Joi.string().valid("true", "false").optional(),
+          callbackUrl: Joi.string().optional(),
+          csrfToken: Joi.string().optional(),
+          json: Joi.string().valid("true", "false").optional(),
         });
 
         const { error } = schema.validate(credentials);
@@ -97,6 +102,7 @@ export const authOptions = {
   },
   callbacks: {
     session: async ({ session, token }) => {
+      // the object is being recreated constantly, figure this out
       const customJwtToken = jwt.sign(
         { id: token.id, name: token.name, email: token.email },
         process.env.JWT_SECRET,

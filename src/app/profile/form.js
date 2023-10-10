@@ -6,6 +6,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 
 export function ProfileForm({ session }) {
+  console.log("🚀 ~ file: form.js:9 ~ ProfileForm ~ session:", session);
   const user = session?.user;
 
   const [formData, setFormData] = useState({

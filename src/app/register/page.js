@@ -1,5 +1,6 @@
 import { RegisterForm } from "./form";
 import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 export default function RegisterPage() {
   return (
@@ -12,6 +13,7 @@ export default function RegisterPage() {
           </div>
         </div>
       </section>
+      <Footer />
     </>
   );
 }

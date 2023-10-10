@@ -61,7 +61,7 @@ export const LoginForm = () => {
     <form onSubmit={onSubmit}>
       {error && (
         <p className="text-center bg-red-300 py-4 mb-6 rounded">
-          {error.message}
+          {error || error.message}
         </p>
       )}
       <div className="mb-6">

@@ -5,6 +5,7 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    unique: true,
   },
   description: {
     type: String,
@@ -35,12 +36,22 @@ const productSchema = new mongoose.Schema({
       "Cars & Motorcycles",
     ],
   },
-  images: [
-    {
-      url: String,
-      alt: String,
-    },
-  ],
+  images: {
+    type: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        alt: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    validate: [arrayLimit, "Product must have 1 to 4 images"],
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -49,6 +60,10 @@ const productSchema = new mongoose.Schema({
     type: Date,
   },
 });
+
+function arrayLimit(val) {
+  return val.length >= 1 && val.length <= 4;
+}
 
 export default mongoose.models.Product ||
   mongoose.model("Product", productSchema);
