@@ -7,7 +7,6 @@ export default function EditProduct({ token }) {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  // continue tomorrow
 
   const handleSearchInputChange = e => {
     setSearchName(e.target.value);
@@ -50,7 +49,7 @@ export default function EditProduct({ token }) {
     e.preventDefault();
 
     if (!isFormValid()) {
-      setErrorMessage("Please fill all the fields");
+      setErrorMessage("Do not remove existing data from fields");
       return;
     }
 
@@ -59,10 +58,16 @@ export default function EditProduct({ token }) {
     setErrorMessage(null);
 
     try {
-      await axios.post("/api/products/addProduct", formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSuccessMessage("Product added successfully");
+      const response = await axios.patch(
+        "/api/products/editProduct",
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setSuccessMessage(response.data.message);
+      setFormData(null);
+      setSearchName("");
     } catch (error) {
       setErrorMessage(error.response?.data?.message || error.message);
     } finally {
@@ -70,8 +75,30 @@ export default function EditProduct({ token }) {
     }
   };
 
+  const handleSearch = async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await axios.post(
+        `/api/products/getProduct`,
+        {
+          productName: searchName,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setFormData(response.data.product);
+    } catch (error) {
+      setErrorMessage(error.response?.data?.message || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // bg-gray-200 my-5 sm:ml-5 ml-20 rounded-lg p-5 max-w-sm
+
   return (
-    <div className="bg-gray-200 my-5 ml-5 rounded-lg p-5">
+    <div className="bg-gray-200 my-5 sm:ml-5 ml-20 rounded-lg p-5 mr-5 lg:mr-0 max-w-sm">
       <h1 className="text-center text-2xl font-bold mb-3">Edit Product</h1>
       {errorMessage && (
         <div
@@ -91,7 +118,7 @@ export default function EditProduct({ token }) {
         </div>
       )}
       {!formData && (
-        <form onSubmit={handleSubmit}>
+        <form>
           <div className="mb-3 max-w-xs">
             <label
               htmlFor="searchName"
@@ -103,14 +130,20 @@ export default function EditProduct({ token }) {
               id="searchName"
               type="text"
               name="searchName"
-              placeholder="Search Name"
+              placeholder="Search Product Name"
               value={searchName}
               onChange={handleSearchInputChange}
               required
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             />
           </div>
-          <button onClick={handleSearch}>Search</button>
+          <button
+            onClick={handleSearch}
+            disabled={isLoading}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/3 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          >
+            Search
+          </button>
         </form>
       )}
       {formData && (
@@ -216,7 +249,7 @@ export default function EditProduct({ token }) {
             </select>
           </div>
           {formData?.images.map((image, index) => (
-            <div key={index}>
+            <div key={index} className="mb-3 max-w-xs">
               <label
                 htmlFor="imageUrl"
                 className="block text-sm font-medium text-gray-900 dark:text-gray-900"
@@ -249,12 +282,12 @@ export default function EditProduct({ token }) {
               />
             </div>
           ))}
-          <div className="flex justify-between mt-3">
+          <div className="block max-w-xs sm:flex sm:justify-between mt-5 sm:mt-3">
             <button
               type="button"
               onClick={addImageField}
               disabled={isLoading}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mr-3"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mr-3 mb-3 sm:mb-0"
             >
               Add Image
             </button>
@@ -263,7 +296,7 @@ export default function EditProduct({ token }) {
               disabled={isLoading}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              {isLoading ? "Processing..." : "Add Product"}
+              {isLoading ? "Processing..." : "Edit Product"}
             </button>
           </div>
         </form>

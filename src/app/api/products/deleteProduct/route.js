@@ -5,7 +5,7 @@ import checkAdmin from "../../../../../utils/checkAdmin";
 import customAPIError from "../../errors";
 import Joi from "joi";
 
-export async function POST(req) {
+export async function DELETE(req) {
   try {
     await connect();
     await checkAdmin(req);
@@ -24,19 +24,17 @@ export async function POST(req) {
       throw new customAPIError.BadRequestError(error.details[0].message);
     }
 
-    const product = await Product.findOne({
+    // Delete the product by name
+    const result = await Product.deleteOne({
       name: { $regex: new RegExp(`^${productName}$`, "i") },
     });
-    if (!product) {
-      throw new customAPIError.NotFoundError("Product not found");
+    if (result.deletedCount === 0) {
+      throw new customAPIError.BadRequestError("Product not found");
     }
 
-    return NextResponse.json(
-      {
-        product,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      message: "Product deleted successfully!",
+    });
   } catch (error) {
     return NextResponse.json(
       {
