@@ -1,18 +1,16 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Jumbotron from "../components/Jumbotron";
+import DefaultCarousel from "../components/Carousel";
 
 export default async function Home() {
   return (
-    <>
+    <div className="bg-sky-400">
       <Header />
-      <section className="bg-blue-600 min-h-screen pt-20">
-        <div className="max-w-4xl mx-auto bg-gray-100 rounded-md h-80 flex justify-center items-center">
-          <p className="text-3xl font-semibold text-slate-700">
-            Welcame to NextAuth and Next.js 13
-          </p>
-        </div>
-      </section>
+      <Jumbotron />
+      <DefaultCarousel />
+      <div className="min-h-screen" />
       <Footer />
-    </>
+    </div>
   );
 }

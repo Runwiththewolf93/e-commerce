@@ -80,7 +80,7 @@ export default function AddProduct({ token }) {
   };
 
   return (
-    <div className="bg-gray-200 my-5 sm:ml-5 ml-20 rounded-lg p-5 max-w-sm">
+    <div className="bg-gray-200 my-5 rounded-lg p-5 min-w-max">
       <h1 className="text-center text-2xl font-bold mb-3">Add Product</h1>
       {errorMessage && (
         <div
@@ -100,7 +100,7 @@ export default function AddProduct({ token }) {
         </div>
       )}
       <form onSubmit={handleSubmit}>
-        <div className="mb-3 max-w-xs">
+        <div className="mb-3">
           <label
             htmlFor="name"
             className="block text-sm font-medium text-gray-900 dark:text-gray-900"
@@ -118,7 +118,7 @@ export default function AddProduct({ token }) {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
         </div>
-        <div className="mb-3 max-w-xs">
+        <div className="mb-3">
           <label
             htmlFor="description"
             className="block text-sm font-medium text-gray-900 dark:text-gray-900"
@@ -136,7 +136,7 @@ export default function AddProduct({ token }) {
             className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           ></textarea>
         </div>
-        <div className="mb-3 max-w-xs">
+        <div className="mb-3">
           <label
             htmlFor="number"
             className="block text-sm font-medium text-gray-900 dark:text-gray-900"
@@ -154,7 +154,7 @@ export default function AddProduct({ token }) {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
         </div>
-        <div className="mb-3 max-w-xs">
+        <div className="mb-3">
           <label
             htmlFor="stock"
             className="block text-sm font-medium text-gray-900 dark:text-gray-900"
@@ -172,7 +172,7 @@ export default function AddProduct({ token }) {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
         </div>
-        <div className="mb-3 max-w-xs">
+        <div className="mb-3">
           <label
             htmlFor="category"
             className="block text-sm font-medium text-gray-900 dark:gray-900"
@@ -201,7 +201,7 @@ export default function AddProduct({ token }) {
           </select>
         </div>
         {formData.images.map((image, index) => (
-          <div key={index} className="mb-3 max-w-xs">
+          <div key={index} className="mb-3">
             <label
               htmlFor="imageUrl"
               className="block text-sm font-medium text-gray-900 dark:text-gray-900"
@@ -234,19 +234,19 @@ export default function AddProduct({ token }) {
             />
           </div>
         ))}
-        <div className="block max-w-xs sm:flex sm:justify-between mt-5 sm:mt-3">
+        <div className="block sm:flex sm:justify-between mt-5 sm:mt-3">
           <button
             type="button"
             onClick={addImageField}
             disabled={isLoading}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mr-3 mb-3 sm:mb-0"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mr-3 mb-3 sm:mb-0 whitespace-nowrap"
           >
             Add Image
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 whitespace-nowrap"
           >
             {isLoading ? "Processing..." : "Add Product"}
           </button>

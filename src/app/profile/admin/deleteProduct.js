@@ -34,7 +34,7 @@ export default function DeleteProduct({ token }) {
   };
 
   return (
-    <div className="bg-gray-200 my-5 sm:ml-5 ml-20 lg:mx-5 rounded-lg p-5 max-w-sm">
+    <div className="bg-gray-200 my-5 rounded-lg p-5 min-w-max">
       <h1 className="text-center text-2xl font-bold mb-3">Delete Product</h1>
       {errorMessage && (
         <div
@@ -54,7 +54,7 @@ export default function DeleteProduct({ token }) {
         </div>
       )}
       <form onSubmit={handleSubmit}>
-        <div className="mb-3 max-w-xs">
+        <div className="mb-3">
           <label
             htmlFor="searchName"
             className="block text-sm font-medium text-gray-900 dark:text-gray-900"
