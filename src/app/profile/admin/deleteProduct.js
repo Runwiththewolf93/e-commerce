@@ -33,8 +33,6 @@ export default function DeleteProduct({ token }) {
     }
   };
 
-  // bg-gray-200 my-5 sm:ml-5 ml-20 rounded-lg p-5 max-w-sm
-
   return (
     <div className="bg-gray-200 my-5 sm:ml-5 ml-20 lg:mx-5 rounded-lg p-5 max-w-sm">
       <h1 className="text-center text-2xl font-bold mb-3">Delete Product</h1>

@@ -95,8 +95,6 @@ export default function EditProduct({ token }) {
     }
   };
 
-  // bg-gray-200 my-5 sm:ml-5 ml-20 rounded-lg p-5 max-w-sm
-
   return (
     <div className="bg-gray-200 my-5 sm:ml-5 ml-20 rounded-lg p-5 mr-5 lg:mr-0 max-w-sm">
       <h1 className="text-center text-2xl font-bold mb-3">Edit Product</h1>
