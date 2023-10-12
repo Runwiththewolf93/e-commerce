@@ -198,6 +198,10 @@ export default function AddProduct({ token }) {
             <option value="Sports">Sports</option>
             <option value="Toys">Toys</option>
             <option value="Cars & Motorcycles">Cars & Motorcycles</option>
+            <option value="Groceries & Food">Groceries & Food</option>
+            <option value="Office Supplies & Stationery">
+              Office Supplies & Stationery
+            </option>
           </select>
         </div>
         {formData.images.map((image, index) => (

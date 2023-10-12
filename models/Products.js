@@ -34,6 +34,8 @@ const productSchema = new mongoose.Schema({
       "Sports",
       "Toys",
       "Cars & Motorcycles",
+      "Groceries & Food",
+      "Office Supplies & Stationery",
     ],
   },
   images: {
