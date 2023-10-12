@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import Jumbotron from "../components/Jumbotron";
 import DefaultCarousel from "../components/Carousel";
 
-export default async function Home() {
+export default function Home() {
   return (
     <div className="bg-sky-400">
       <Header />
