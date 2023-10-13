@@ -32,7 +32,7 @@ export default function GalleryBestsellers() {
       const newIds = data.products.map(p => p._id);
       dispatch(addProductIds(newIds));
       dispatch(setCurrentGallery("featured"));
-      setError(null); // Clear any existing errors
+      setError(null);
       setRetryCount(0);
     } catch (error) {
       setError(error.response?.data?.message || error.message);

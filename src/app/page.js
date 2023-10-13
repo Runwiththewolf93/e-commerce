@@ -4,6 +4,7 @@ import Jumbotron from "../components/Jumbotron";
 import DefaultCarousel from "../components/Carousel";
 import Banner from "../components/Banner";
 import GalleryBestsellers from "../components/GalleryBestsellers";
+import CategoryGrid from "../components/CategoryGrid";
 
 export default function Home() {
   return (
@@ -14,6 +15,8 @@ export default function Home() {
       <DefaultCarousel />
       <div className="divider" />
       <GalleryBestsellers />
+      <div className="divider" />
+      <CategoryGrid />
       <div className="divider" />
       <Banner />
       <Footer />
