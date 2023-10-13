@@ -96,11 +96,11 @@ export default function EditProduct({ token }) {
   };
 
   return (
-    <div className="bg-gray-200 my-5 rounded-lg p-5 min-w-max">
+    <div className="bg-gray-200 my-5 rounded-lg p-5 max-w-max self-start">
       <h1 className="text-center text-2xl font-bold mb-3">Edit Product</h1>
       {errorMessage && (
         <div
-          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 max-w-xs"
           role="alert"
         >
           <span className="font-medium">{errorMessage}</span> Change a few
@@ -109,7 +109,7 @@ export default function EditProduct({ token }) {
       )}
       {successMessage && (
         <div
-          className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
+          className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 max-w-xs"
           role="alert"
         >
           <span className="font-medium">{successMessage}</span>

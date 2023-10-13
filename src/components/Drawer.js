@@ -1,6 +1,6 @@
 export default function Drawer() {
   return (
-    <div className="drawer">
+    <div className="drawer relative z-50">
       <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col">
         <div className="flex-none">
@@ -56,6 +56,12 @@ export default function Drawer() {
           </li>
           <li>
             <a>Cars & Motorcycles</a>
+          </li>
+          <li>
+            <a>Groceries & Food</a>
+          </li>
+          <li>
+            <a>Office Supplies & Stationery</a>
           </li>
         </ul>
       </div>

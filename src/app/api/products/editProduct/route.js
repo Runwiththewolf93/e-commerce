@@ -27,7 +27,9 @@ export async function PATCH(req) {
           "Health & Beauty",
           "Sports",
           "Toys",
-          "Cars & Motorcycles"
+          "Cars & Motorcycles",
+          "Groceries & Food",
+          "Office Supplies & Stationery"
         )
         .required(),
       images: Joi.array()

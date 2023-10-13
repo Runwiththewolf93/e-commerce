@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export default function DefaultCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -14,8 +15,22 @@ export default function DefaultCarousel() {
     "https://raw.githubusercontent.com/Runwiththewolf93/e-commerce/master/public/dall-e/product4.png",
   ];
 
+  const categoryLinks = [
+    "/clothing",
+    "/cars-motorcycles",
+    "/home-garden",
+    "/toys",
+  ];
+
+  const catchyTexts = [
+    "Step up your style with our latest sneakers",
+    "Drive your dreams with our latest cars and motorcycles",
+    "Make your house a home with our stylish and affordable home and garden products",
+    "Let your kids' imaginations run wild with our fun and educational toys",
+  ];
+
   const nextSlide = () => {
-    setOpacity(0);
+    setOpacity(0.1);
     setTimeout(() => {
       setCurrentSlide(prevSlide => (prevSlide + 1) % images.length);
       setOpacity(1);
@@ -23,7 +38,7 @@ export default function DefaultCarousel() {
   };
 
   const prevSlide = () => {
-    setOpacity(0);
+    setOpacity(0.1);
     setTimeout(() => {
       setCurrentSlide(
         prevSlide => (prevSlide - 1 + images.length) % images.length
@@ -33,14 +48,22 @@ export default function DefaultCarousel() {
   };
 
   return (
-    <div className="carousel w-full h-96">
+    <section className="carousel w-full h-72 lg:h-96 relative z-0">
       <div id="slide1" className="carousel-item relative w-full">
-        <img
-          src={images[currentSlide]}
-          className="w-full h-full object-cover transition-opacity duration-300"
-          style={{ opacity: opacity }}
-          alt={`product image ${currentSlide + 1}`}
-        />
+        <Link
+          href={categoryLinks[currentSlide]}
+          className="w-full h-full relative"
+        >
+          <img
+            src={images[currentSlide]}
+            className="w-full h-full object-cover transition-opacity duration-300"
+            style={{ opacity: opacity }}
+            alt={`product image ${currentSlide + 1}`}
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4 text-center font-semibold text-xl">
+            <p>{catchyTexts[currentSlide]}</p>
+          </div>
+        </Link>
         <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
           <button onClick={prevSlide} className="btn btn-circle">
             ❮
@@ -50,6 +73,6 @@ export default function DefaultCarousel() {
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
