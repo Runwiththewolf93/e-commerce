@@ -7,6 +7,7 @@ import { addProductIds, setCurrentGallery } from "../redux/slices/productSlice";
 import axios from "axios";
 import GalleryBestsellersSkeleton from "../subcomponents/GalleryBestsellersSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
+import Link from "next/link";
 
 export default function GalleryBestsellers() {
   const [bestSellers, setBestSellers] = useState([]);
@@ -21,7 +22,6 @@ export default function GalleryBestsellers() {
     setIsLoading(true);
     try {
       const { data } = await axios.post("/api/products/getProducts", {
-        type: "bestsellers",
         fetchedIds: productIds,
       });
       const productsWithRandomDiscount = data.products.map(product => ({
@@ -76,42 +76,44 @@ export default function GalleryBestsellers() {
           const discount = product.randomDiscount;
           const discountedPrice = product.price * ((100 - discount) / 100);
           return (
-            <div key={product._id} className="relative w-64">
-              <div className="absolute bg-red-500 text-white text-xs font-bold rounded-full p-2 z-10">
-                -{discount}%
-              </div>
-              <div className="card card-compact w-64 bg-base-100 shadow-xl">
-                <figure className="relative h-32 w-full">
-                  <div className="absolute inset-0 bg-gray-300">
-                    <img
-                      className="absolute inset-0 object-cover w-full h-full"
-                      src={product.images[0]?.url}
-                      alt={product.images[0]?.alt}
-                    />
-                  </div>
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title truncate">{product.name}</h2>
-                  <div>
-                    <span className="bg-indigo-100 text-indigo-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300 max-w-max">
-                      Fast delivery
-                    </span>
-                    <span className="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300 max-w-max">
-                      Free shipping
-                    </span>
-                  </div>
-                  <p className="line-clamp-2">{product.description}</p>
-                  <div className="text-sm">
-                    <del className="text-red-500">
-                      Original Price: €{product.price.toFixed(2)}
-                    </del>
-                    <div className="text-green-500">
-                      Discounted Price: €{discountedPrice.toFixed(2)}
+            <Link key={product._id} href="#">
+              <div className="relative w-64">
+                <div className="absolute bg-red-500 text-white text-xs font-bold rounded-full p-2 z-10">
+                  -{discount}%
+                </div>
+                <div className="card card-compact w-64 bg-base-100 shadow-xl">
+                  <figure className="relative h-32 w-full">
+                    <div className="absolute inset-0 bg-gray-300">
+                      <img
+                        className="absolute inset-0 object-cover w-full h-full"
+                        src={product.images[0]?.url}
+                        alt={product.images[0]?.alt}
+                      />
+                    </div>
+                  </figure>
+                  <div className="card-body">
+                    <h2 className="card-title truncate">{product.name}</h2>
+                    <div>
+                      <span className="bg-indigo-100 text-indigo-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300 max-w-max">
+                        Fast delivery
+                      </span>
+                      <span className="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300 max-w-max">
+                        Free shipping
+                      </span>
+                    </div>
+                    <p className="line-clamp-2">{product.description}</p>
+                    <div className="text-sm">
+                      <del className="text-red-500">
+                        Original Price: €{product.price.toFixed(2)}
+                      </del>
+                      <div className="text-green-500">
+                        Discounted Price: €{discountedPrice.toFixed(2)}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

@@ -5,6 +5,7 @@ import DefaultCarousel from "../components/Carousel";
 import Banner from "../components/Banner";
 import GalleryBestsellers from "../components/GalleryBestsellers";
 import CategoryGrid from "../components/CategoryGrid";
+import GalleryFeatured from "../components/GalleryFeatured";
 
 export default function Home() {
   return (
@@ -17,6 +18,8 @@ export default function Home() {
       <GalleryBestsellers />
       <div className="divider" />
       <CategoryGrid />
+      <div className="divider" />
+      <GalleryFeatured />
       <div className="divider" />
       <Banner />
       <Footer />

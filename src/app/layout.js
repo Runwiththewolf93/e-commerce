@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import Providers from "../redux/Provider";
+import ReduxProvider from "../redux/Provider";
 import { NextAuthProvider } from "./providers";
 import { IsClientCtxProvider } from "../lib/is-client-ctx";
 import Script from "next/script";
@@ -16,11 +16,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
+        <ReduxProvider>
           <NextAuthProvider>
             <IsClientCtxProvider>{children}</IsClientCtxProvider>
           </NextAuthProvider>
-        </Providers>
+        </ReduxProvider>
         <Script src="/scripts/flowbite.min.js" strategy="lazyOnload" />
       </body>
     </html>

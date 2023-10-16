@@ -8,16 +8,14 @@ export async function POST(req) {
   try {
     await connect();
 
-    const { type, fetchedIds = [] } = await req.json();
+    const { fetchedIds = [] } = await req.json();
 
     const schema = Joi.object({
-      type: Joi.string().max(100).required(),
       fetchedIds: Joi.array().items(Joi.string()),
     });
 
     // Validate the request data
     const { error } = schema.validate({
-      type,
       fetchedIds,
     });
     if (error) {
