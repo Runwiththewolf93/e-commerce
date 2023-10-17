@@ -1,91 +1,37 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addProductIds, setCurrentGallery } from "../redux/slices/productSlice";
-import axios from "axios";
-import GalleryBestsellersSkeleton from "../subcomponents/GalleryBestsellersSkeleton";
+import GalleryBestSellersSkeleton from "../subcomponents/GalleryBestSellersSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
 import Link from "next/link";
+import { fetchFeatured } from "../redux/slices/productSlice";
 
 export default function GalleryFeatured() {
-  const [featured, setFeatured] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
-
   const dispatch = useDispatch();
-  const { productIds, currentGallery } = useSelector(state => state.products);
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await axios.post("/api/products/getProducts", {
-        fetchedIds: productIds,
-      });
-      const productsWithRandomReviews = data.products.map(product => ({
-        ...product,
-        randomReviews: Array.from(
-          { length: Math.floor(Math.random() * 10) + 1 },
-          () => Math.floor(Math.random() * 5) + 1
-        ),
-      }));
-      const productsWithAggregateRating = productsWithRandomReviews.map(
-        product => {
-          const totalRating = product.randomReviews.reduce(
-            (acc, curr) => acc + curr,
-            0
-          );
-          const avgRating = (
-            totalRating / product.randomReviews.length
-          ).toFixed(1);
-          return {
-            ...product,
-            aggregateRating: avgRating,
-          };
-        }
-      );
-      setFeatured(productsWithAggregateRating);
-      const newIds = data.products.map(p => p._id);
-      dispatch(addProductIds(newIds));
-      dispatch(setCurrentGallery("newArrivals"));
-      setError(null);
-      setRetryCount(0);
-    } catch (error) {
-      setError(error.response?.data?.message || error.message);
-      setRetryCount(prevCount => prevCount + 1);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [dispatch, productIds]);
+  const { featured, isLoading, error, currentGallery } = useSelector(
+    state => state.products
+  );
 
   useEffect(() => {
     if (currentGallery === "featured") {
-      fetchData();
+      dispatch(fetchFeatured());
     }
-  }, [currentGallery, fetchData]);
-
-  useEffect(() => {
-    if (error && retryCount < 3) {
-      const timer = setTimeout(() => {
-        fetchData();
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [error, retryCount, fetchData]);
+  }, [currentGallery, dispatch]);
 
   if (isLoading) {
-    return <GalleryBestsellersSkeleton />;
+    return <GalleryBestSellersSkeleton />;
   }
 
   if (error) {
     return <GalleryError error={error} />;
   }
 
-  // check if featured is working and if the component works
-  console.log(featured);
+  console.log(
+    "🚀 ~ file: GalleryFeatured.js:35 ~ GalleryFeatured ~ featured:",
+    featured
+  );
 
   return (
     <section className="overflow-x-auto pb-3">

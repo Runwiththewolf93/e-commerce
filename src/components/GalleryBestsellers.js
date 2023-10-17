@@ -1,72 +1,37 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addProductIds, setCurrentGallery } from "../redux/slices/productSlice";
-import axios from "axios";
-import GalleryBestsellersSkeleton from "../subcomponents/GalleryBestsellersSkeleton";
+import GalleryBestSellersSkeleton from "../subcomponents/GalleryBestSellersSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
 import Link from "next/link";
+import { fetchBestSellers } from "../redux/slices/productSlice";
 
-export default function GalleryBestsellers() {
-  const [bestSellers, setBestSellers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
-
+export default function GalleryBestSellers() {
   const dispatch = useDispatch();
-  const { productIds, currentGallery } = useSelector(state => state.products);
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await axios.post("/api/products/getProducts", {
-        fetchedIds: productIds,
-      });
-      const productsWithRandomDiscount = data.products.map(product => ({
-        ...product,
-        randomDiscount: Math.floor(Math.random() * 50) + 1,
-      }));
-      setBestSellers(productsWithRandomDiscount);
-      const newIds = data.products.map(p => p._id);
-      dispatch(addProductIds(newIds));
-      dispatch(setCurrentGallery("featured"));
-      setError(null);
-      setRetryCount(0);
-    } catch (error) {
-      setError(error.response?.data?.message || error.message);
-      setRetryCount(prevCount => prevCount + 1);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [dispatch, productIds]);
+  const { bestSellers, isLoading, error, currentGallery } = useSelector(
+    state => state.products
+  );
 
   useEffect(() => {
     if (currentGallery === "bestsellers") {
-      fetchData();
+      dispatch(fetchBestSellers());
     }
-  }, [currentGallery, fetchData]);
-
-  useEffect(() => {
-    if (error && retryCount < 3) {
-      const timer = setTimeout(() => {
-        fetchData();
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [error, retryCount, fetchData]);
+  }, [currentGallery, dispatch]);
 
   if (isLoading) {
-    return <GalleryBestsellersSkeleton />;
+    return <GalleryBestSellersSkeleton />;
   }
 
   if (error) {
     return <GalleryError error={error} />;
   }
 
-  // console.log("🚀 ~ file: GalleryBestsellers.js:70 ~ GalleryBestsellers ~ bestSellers:", bestSellers)
+  console.log(
+    "🚀 ~ file: GalleryBestSellers.js:70 ~ GalleryBestSellers ~ bestSellers:",
+    bestSellers
+  );
 
   return (
     <section className="overflow-x-auto pb-3">
