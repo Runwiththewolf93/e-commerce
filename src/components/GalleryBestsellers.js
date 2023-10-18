@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import GalleryBestSellersSkeleton from "../subcomponents/GalleryBestSellersSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
 import Link from "next/link";
-import { fetchBestSellers } from "../redux/slices/productSlice";
+import { fetchBestSellers, fetchFeatured } from "../redux/slices/productSlice";
 
 export default function GalleryBestSellers() {
   const dispatch = useDispatch();
@@ -15,8 +15,17 @@ export default function GalleryBestSellers() {
   );
 
   useEffect(() => {
-    if (currentGallery === "bestsellers") {
-      dispatch(fetchBestSellers());
+    if (currentGallery === "bestSellers") {
+      console.log(
+        "🚀 ~ file: GalleryBestsellers.js:19 ~ useEffect ~ currentGallery:",
+        currentGallery
+      );
+      dispatch(fetchBestSellers()).then(resultAction => {
+        if (fetchBestSellers.fulfilled.match(resultAction)) {
+          const newIds = resultAction.payload.map(p => p._id);
+          dispatch(fetchFeatured(newIds));
+        }
+      });
     }
   }, [currentGallery, dispatch]);
 
@@ -27,11 +36,6 @@ export default function GalleryBestSellers() {
   if (error) {
     return <GalleryError error={error} />;
   }
-
-  console.log(
-    "🚀 ~ file: GalleryBestSellers.js:70 ~ GalleryBestSellers ~ bestSellers:",
-    bestSellers
-  );
 
   return (
     <section className="overflow-x-auto pb-3">

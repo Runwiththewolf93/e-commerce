@@ -14,11 +14,11 @@ export default function GalleryFeatured() {
     state => state.products
   );
 
-  useEffect(() => {
-    if (currentGallery === "featured") {
-      dispatch(fetchFeatured());
-    }
-  }, [currentGallery, dispatch]);
+  // useEffect(() => {
+  //   if (currentGallery === "featured") {
+  //     dispatch(fetchFeatured());
+  //   }
+  // }, [currentGallery, dispatch]);
 
   if (isLoading) {
     return <GalleryBestSellersSkeleton />;
@@ -28,11 +28,6 @@ export default function GalleryFeatured() {
     return <GalleryError error={error} />;
   }
 
-  console.log(
-    "🚀 ~ file: GalleryFeatured.js:35 ~ GalleryFeatured ~ featured:",
-    featured
-  );
-
   return (
     <section className="overflow-x-auto pb-3">
       <h1 className="text-2xl font-bold mb-4 ml-4">Our Bestsellers</h1>
@@ -40,14 +35,18 @@ export default function GalleryFeatured() {
         {featured.map((product, index) => (
           <div
             key={product._id}
-            className="w-64 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+            className="w-64 bg-white border border-gray-200 rounded-2xl shadow dark:bg-gray-800 dark:border-gray-700"
           >
             <Link href="#">
-              <img
-                className="rounded-t-lg"
-                src={product.images[0]?.url}
-                alt={product.images[0]?.alt}
-              />
+              <figure className="relative h-40 w-full">
+                <div className="absolute inset-0 bg-inherit">
+                  <img
+                    className="absolute inset-0 object-cover w-full h-full rounded-t-2xl overflow-hidden"
+                    src={product.images[0]?.url}
+                    alt={product.images[0]?.alt}
+                  />
+                </div>
+              </figure>
             </Link>
             <div className="px-5 pb-5">
               <Link href="#">

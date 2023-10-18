@@ -6,15 +6,21 @@ axiosRetry(axios, { retries: 3 });
 
 export const fetchBestSellers = createAsyncThunk(
   "products/fetchBestSellers",
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { getState, dispatch, rejectWithValue }) => {
     try {
-      const { data } = await axios.post("/api/products/getProducts");
+      dispatch(resetProductState());
+      if (getState().products.productIds.length > 0) return;
+
+      const { data } = await axios.post("/api/products/getProducts", {
+        fetchedIds: [],
+      });
       const bestSellersRandomDiscount = data.products.map(product => ({
         ...product,
         randomDiscount: Math.floor(Math.random() * 50) + 1,
       }));
 
       const newIds = data.products.map(p => p._id);
+      console.log("🚀 ~ file: productSlice.js:22 ~ newIds:", newIds);
       dispatch(addProductIds(newIds));
       dispatch(setCurrentGallery("featured"));
 
@@ -27,9 +33,12 @@ export const fetchBestSellers = createAsyncThunk(
 
 export const fetchFeatured = createAsyncThunk(
   "products/fetchFeatured",
-  async (_, { getState, dispatch, rejectWithValue }) => {
+  async (existingProductIds, { dispatch, rejectWithValue }) => {
     try {
-      const existingProductIds = getState().productIds;
+      console.log(
+        "🚀 ~ file: productSlice.js:38 ~ existingProductIds:",
+        existingProductIds
+      );
 
       const { data } = await axios.post("/api/products/getProducts", {
         fetchedIds: existingProductIds,
@@ -59,6 +68,7 @@ export const fetchFeatured = createAsyncThunk(
       );
 
       const newIds = data.products.map(p => p._id);
+      console.log("🚀 ~ file: productSlice.js:70 ~ newIds:", newIds);
       dispatch(addProductIds(newIds));
       dispatch(setCurrentGallery("newArrivals"));
 
@@ -77,11 +87,25 @@ export const productSlice = createSlice({
     featured: [],
     isLoading: false,
     error: null,
-    currentGallery: "bestsellers",
+    currentGallery: "bestSellers",
   },
   reducers: {
     addProductIds: (state, action) => {
-      state.productIds = [...state.productIds, ...action.payload];
+      const uniqueIds = new Set([...state.productIds, ...action.payload]);
+
+      const uniqueIdsArray = Array.from(uniqueIds);
+
+      const limitedIds = uniqueIdsArray.slice(-30);
+
+      state.productIds = limitedIds;
+    },
+    resetProductState: state => {
+      state.productIds = [];
+      state.bestSellers = [];
+      state.featured = [];
+      state.isLoading = false;
+      state.error = null;
+      state.currentGallery = "bestSellers";
     },
     setCurrentGallery: (state, action) => {
       state.currentGallery = action.payload;
@@ -118,6 +142,7 @@ export const productSlice = createSlice({
   },
 });
 
-export const { addProductIds, setCurrentGallery } = productSlice.actions;
+export const { addProductIds, resetProductState, setCurrentGallery } =
+  productSlice.actions;
 
 export default productSlice.reducer;

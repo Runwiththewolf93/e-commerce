@@ -9,16 +9,17 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "./customStorage";
-import postsSlice from "./slices/postsSlice";
+import postsReducer from "./slices/postsSlice";
 import productReducer from "./slices/productSlice";
 
 const persistConfig = {
   key: "root",
   storage,
+  debug: true,
 };
 
 const rootReducer = combineReducers({
-  posts: postsSlice,
+  posts: postsReducer,
   products: productReducer,
 });
 
