@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function DefaultCarousel() {
@@ -29,23 +29,18 @@ export default function DefaultCarousel() {
     "Let your kids' imaginations run wild with our fun and educational toys",
   ];
 
-  const nextSlide = () => {
-    setOpacity(0.1);
-    setTimeout(() => {
-      setCurrentSlide(prevSlide => (prevSlide + 1) % images.length);
-      setOpacity(1);
-    }, 300);
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOpacity(0.1);
+      setTimeout(() => {
+        setCurrentSlide(prevSlide => (prevSlide + 1) % images.length);
+        setOpacity(1);
+      }, 300);
+    }, 10000);
 
-  const prevSlide = () => {
-    setOpacity(0.1);
-    setTimeout(() => {
-      setCurrentSlide(
-        prevSlide => (prevSlide - 1 + images.length) % images.length
-      );
-      setOpacity(1);
-    }, 300);
-  };
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section className="carousel w-full h-72 lg:h-96 relative z-0">
@@ -64,14 +59,6 @@ export default function DefaultCarousel() {
             <p>{catchyTexts[currentSlide]}</p>
           </div>
         </Link>
-        <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-          <button onClick={prevSlide} className="btn btn-circle">
-            ❮
-          </button>
-          <button onClick={nextSlide} className="btn btn-circle">
-            ❯
-          </button>
-        </div>
       </div>
     </section>
   );
