@@ -39,13 +39,14 @@ export const LoginForm = () => {
       setLoading(false);
       if (!res?.error) {
         setFormValues({ email: "", password: "" });
+        console.log("does redirect trigger");
         router.push(callbackUrl);
       } else {
         setError(res.error);
       }
     } catch (error) {
       setLoading(false);
-      setError(error);
+      setError(error || error.message || error.response?.data?.message);
     }
   };
 
@@ -60,9 +61,7 @@ export const LoginForm = () => {
   return (
     <form onSubmit={onSubmit}>
       {error && (
-        <p className="text-center bg-red-300 py-4 mb-6 rounded">
-          {error || error.message}
-        </p>
+        <p className="text-center bg-red-300 py-4 mb-6 rounded">{error}</p>
       )}
       <div className="mb-6">
         <input

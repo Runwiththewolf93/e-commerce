@@ -6,9 +6,9 @@ import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import connect from "../../utils/db";
 import jwt from "jsonwebtoken";
-import crypto from "crypto";
 import CustomAPIError from "../app/api/errors";
 import Joi from "joi";
+import axios from "axios";
 
 export const authOptions = {
   pages: {
@@ -16,7 +16,10 @@ export const authOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 3 * 24 * 60 * 60,
+  },
+  jwt: {
+    maxAge: 3 * 24 * 60 * 60,
   },
   providers: [
     GoogleProvider({
@@ -78,62 +81,39 @@ export const authOptions = {
       },
     }),
   ],
-  jwt: {
-    maxAge: 86400,
-    signingKey: process.env.NEXTAUTH_SECRET,
-    sign: async options => {
-      const { secret, token, maxAge, user } = options;
-      const issuedAt = Math.floor(Date.now() / 1000);
-      const expiresAt = issuedAt + maxAge; // Using maxAge for consistency
-      const jwtClaims = {
-        name: user.name,
-        email: user.email,
-        sub: user.id.toString(),
-        id: user.id.toString(),
-        iat: issuedAt,
-        exp: expiresAt,
-        jti: crypto.randomBytes(16).toString("hex"),
-      };
-      const tokenPayload = jwt.sign(jwtClaims, secret, {
-        algorithm: "HS256",
-      });
-      return tokenPayload;
-    },
-  },
   callbacks: {
-    session: async ({ session, token }) => {
-      // the object is being recreated constantly, figure this out
-      const customJwtToken = jwt.sign(
-        { id: token.id, name: token.name, email: token.email },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1d",
-        }
-      );
+    jwt: async ({ token, user }) => {
+      if (user) {
+        console.log("This shouldn't trigger after login");
+        const userIdString = user.id.toString();
 
+        const { data: customJwt } = await axios.post(
+          "http://localhost:3000/api/jwt",
+          {
+            userId: userIdString,
+          }
+        );
+        const { customJwt: customJwtString } = customJwt;
+
+        const decodedJwt = jwt.verify(customJwtString, process.env.JWT_SECRET);
+
+        return {
+          ...token,
+          ...decodedJwt,
+          customJwt: customJwtString,
+        };
+      }
+      return token;
+    },
+    session: async ({ session, token }) => {
       return {
         ...session,
-        customJwt: customJwtToken,
+        customJwt: token.customJwt,
         user: {
           ...session.user,
           id: token.id,
         },
       };
-    },
-    jwt: async ({ token, user }) => {
-      if (user) {
-        const issuedAt = Math.floor(Date.now() / 1000);
-        const expiresAt = issuedAt + 86400;
-        const u = user;
-        return {
-          ...token,
-          id: u.id,
-          iat: issuedAt,
-          exp: expiresAt,
-          jti: crypto.randomBytes(16).toString("hex"),
-        };
-      }
-      return token;
     },
   },
 };

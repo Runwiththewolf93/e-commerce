@@ -36,3 +36,6 @@ const paymentSchema = new mongoose.Schema({
     type: Date,
   },
 });
+
+export default mongoose.models.Payment ||
+  mongoose.model("Payment", paymentSchema);

@@ -39,7 +39,7 @@ export default function GalleryBestSellers() {
 
   return (
     <section className="overflow-x-auto pb-3">
-      <h1 className="text-2xl font-bold mb-4 ml-4">Our Bestsellers</h1>
+      <h1 className="text-2xl font-bold mb-4 ml-4">Bestsellers</h1>
       <div className="grid grid-flow-col auto-cols-min gap-4 mx-4">
         {bestSellers.map(product => {
           const discount = product.randomDiscount;

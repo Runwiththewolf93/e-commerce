@@ -9,7 +9,7 @@ import GalleryFeatured from "../components/GalleryFeatured";
 
 export default function Home() {
   return (
-    <div className="bg-sky-400">
+    <div className="bg-sky-300">
       <Header />
       <Jumbotron />
       <div className="divider" />

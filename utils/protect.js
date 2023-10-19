@@ -25,7 +25,9 @@ export default function validateJWT(req) {
   }
 
   if (!decoded) {
-    throw new CustomAPIError.UnauthenticatedError("Invalid token");
+    throw new CustomAPIError.UnauthenticatedError(
+      "Invalid token, please login again"
+    );
   }
 
   req.user = decoded;

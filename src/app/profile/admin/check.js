@@ -35,10 +35,10 @@ export default function AdminCheck({ session }) {
     <section className="bg-blue-400 min-h-screen">
       {error && (
         <div
-          class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 text-center w-1/2 mx-auto"
           role="alert"
         >
-          <span class="font-medium">{error}</span>
+          <span className="font-medium text-2xl">{error}</span>
         </div>
       )}
       {isAdmin !== null && (
