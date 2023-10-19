@@ -47,10 +47,6 @@ export async function POST(req) {
       // Generate new token
       console.log("Generating new token");
 
-      // Debug: Print environment variable and user object
-      console.log("JWT Secret:", process.env.JWT_SECRET);
-      console.log("User Object:", user);
-
       try {
         const issuedAt = Math.floor(Date.now() / 1000);
         const expiresAt = issuedAt + 259200;
@@ -64,12 +60,7 @@ export async function POST(req) {
           jti: crypto.randomBytes(16).toString("hex"),
         };
 
-        // Debug: Print payload
-        console.log("Payload:", payload);
-
         customJwtToken = jwt.sign(payload, process.env.JWT_SECRET);
-
-        console.log("Token generated successfully.");
 
         // Store token in db
         await jwtToken.updateOne(

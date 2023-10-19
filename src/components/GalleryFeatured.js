@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import GalleryFeaturedSkeleton from "../subcomponents/GalleryFeaturedSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
 import Link from "next/link";
-import { StarFull, StarHalf, StarEmpty } from "../subcomponents/StarRating";
+import StarRating from "../subcomponents/StarRating";
 
 export default function GalleryFeatured() {
   const { featured, isLoading, error } = useSelector(state => state.products);
@@ -46,28 +46,7 @@ export default function GalleryFeatured() {
                 <p className="mt-1 line-clamp-2">{product.description}</p>
               </Link>
               <div className="flex items-center mt-2.5 mb-3">
-                {Array.from({ length: 5 }, (_, index) => {
-                  const ratingValue = index + 1;
-                  let starType = "empty";
-
-                  if (Math.ceil(product.aggregateRating) >= ratingValue) {
-                    starType = "full";
-                  } else if (
-                    product.aggregateRating >= ratingValue - 0.5 &&
-                    product.aggregateRating < ratingValue
-                  ) {
-                    console.log("does this ever trigger?");
-                    starType = "half";
-                  }
-
-                  return (
-                    <div key={index} className="mb-1">
-                      {starType === "full" && <StarFull />}
-                      {starType === "half" && <StarHalf />}
-                      {starType === "empty" && <StarEmpty />}
-                    </div>
-                  );
-                })}
+                <StarRating aggregateRating={product.aggregateRating} />
                 <span className="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">
                   {product.aggregateRating}
                 </span>
