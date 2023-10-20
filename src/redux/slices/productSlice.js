@@ -79,6 +79,22 @@ export const fetchFeatured = createAsyncThunk(
   }
 );
 
+export const fetchSearch = createAsyncThunk(
+  "/products/fetchSearch",
+  async ({ productName, search }, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post("/api/products/getProduct", {
+        productName,
+        search,
+      });
+
+      return { products: data.products, message: data.message };
+    } catch (error) {
+      rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const productSlice = createSlice({
   name: "products",
   initialState: {
@@ -88,15 +104,14 @@ export const productSlice = createSlice({
     isLoading: false,
     error: null,
     currentGallery: "bestSellers",
+    products: [],
+    searchMessage: "",
   },
   reducers: {
     addProductIds: (state, action) => {
       const uniqueIds = new Set([...state.productIds, ...action.payload]);
-
       const uniqueIdsArray = Array.from(uniqueIds);
-
       const limitedIds = uniqueIdsArray.slice(-30);
-
       state.productIds = limitedIds;
     },
     resetProductState: state => {
@@ -109,6 +124,10 @@ export const productSlice = createSlice({
     },
     setCurrentGallery: (state, action) => {
       state.currentGallery = action.payload;
+    },
+    clearProducts: state => {
+      state.products = [];
+      state.searchMessage = "";
     },
   },
   extraReducers: builder => {
@@ -138,11 +157,29 @@ export const productSlice = createSlice({
       .addCase(fetchFeatured.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      // fetchSearch reducer
+      .addCase(fetchSearch.pending, state => {
+        state.isLoading = false;
+      })
+      .addCase(fetchSearch.fulfilled, (state, action) => {
+        state.products = action.payload.products;
+        state.searchMessage = action.payload.message;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(fetchSearch.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { addProductIds, resetProductState, setCurrentGallery } =
-  productSlice.actions;
+export const {
+  addProductIds,
+  resetProductState,
+  setCurrentGallery,
+  clearProducts,
+} = productSlice.actions;
 
 export default productSlice.reducer;

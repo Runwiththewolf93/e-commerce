@@ -8,9 +8,17 @@ import Joi from "joi";
 export async function POST(req) {
   try {
     await connect();
-    await checkAdmin(req);
 
-    const { productName } = await req.json();
+    const { productName, search = false } = await req.json();
+
+    // Early return if productName is empty and search is true
+    if (search && !productName.trim()) {
+      return NextResponse.json({ products: [] }, { status: 200 });
+    }
+
+    if (!search) {
+      await checkAdmin(req);
+    }
 
     const schema = Joi.object({
       productName: Joi.string().max(100).required(),
@@ -24,19 +32,35 @@ export async function POST(req) {
       throw new customAPIError.BadRequestError(error.details[0].message);
     }
 
-    const product = await Product.findOne({
-      name: { $regex: new RegExp(`^${productName}$`, "i") },
-    });
-    if (!product) {
-      throw new customAPIError.NotFoundError("Product not found");
+    let product = null;
+    let products = null;
+
+    if (!search) {
+      product = await Product.findOne({
+        name: { $regex: new RegExp(`^${productName}$`, "i") },
+      });
+      if (!product) {
+        throw new customAPIError.NotFoundError("Product not found");
+      }
     }
 
-    return NextResponse.json(
-      {
-        product,
-      },
-      { status: 200 }
-    );
+    if (search) {
+      products = await Product.find({
+        name: { $regex: new RegExp(`${productName}`, "i") },
+      })
+        .sort({ name: 1 })
+        .limit(5);
+      if (products.length === 0) {
+        return NextResponse.json(
+          { products: [], message: "No products found" },
+          { status: 200 }
+        );
+      }
+    }
+
+    return NextResponse.json(search ? { products } : { product }, {
+      status: 200,
+    });
   } catch (error) {
     return NextResponse.json(
       {
