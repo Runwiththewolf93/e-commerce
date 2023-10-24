@@ -42,5 +42,9 @@
   "devDependencies": {
     "daisyui": "^3.9.2",
     "jest": "^29.7.0"
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/node_modules/**": true
   }
 }

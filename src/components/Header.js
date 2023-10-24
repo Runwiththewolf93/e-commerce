@@ -4,6 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Drawer from "./Drawer";
 import SearchForm from "../subcomponents/SearchForm";
+import { CartSVG, ProfileSVG, LogoutSVG } from "../subcomponents/SVG";
 
 export default function Header() {
   const { data: session } = useSession();
@@ -26,10 +27,10 @@ export default function Header() {
             </Link>
           </div>
           <div className="flex-1 flex justify-end">
-            <ul className="flex items-center gap-4">
+            <ul className="flex items-center gap-6">
               <li>
                 <Link href="/" className="text-gray-600">
-                  Home
+                  <CartSVG />
                 </Link>
               </li>
               {!user && (
@@ -50,11 +51,11 @@ export default function Header() {
                 <>
                   <li>
                     <Link href="/profile" className="text-gray-600">
-                      Profile
+                      <ProfileSVG />
                     </Link>
                   </li>
                   <li className="cursor-pointer" onClick={logoutHandler}>
-                    Logout
+                    <LogoutSVG />
                   </li>
                 </>
               )}
@@ -68,3 +69,5 @@ export default function Header() {
     </header>
   );
 }
+
+// make the search form sticky, check if frontpage complete.

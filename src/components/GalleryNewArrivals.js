@@ -2,16 +2,17 @@
 "use client";
 
 import { useSelector } from "react-redux";
-import GalleryFeaturedSkeleton from "../subcomponents/GalleryFeaturedSkeleton";
+import GalleryNewArrivalsSkeleton from "../subcomponents/GalleryNewArrivalsSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
 import Link from "next/link";
-import StarRating from "../subcomponents/StarRating";
 
-export default function GalleryFeatured() {
-  const { featured, isLoading, error } = useSelector(state => state.products);
+export default function GalleryNewArrivals() {
+  const { newArrivals, isLoading, error } = useSelector(
+    state => state.products
+  );
 
   if (isLoading) {
-    return <GalleryFeaturedSkeleton />;
+    return <GalleryNewArrivalsSkeleton />;
   }
 
   if (error) {
@@ -20,9 +21,9 @@ export default function GalleryFeatured() {
 
   return (
     <section className="overflow-x-auto pb-3">
-      <h1 className="text-2xl font-bold mb-4 ml-4">Featured</h1>
+      <h1 className="text-2xl font-bold mb-4 ml-4">New Arrivals</h1>
       <div className="grid grid-flow-col auto-cols-min gap-4 mx-4">
-        {featured.map(product => (
+        {newArrivals.map(product => (
           <div
             key={product._id}
             className="w-64 bg-white border border-gray-200 rounded-2xl shadow dark:bg-gray-800 dark:border-gray-700"
@@ -38,18 +39,31 @@ export default function GalleryFeatured() {
                 </div>
               </figure>
             </Link>
-            <div className="px-5 pb-5">
+            <div className="p-5">
               <Link href="#">
-                <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white mt-3 truncate">
+                <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white truncate">
                   {product.name}
                 </h5>
-                <p className="mt-1 line-clamp-2">{product.description}</p>
               </Link>
-              <div className="flex items-center mt-2.5 mb-3">
-                <StarRating aggregateRating={product.aggregateRating} />
-                <span className="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">
-                  {product.aggregateRating}
-                </span>
+              <p className="mb-2 font-normal text-gray-700 dark:text-gray-400 line-clamp-2">
+                {product.description}
+              </p>
+              <div className="mb-2">
+                {product.stock <= 5 && (
+                  <span className="bg-red-100 text-red-800 text-sm font-medium py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                    Only {product.stock} items remaining!
+                  </span>
+                )}
+                {product.stock > 5 && product.stock <= 20 && (
+                  <span className="bg-yellow-100 text-yellow-800 text-sm font-medium py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+                    Hurry, only {product.stock} items left!
+                  </span>
+                )}
+                {product.stock > 20 && (
+                  <span className="bg-green-100 text-green-800 text-sm font-medium py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+                    {product.stock} items in stock.
+                  </span>
+                )}
               </div>
               <div className="flex items-center justify-between">
                 <span
@@ -65,7 +79,7 @@ export default function GalleryFeatured() {
                 </span>
                 <Link
                   href="#"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 min-w-[100px]"
+                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 min-w-[100px]"
                 >
                   Add to cart
                 </Link>

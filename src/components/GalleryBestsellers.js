@@ -6,7 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import GalleryBestSellersSkeleton from "../subcomponents/GalleryBestSellersSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
 import Link from "next/link";
-import { fetchBestSellers, fetchFeatured } from "../redux/slices/productSlice";
+import {
+  fetchBestSellers,
+  fetchFeatured,
+  fetchNewArrivals,
+} from "../redux/slices/productSlice";
 
 export default function GalleryBestSellers() {
   const dispatch = useDispatch();
@@ -15,19 +19,18 @@ export default function GalleryBestSellers() {
   );
 
   useEffect(() => {
-    if (currentGallery === "bestSellers") {
-      console.log(
-        "🚀 ~ file: GalleryBestsellers.js:19 ~ useEffect ~ currentGallery:",
-        currentGallery
-      );
-      dispatch(fetchBestSellers()).then(resultAction => {
-        if (fetchBestSellers.fulfilled.match(resultAction)) {
-          const newIds = resultAction.payload.map(p => p._id);
-          dispatch(fetchFeatured(newIds));
-        }
-      });
-    }
-  }, [currentGallery, dispatch]);
+    dispatch(fetchBestSellers()).then(resultAction => {
+      if (fetchBestSellers.fulfilled.match(resultAction)) {
+        const newIds = resultAction.payload.map(p => p._id);
+        dispatch(fetchFeatured(newIds)).then(resultAction => {
+          if (fetchFeatured.fulfilled.match(resultAction)) {
+            const newIds = resultAction.payload.map(p => p._id);
+            dispatch(fetchNewArrivals(newIds));
+          }
+        });
+      }
+    });
+  }, [dispatch]);
 
   if (isLoading) {
     return <GalleryBestSellersSkeleton />;

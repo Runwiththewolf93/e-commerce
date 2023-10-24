@@ -6,6 +6,8 @@ import Banner from "../components/Banner";
 import GalleryBestSellers from "../components/GalleryBestSellers";
 import CategoryGrid from "../components/CategoryGrid";
 import GalleryFeatured from "../components/GalleryFeatured";
+import UserTestimonial from "../components/UserTestimonial";
+import GalleryNewArrivals from "../components/GalleryNewArrivals";
 
 export default function Home() {
   return (
@@ -20,6 +22,10 @@ export default function Home() {
       <CategoryGrid />
       <div className="divider" />
       <GalleryFeatured />
+      <div className="divider" />
+      <UserTestimonial />
+      <div className="divider" />
+      <GalleryNewArrivals />
       <div className="divider" />
       <Banner />
       <Footer />
