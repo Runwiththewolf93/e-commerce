@@ -8,6 +8,7 @@ import CategoryGrid from "../components/CategoryGrid";
 import GalleryFeatured from "../components/GalleryFeatured";
 import UserTestimonial from "../components/UserTestimonial";
 import GalleryNewArrivals from "../components/GalleryNewArrivals";
+import SocialProof from "../components/SocialProof";
 
 export default function Home() {
   return (
@@ -26,6 +27,8 @@ export default function Home() {
       <UserTestimonial />
       <div className="divider" />
       <GalleryNewArrivals />
+      <div className="divider" />
+      <SocialProof />
       <div className="divider" />
       <Banner />
       <Footer />

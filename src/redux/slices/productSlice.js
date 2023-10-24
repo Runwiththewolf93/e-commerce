@@ -20,7 +20,6 @@ export const fetchBestSellers = createAsyncThunk(
       }));
 
       const newIds = data.products.map(p => p._id);
-      console.log("🚀 ~ file: productSlice.js:22 ~ newIds:", newIds);
       dispatch(addProductIds(newIds));
       dispatch(setCurrentGallery("featured"));
 
@@ -35,11 +34,6 @@ export const fetchFeatured = createAsyncThunk(
   "products/fetchFeatured",
   async (existingProductIds, { dispatch, rejectWithValue }) => {
     try {
-      console.log(
-        "🚀 ~ file: productSlice.js:38 ~ existingProductIds:",
-        existingProductIds
-      );
-
       const { data } = await axios.post("/api/products/getProducts", {
         fetchedIds: existingProductIds,
       });
@@ -68,7 +62,6 @@ export const fetchFeatured = createAsyncThunk(
       );
 
       const newIds = data.products.map(p => p._id);
-      console.log("🚀 ~ file: productSlice.js:70 ~ newIds:", newIds);
       dispatch(addProductIds(newIds));
       dispatch(setCurrentGallery("newArrivals"));
 
@@ -83,17 +76,11 @@ export const fetchNewArrivals = createAsyncThunk(
   "products/fetchNewArrivals",
   async (existingProductIds, { dispatch, rejectWithValue }) => {
     try {
-      console.log(
-        "🚀 ~ file: productSlice.js:85 ~ existingProductIds:",
-        existingProductIds
-      );
-
       const { data } = await axios.post("/api/products/getProducts", {
         fetchedIds: existingProductIds,
       });
 
       const newIds = data.products.map(p => p._id);
-      console.log("🚀 ~ file: productSlice.js:96 ~ newIds:", newIds);
       dispatch(addProductIds(newIds));
 
       return data.products;
@@ -122,14 +109,16 @@ export const fetchSearch = createAsyncThunk(
 export const productSlice = createSlice({
   name: "products",
   initialState: {
+    isLoading: false,
     productIds: [],
     bestSellers: [],
     featured: [],
     newArrivals: [],
-    isLoading: false,
     error: null,
     currentGallery: "bestSellers",
+    isLoadingSearch: false,
     products: [],
+    errorSearch: null,
     searchMessage: "",
   },
   reducers: {
@@ -199,17 +188,17 @@ export const productSlice = createSlice({
       })
       // fetchSearch reducer
       .addCase(fetchSearch.pending, state => {
-        state.isLoading = false;
+        state.isLoadingSearch = false;
       })
       .addCase(fetchSearch.fulfilled, (state, action) => {
         state.products = action.payload.products;
         state.searchMessage = action.payload.message;
-        state.isLoading = false;
-        state.error = null;
+        state.isLoadingSearch = false;
+        state.errorSearch = null;
       })
       .addCase(fetchSearch.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
+        state.isLoadingSearch = false;
+        state.errorSearch = action.payload;
       });
   },
 });

@@ -8,9 +8,12 @@ import Link from "next/link";
 
 export default function SearchForm() {
   const dispatch = useDispatch();
-  const { products, isLoading, error, searchMessage } = useSelector(
-    state => state.products
-  );
+  const {
+    products,
+    isLoadingSearch: isLoading,
+    errorSearch: error,
+    searchMessage,
+  } = useSelector(state => state.products);
   const [searchTerm, setSearchTerm] = useState("");
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [isLoadingSearch, setIsLoadingSearch] = useState(false);

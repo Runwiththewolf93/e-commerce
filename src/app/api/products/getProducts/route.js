@@ -10,7 +10,6 @@ export async function POST(req) {
     await connect();
 
     const { fetchedIds = [] } = await req.json();
-    console.log("🚀 ~ file: route.js:12 ~ POST ~ fetchedIds:", fetchedIds);
 
     const schema = Joi.object({
       fetchedIds: Joi.array().items(Joi.string()),
@@ -31,10 +30,6 @@ export async function POST(req) {
       { $match: { _id: { $nin: objectIds } } },
       { $sample: { size: 10 } },
     ]);
-    console.log(
-      "🚀 ~ file: route.js:31 ~ POST ~ products:",
-      products.map(p => p._id)
-    );
 
     if (!products || products.length === 0) {
       throw new customAPIError.NotFoundError("Products not found");

@@ -5,17 +5,35 @@ import Link from "next/link";
 import Drawer from "./Drawer";
 import SearchForm from "../subcomponents/SearchForm";
 import { CartSVG, ProfileSVG, LogoutSVG } from "../subcomponents/SVG";
+import { useState, useEffect } from "react";
 
 export default function Header() {
   const { data: session } = useSession();
   const user = session?.user;
+  const [sticky, setSticky] = useState(false);
 
   const logoutHandler = async () => {
     await signOut({ callbackUrl: "http://localhost:3000/login" });
   };
 
+  const handleScroll = () => {
+    if (window.scrollY > 0) {
+      setSticky(true);
+    } else {
+      setSticky(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <header className="bg-white">
+    <header className={`bg-white ${sticky ? "sticky top-0 z-50" : ""}`}>
       <div className="h-20">
         <nav className="h-full flex justify-between items-center mx-3">
           <div className="flex-1">
@@ -69,5 +87,3 @@ export default function Header() {
     </header>
   );
 }
-
-// make the search form sticky, check if frontpage complete.
