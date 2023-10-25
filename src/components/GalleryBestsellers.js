@@ -19,18 +19,20 @@ export default function GalleryBestSellers() {
   );
 
   useEffect(() => {
-    dispatch(fetchBestSellers()).then(resultAction => {
-      if (fetchBestSellers.fulfilled.match(resultAction)) {
-        const newIds = resultAction.payload.map(p => p._id);
-        dispatch(fetchFeatured(newIds)).then(resultAction => {
-          if (fetchFeatured.fulfilled.match(resultAction)) {
-            const newIds = resultAction.payload.map(p => p._id);
-            dispatch(fetchNewArrivals(newIds));
-          }
-        });
-      }
-    });
-  }, [dispatch]);
+    if (currentGallery === "bestSellers") {
+      dispatch(fetchBestSellers()).then(resultAction => {
+        if (fetchBestSellers.fulfilled.match(resultAction)) {
+          const newIds = resultAction.payload.map(p => p._id);
+          dispatch(fetchFeatured(newIds)).then(resultAction => {
+            if (fetchFeatured.fulfilled.match(resultAction)) {
+              const newIds = resultAction.payload.map(p => p._id);
+              dispatch(fetchNewArrivals(newIds));
+            }
+          });
+        }
+      });
+    }
+  }, [dispatch, currentGallery]);
 
   if (isLoading) {
     return <GalleryBestSellersSkeleton />;

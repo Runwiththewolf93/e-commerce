@@ -91,7 +91,7 @@ export const fetchNewArrivals = createAsyncThunk(
 );
 
 export const fetchSearch = createAsyncThunk(
-  "/products/fetchSearch",
+  "products/fetchSearch",
   async ({ productName, search }, { rejectWithValue }) => {
     try {
       const { data } = await axios.post("/api/products/getProduct", {
@@ -100,6 +100,19 @@ export const fetchSearch = createAsyncThunk(
       });
 
       return { products: data.products, message: data.message };
+    } catch (error) {
+      rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const fetchCategory = createAsyncThunk(
+  "products/fetchCategory",
+  async (link, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post("/api/products/getCategory", { link });
+
+      return data.products;
     } catch (error) {
       rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -117,9 +130,12 @@ export const productSlice = createSlice({
     error: null,
     currentGallery: "bestSellers",
     isLoadingSearch: false,
+    searchMessage: "",
     products: [],
     errorSearch: null,
-    searchMessage: "",
+    isLoadingCategory: false,
+    productsCategory: [],
+    errorCategory: null,
   },
   reducers: {
     addProductIds: (state, action) => {
@@ -143,6 +159,8 @@ export const productSlice = createSlice({
     clearProducts: state => {
       state.products = [];
       state.searchMessage = "";
+      state.isLoadingSearch = false;
+      state.errorSearch = null;
     },
   },
   extraReducers: builder => {
@@ -188,7 +206,7 @@ export const productSlice = createSlice({
       })
       // fetchSearch reducer
       .addCase(fetchSearch.pending, state => {
-        state.isLoadingSearch = false;
+        state.isLoadingSearch = true;
       })
       .addCase(fetchSearch.fulfilled, (state, action) => {
         state.products = action.payload.products;
@@ -199,6 +217,19 @@ export const productSlice = createSlice({
       .addCase(fetchSearch.rejected, (state, action) => {
         state.isLoadingSearch = false;
         state.errorSearch = action.payload;
+      })
+      // fetchCategory reducer
+      .addCase(fetchCategory.pending, state => {
+        state.isLoadingCategory = true;
+      })
+      .addCase(fetchCategory.fulfilled, (state, action) => {
+        state.productsCategory = action.payload;
+        state.isLoadingCategory = false;
+        state.errorCategory = null;
+      })
+      .addCase(fetchCategory.rejected, (state, action) => {
+        state.isLoadingCategory = false;
+        state.errorCategory = action.payload;
       });
   },
 });

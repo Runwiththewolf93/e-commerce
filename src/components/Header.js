@@ -4,7 +4,8 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Drawer from "./Drawer";
 import SearchForm from "../subcomponents/SearchForm";
-import { CartSVG, ProfileSVG, LogoutSVG } from "../subcomponents/SVG";
+import { BsCart3 } from "react-icons/bs";
+import { BiUser, BiLogOut } from "react-icons/bi";
 import { useState, useEffect } from "react";
 
 export default function Header() {
@@ -48,7 +49,7 @@ export default function Header() {
             <ul className="flex items-center gap-6">
               <li>
                 <Link href="/" className="text-gray-600">
-                  <CartSVG />
+                  <BsCart3 className="h-6 w-6" />
                 </Link>
               </li>
               {!user && (
@@ -69,11 +70,11 @@ export default function Header() {
                 <>
                   <li>
                     <Link href="/profile" className="text-gray-600">
-                      <ProfileSVG />
+                      <BiUser className="w-6 h-6" />
                     </Link>
                   </li>
                   <li className="cursor-pointer" onClick={logoutHandler}>
-                    <LogoutSVG />
+                    <BiLogOut className="w-6 h-6" />
                   </li>
                 </>
               )}

@@ -9,7 +9,6 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "./customStorage";
-import postsReducer from "./slices/postsSlice";
 import productReducer from "./slices/productSlice";
 
 const persistConfig = {
@@ -19,7 +18,6 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
-  posts: postsReducer,
   products: productReducer,
 });
 
