@@ -1,6 +1,6 @@
 "use client";
 
-import { Breadcrumb, Dropdown, Label, RangeSlider } from "flowbite-react";
+import { Breadcrumb, Label, RangeSlider } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import { useState, memo } from "react";
 
@@ -16,14 +16,74 @@ export function BreadCrumb({ category }) {
   );
 }
 
-export function DropDown() {
+export function DropDown({ setSortOption }) {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
+  const handleSelection = value => {
+    console.log("Dropdown value changed:", value);
+    setSortOption(value);
+    toggleDropdown();
+  };
+
   return (
-    <Dropdown label="Sort By" inline>
-      <Dropdown.Item>Dashboard</Dropdown.Item>
-      <Dropdown.Item>Settings</Dropdown.Item>
-      <Dropdown.Item>Earnings</Dropdown.Item>
-      <Dropdown.Item>Sign out</Dropdown.Item>
-    </Dropdown>
+    <div className="relative">
+      <button
+        onClick={toggleDropdown}
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      >
+        Sort By
+        <svg
+          className="w-2.5 h-2.5 ml-2.5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 10 6"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="m1 1 4 4 4-4"
+          />
+        </svg>
+      </button>
+
+      {dropdownVisible && (
+        <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+          <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+            <li>
+              <button
+                onClick={() => handleSelection("Newest")}
+                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+              >
+                Newest
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleSelection("PriceLowToHigh")}
+                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+              >
+                Price (Low to High)
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleSelection("PriceHighToLow")}
+                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+              >
+                Price (High to Low)
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -39,26 +99,14 @@ const RangeSliderElement = ({
   lastCloseEnough,
   setLastCloseEnough,
 }) => {
-  const [isMouseDown, setIsMouseDown] = useState(false);
-
   console.log(
     "🚀 ~ file: CategoryComponents.js:37 ~ uniquePrices:",
     uniquePrices
   );
 
-  const handleMouseDown = () => {
-    setIsMouseDown(true);
-  };
-
-  const handleMouseUp = () => {
-    setIsMouseDown(false);
-  };
-
   const tolerance = 5;
 
   const handleSliderChange = e => {
-    if (!isMouseDown) return;
-
     const value = parseInt(e.target.value, 10);
 
     const closeEnough = uniquePrices.find(
@@ -84,9 +132,7 @@ const RangeSliderElement = ({
           id="range"
           min={minPrice}
           max={maxPrice}
-          onMouseDown={handleMouseDown}
           onMouseMove={handleSliderChange}
-          onMouseUp={handleMouseUp}
           className="flex-1"
         />
         <span className="ml-1">€ {maxPrice}</span>
