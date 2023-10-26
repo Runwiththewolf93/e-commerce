@@ -9,6 +9,9 @@ import Link from "next/link";
 import RangeSliderElement, {
   BreadCrumb,
   DropDown,
+  CategorySkeleton,
+  CategoryError,
+  CategoryPagination,
 } from "../components/CategoryComponents";
 
 export default function Category() {
@@ -31,6 +34,10 @@ export default function Category() {
   const [triggerValue, setTriggerValue] = useState(null);
   const [lastCloseEnough, setLastCloseEnough] = useState(null);
   const [sortOption, setSortOption] = useState("Newest");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(
+    Math.ceil(filteredProducts.length / 16)
+  );
 
   useEffect(() => {
     if (!productsCategory.length) {
@@ -90,11 +97,26 @@ export default function Category() {
     }
 
     setFilteredProducts(newFilteredProducts);
+    setTotalPages(Math.ceil(newFilteredProducts.length / 16));
+    setCurrentPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerValue, sortOption]);
 
+  const productsToDisplay = filteredProducts.slice(
+    (currentPage - 1) * 16,
+    currentPage * 16
+  );
+
+  if (isLoadingCategory) {
+    return <CategorySkeleton />;
+  }
+
+  if (errorCategory) {
+    return <CategoryError />;
+  }
+
   return (
-    <div className="bg-white pt-5">
+    <div className="bg-white py-5">
       <BreadCrumb category={category} />
       <div className="grid grid-cols-3 pt-5 max-w-max mx-auto">
         <div>
@@ -119,7 +141,7 @@ export default function Category() {
       </div>
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {filteredProducts.map(product => (
+          {productsToDisplay.map(product => (
             <Link
               key={product._id}
               href={
@@ -146,6 +168,13 @@ export default function Category() {
             </Link>
           ))}
         </div>
+      </div>
+      <div className="flex justify-center items-center">
+        <CategoryPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={newPage => setCurrentPage(newPage)}
+        />
       </div>
     </div>
   );
