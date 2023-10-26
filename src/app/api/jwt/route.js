@@ -34,46 +34,20 @@ export async function POST(req) {
         const decoded = jwt.verify(existingToken.jwt, process.env.JWT_SECRET);
         if (decoded.exp > Math.floor(Date.now() / 1000)) {
           customJwtToken = existingToken.jwt;
+        } else {
+          // Token has expired but is otherwise valid, generate a new one
+          customJwtToken = await generateNewToken(user);
         }
       } catch (error) {
         await jwtToken.deleteOne({ userId });
-        throw new customAPIError.UnauthorizedError(
-          "Token is invalid or expired, please log in again"
-        );
+        // Generate a new token if the existing one is invalid
+        customJwtToken = await generateNewToken(user);
       }
     }
 
     if (!customJwtToken) {
-      // Generate new token
-      console.log("Generating new token");
-
-      try {
-        const issuedAt = Math.floor(Date.now() / 1000);
-        const expiresAt = issuedAt + 259200;
-
-        const payload = {
-          name: user.username,
-          email: user.email,
-          id: user._id,
-          iat: issuedAt,
-          exp: expiresAt,
-          jti: crypto.randomBytes(16).toString("hex"),
-        };
-
-        customJwtToken = jwt.sign(payload, process.env.JWT_SECRET);
-
-        // Store token in db
-        await jwtToken.updateOne(
-          { userId },
-          { jwt: customJwtToken },
-          { upsert: true }
-        );
-      } catch (error) {
-        throw new customAPIError.BadRequestError(
-          "Error generating token:",
-          error.message
-        );
-      }
+      // Generate new token if not token exists in db
+      customJwtToken = await generateNewToken(user);
     }
 
     return NextResponse.json(
@@ -89,6 +63,38 @@ export async function POST(req) {
         message: error.message || "Internal Server Error",
       },
       { status: error.statusCode || 500 }
+    );
+  }
+}
+
+async function generateNewToken(user) {
+  try {
+    const issuedAt = Math.floor(Date.now() / 1000);
+    const expiresAt = issuedAt + 259200; // Token expires in 3 days
+
+    const payload = {
+      name: user.username,
+      email: user.email,
+      id: user._id,
+      iat: issuedAt,
+      exp: expiresAt,
+      jti: crypto.randomBytes(16).toString("hex"),
+    };
+
+    const newToken = jwt.sign(payload, process.env.JWT_SECRET);
+
+    // Store the new token in the database
+    await jwtToken.updateOne(
+      { userId: user._id },
+      { jwt: newToken },
+      { upsert: true }
+    );
+
+    return newToken;
+  } catch (error) {
+    throw new customAPIError.BadRequestError(
+      "Error generating token:",
+      error.message
     );
   }
 }
