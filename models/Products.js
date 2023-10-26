@@ -38,6 +38,31 @@ const productSchema = new mongoose.Schema({
       "Office Supplies & Stationery",
     ],
   },
+  discount: {
+    percentage: {
+      type: Number,
+      min: 0,
+      max: 100,
+    },
+    startDate: {
+      type: Date,
+    },
+    endDate: {
+      type: Date,
+      validate: {
+        validator: function () {
+          // Ensure that endDate is after startDate
+          return (
+            !this.discount ||
+            !this.discount.startDate ||
+            !this.discount.endDate ||
+            this.discount.endDate > this.discount.startDate
+          );
+        },
+        message: "Discount end date must be after start date",
+      },
+    },
+  },
   images: {
     type: [
       {
