@@ -102,9 +102,17 @@ export default function Category() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerValue, sortOption]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage]);
+
   const productsToDisplay = filteredProducts.slice(
     (currentPage - 1) * 16,
     currentPage * 16
+  );
+  console.log(
+    "🚀 ~ file: page.js:109 ~ Category ~ productsToDisplay:",
+    productsToDisplay
   );
 
   if (isLoadingCategory) {
@@ -162,9 +170,24 @@ export default function Category() {
                 )}
               </div>
               <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
-              <p className="mt-1 text-lg font-medium text-gray-900">
-                €{product.price.toFixed(2)}
-              </p>
+              {product.discount?.percentage ? (
+                <div className="mt-1">
+                  <del className="text-red-500 text-lg">
+                    €{product.price.toFixed(2)}
+                  </del>
+                  <span className="text-green-500 text-lg font-medium ml-2">
+                    €
+                    {(
+                      product.price *
+                      (1 - product.discount.percentage / 100)
+                    ).toFixed(2)}
+                  </span>
+                </div>
+              ) : (
+                <p className="mt-1 text-lg font-medium text-gray-900">
+                  €{product.price.toFixed(2)}
+                </p>
+              )}
             </Link>
           ))}
         </div>
