@@ -8,6 +8,11 @@ export default function AddProduct({ token }) {
     price: "",
     stock: "",
     category: "",
+    discount: {
+      percentage: "",
+      startDate: "",
+      endDate: "",
+    },
     images: [{ url: "", alt: "" }],
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +24,17 @@ export default function AddProduct({ token }) {
     setFormData({
       ...formData,
       [name]: value,
+    });
+  };
+
+  const handleDiscountChange = e => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      discount: {
+        ...formData.discount,
+        [name]: value,
+      },
     });
   };
 
@@ -203,6 +219,37 @@ export default function AddProduct({ token }) {
               Office Supplies & Stationery
             </option>
           </select>
+        </div>
+        <div className="mb-3">
+          <label
+            htmlFor="percentage"
+            className="block text-sm font-medium text-gray-900 dark:text-gray-900"
+          >
+            Discount Percentage
+          </label>
+          <input
+            id="percentage"
+            type="number"
+            name="percentage"
+            placeholder="Discount Percentage"
+            value={formData.discount.percentage}
+            onChange={handleDiscountChange}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+          <input
+            type="date"
+            name="startDate"
+            placeholder="Discount Start Date"
+            value={formData.discount.startDate}
+            onChange={handleDiscountChange}
+          />
+          <input
+            type="date"
+            name="endDate"
+            placeholder="Discount End Date"
+            value={formData.discount.endDate}
+            onChange={handleDiscountChange}
+          />
         </div>
         {formData.images.map((image, index) => (
           <div key={index} className="mb-3">

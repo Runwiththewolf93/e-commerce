@@ -92,5 +92,10 @@ function arrayLimit(val) {
   return val.length >= 1 && val.length <= 4;
 }
 
+productSchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
 export default mongoose.models.Product ||
   mongoose.model("Product", productSchema);

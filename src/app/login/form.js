@@ -46,7 +46,11 @@ export const LoginForm = () => {
       }
     } catch (error) {
       setLoading(false);
-      setError(error || error.message || error.response?.data?.message);
+      const errorMessage =
+        error.message ||
+        error.response?.data?.message ||
+        "An unknown error occurred";
+      setError(errorMessage);
     }
   };
 

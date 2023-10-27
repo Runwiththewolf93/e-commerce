@@ -10,7 +10,7 @@ export async function POST(req) {
     await connect();
     await checkAdmin(req);
 
-    const { name, description, price, stock, category, images } =
+    const { name, description, price, stock, category, discount, images } =
       await req.json();
 
     const schema = Joi.object({
@@ -32,6 +32,11 @@ export async function POST(req) {
           "Office Supplies & Stationery"
         )
         .required(),
+      discount: Joi.object({
+        percentage: Joi.number().min(0).max(100),
+        startDate: Joi.date(),
+        endDate: Joi.date().greater(Joi.ref("startDate")),
+      }).optional(),
       images: Joi.array()
         .items(
           Joi.object({
@@ -51,6 +56,7 @@ export async function POST(req) {
       price,
       stock,
       category,
+      discount,
       images,
     });
     if (error) {
@@ -63,6 +69,7 @@ export async function POST(req) {
       price,
       stock,
       category,
+      discount,
       images,
     });
 
