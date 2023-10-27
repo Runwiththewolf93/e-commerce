@@ -36,8 +36,9 @@ export async function POST(req) {
     let products = null;
 
     if (!search) {
+      console.log("🚀 ~ file: route.js:13 ~ POST ~ productName:", productName);
       product = await Product.findOne({
-        name: { $regex: new RegExp(`^${productName}$`, "i") },
+        name: { $regex: new RegExp(`${productName}`, "i") },
       });
       if (!product) {
         throw new customAPIError.NotFoundError("Product not found");

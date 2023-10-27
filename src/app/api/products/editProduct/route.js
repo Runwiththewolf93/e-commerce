@@ -10,7 +10,7 @@ export async function PATCH(req) {
     await connect();
     await checkAdmin(req);
 
-    const { name, description, price, stock, category, images } =
+    const { name, description, price, stock, category, discount, images } =
       await req.json();
 
     const schema = Joi.object({
@@ -32,6 +32,11 @@ export async function PATCH(req) {
           "Office Supplies & Stationery"
         )
         .required(),
+      discount: Joi.object({
+        percentage: Joi.number().min(0).max(100),
+        startDate: Joi.date(),
+        endDate: Joi.date().greater(Joi.ref("startDate")),
+      }).optional(),
       images: Joi.array()
         .items(
           Joi.object({
@@ -52,6 +57,7 @@ export async function PATCH(req) {
       price,
       stock,
       category,
+      discount,
       images,
     });
     if (error) {
@@ -70,6 +76,7 @@ export async function PATCH(req) {
     existingProduct.price = price;
     existingProduct.stock = stock;
     existingProduct.category = category;
+    existingProduct.discount = discount;
     existingProduct.images = images;
 
     // Save the updated product

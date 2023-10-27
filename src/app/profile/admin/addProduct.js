@@ -86,6 +86,11 @@ export default function AddProduct({ token }) {
         price: "",
         stock: "",
         category: "",
+        discount: {
+          percentage: "",
+          startDate: "",
+          endDate: "",
+        },
         images: [{ url: "", alt: "" }],
       });
     } catch (error) {
@@ -232,7 +237,7 @@ export default function AddProduct({ token }) {
             type="number"
             name="percentage"
             placeholder="Discount Percentage"
-            value={formData.discount.percentage}
+            value={formData?.discount?.percentage || ""}
             onChange={handleDiscountChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
@@ -240,14 +245,14 @@ export default function AddProduct({ token }) {
             type="date"
             name="startDate"
             placeholder="Discount Start Date"
-            value={formData.discount.startDate}
+            value={formData?.discount?.startDate || ""}
             onChange={handleDiscountChange}
           />
           <input
             type="date"
             name="endDate"
             placeholder="Discount End Date"
-            value={formData.discount.endDate}
+            value={formData?.discount?.endDate || ""}
             onChange={handleDiscountChange}
           />
         </div>
