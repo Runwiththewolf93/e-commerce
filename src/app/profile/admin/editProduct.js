@@ -88,6 +88,7 @@ export default function EditProduct({ token }) {
 
   const handleSearch = async () => {
     setIsLoading(true);
+    setSuccessMessage(null);
     setErrorMessage(null);
 
     try {

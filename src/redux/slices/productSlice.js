@@ -14,16 +14,12 @@ export const fetchBestSellers = createAsyncThunk(
       const { data } = await axios.post("/api/products/getProducts", {
         fetchedIds: [],
       });
-      const bestSellersRandomDiscount = data.products.map(product => ({
-        ...product,
-        randomDiscount: Math.floor(Math.random() * 50) + 1,
-      }));
 
       const newIds = data.products.map(p => p._id);
       dispatch(addProductIds(newIds));
       dispatch(setCurrentGallery("featured"));
 
-      return bestSellersRandomDiscount;
+      return data.products;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }

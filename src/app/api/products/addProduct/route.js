@@ -34,8 +34,8 @@ export async function POST(req) {
         .required(),
       discount: Joi.object({
         percentage: Joi.number().min(0).max(100),
-        startDate: Joi.date(),
-        endDate: Joi.date().greater(Joi.ref("startDate")),
+        startDate: Joi.date().allow(""),
+        endDate: Joi.date().greater(Joi.ref("startDate")).allow(""),
       }).optional(),
       images: Joi.array()
         .items(
