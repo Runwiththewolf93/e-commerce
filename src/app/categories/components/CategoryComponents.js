@@ -65,7 +65,7 @@ export function DropDown({ setSortOption }) {
             <li>
               <button
                 onClick={() => handleSelection("Newest")}
-                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
               >
                 Newest
               </button>
@@ -73,7 +73,7 @@ export function DropDown({ setSortOption }) {
             <li>
               <button
                 onClick={() => handleSelection("PriceLowToHigh")}
-                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
               >
                 Price (Low to High)
               </button>
@@ -81,7 +81,7 @@ export function DropDown({ setSortOption }) {
             <li>
               <button
                 onClick={() => handleSelection("PriceHighToLow")}
-                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
               >
                 Price (High to Low)
               </button>
@@ -156,7 +156,7 @@ export function CategorySkeleton() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+    <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 min-h-screen">
       {Array.from({ length: skeletonCount }, (_, index) => (
         <div key={index} className="animate-pulse">
           <div className="relative aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
@@ -172,13 +172,15 @@ export function CategorySkeleton() {
 
 export function CategoryError({ errorCategory }) {
   return (
-    <Alert color="failure" icon={HiInformationCircle}>
-      <span>
-        <p>
-          <span className="font-medium">{errorCategory}</span>
-        </p>
-      </span>
-    </Alert>
+    <div className="min-h-screen">
+      <Alert color="failure" icon={HiInformationCircle}>
+        <span>
+          <p>
+            <span className="font-medium">{errorCategory}</span>
+          </p>
+        </span>
+      </Alert>
+    </div>
   );
 }
 

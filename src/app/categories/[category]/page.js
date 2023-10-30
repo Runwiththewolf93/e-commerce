@@ -25,10 +25,6 @@ export default function Category() {
   const minPrice = Math.min(...productsCategory.map(p => p.price));
   const maxPrice = Math.max(...productsCategory.map(p => p.price));
   const uniquePrices = [...new Set(productsCategory.map(p => p.price))];
-  console.log(
-    "🚀 ~ file: page.js:18 ~ Category ~ productsCategory:",
-    productsCategory
-  );
 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [triggerValue, setTriggerValue] = useState(null);
@@ -51,21 +47,27 @@ export default function Category() {
       return Math.random().toString(16).substr(2, 24);
     };
 
-    return Array(15)
+    const formattedCurrentDate = new Date().toISOString();
+
+    const duplicates = Array(15)
       .fill(productsCategory)
       .flat()
       .map(product => {
         const newProduct = { ...product, _id: generateObjectID() };
-        const date = new Date();
-        const formattedDate = date.toISOString();
 
+        // Set stock to 0 with a 20% chance
         if (Math.random() < 0.2) {
           newProduct.stock = 0;
-          newProduct.createdAt = formattedDate;
         }
+
+        // Set the createdAt date for all duplicates to the current date
+        newProduct.createdAt = formattedCurrentDate;
 
         return newProduct;
       });
+
+    // Combine the original and duplicated products
+    return [...productsCategory, ...duplicates];
   }, [productsCategory]);
   // For testing purposes only
 
@@ -110,18 +112,6 @@ export default function Category() {
     (currentPage - 1) * 16,
     currentPage * 16
   );
-  console.log(
-    "🚀 ~ file: page.js:109 ~ Category ~ productsToDisplay:",
-    productsToDisplay
-  );
-
-  if (isLoadingCategory) {
-    return <CategorySkeleton />;
-  }
-
-  if (errorCategory) {
-    return <CategoryError />;
-  }
 
   return (
     <div className="bg-white py-5">
@@ -149,47 +139,60 @@ export default function Category() {
       </div>
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {productsToDisplay.map(product => (
-            <Link
-              key={product._id}
-              href={
-                product.stock === 0 ? "#" : `/categories/${link}/${product._id}`
-              }
-              className="group"
-            >
-              <div className="relative aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-                <img
-                  src={product.images[0]?.url}
-                  alt={product.images[0]?.alt}
-                  className="h-full w-full object-cover object-center group-hover:opacity-75"
-                />
-                {product.stock === 0 && (
-                  <div className="absolute inset-0 bg-black opacity-70 flex items-center justify-center">
-                    <span className="text-white text-lg">Out of Stock</span>
-                  </div>
-                )}
-              </div>
-              <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
-              {product.discount?.percentage ? (
-                <div className="mt-1">
-                  <del className="text-red-500 text-lg">
-                    €{product.price.toFixed(2)}
-                  </del>
-                  <span className="text-green-500 text-lg font-medium ml-2">
-                    €
-                    {(
-                      product.price *
-                      (1 - product.discount.percentage / 100)
-                    ).toFixed(2)}
-                  </span>
+          {isLoadingCategory ? (
+            <CategorySkeleton />
+          ) : errorCategory ? (
+            <CategoryError />
+          ) : (
+            productsToDisplay.map(product => (
+              <Link
+                key={product._id}
+                href={
+                  product.stock === 0
+                    ? "#"
+                    : `/categories/${link}/${product._id}`
+                }
+                className="group"
+                onClick={e => {
+                  if (product.stock === 0) {
+                    e.preventDefault();
+                  }
+                }}
+              >
+                <div className="relative aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                  <img
+                    src={product.images[0]?.url}
+                    alt={product.images[0]?.alt}
+                    className="h-full w-full object-cover object-center group-hover:opacity-75"
+                  />
+                  {product.stock === 0 && (
+                    <div className="absolute inset-0 bg-black opacity-70 flex items-center justify-center">
+                      <span className="text-white text-lg">Out of Stock</span>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <p className="mt-1 text-lg font-medium text-gray-900">
-                  €{product.price.toFixed(2)}
-                </p>
-              )}
-            </Link>
-          ))}
+                <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
+                {product.discount?.percentage ? (
+                  <div className="mt-1">
+                    <del className="text-red-500 text-lg">
+                      €{product.price.toFixed(2)}
+                    </del>
+                    <span className="text-green-500 text-lg font-medium ml-2">
+                      €
+                      {(
+                        product.price *
+                        (1 - product.discount.percentage / 100)
+                      ).toFixed(2)}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="mt-1 text-lg font-medium text-gray-900">
+                    €{product.price.toFixed(2)}
+                  </p>
+                )}
+              </Link>
+            ))
+          )}
         </div>
       </div>
       <div className="flex justify-center items-center">
