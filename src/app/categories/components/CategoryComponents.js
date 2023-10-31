@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Breadcrumb,
-  Label,
-  RangeSlider,
-  Alert,
-  Pagination,
-} from "flowbite-react";
+import { Breadcrumb, Label, RangeSlider, Alert } from "flowbite-react";
 import { HiHome, HiInformationCircle } from "react-icons/hi";
 import { useState, memo, useEffect } from "react";
 

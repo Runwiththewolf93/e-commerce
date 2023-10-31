@@ -76,7 +76,7 @@ const productSchema = new mongoose.Schema({
         },
       },
     ],
-    validate: [arrayLimit, "Product must have 1 to 4 images"],
+    validate: [arrayLimit, "Product must have 3 to 4 images"],
     required: true,
   },
   createdAt: {
@@ -89,7 +89,7 @@ const productSchema = new mongoose.Schema({
 });
 
 function arrayLimit(val) {
-  return val.length >= 1 && val.length <= 4;
+  return val.length >= 3 && val.length <= 4;
 }
 
 productSchema.pre("save", function (next) {

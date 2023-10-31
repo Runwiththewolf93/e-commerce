@@ -98,6 +98,11 @@ export default function Category() {
         break;
     }
 
+    console.log(
+      "🚀 ~ file: page.js:76 ~ useEffect ~ newFilteredProducts:",
+      newFilteredProducts.map(p => p.createdAt)
+    );
+
     setFilteredProducts(newFilteredProducts);
     setTotalPages(Math.ceil(newFilteredProducts.length / 16));
     setCurrentPage(1);

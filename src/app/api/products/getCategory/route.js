@@ -3,23 +3,7 @@ import { NextResponse } from "next/server";
 import connect from "../../../../../utils/db";
 import customAPIError from "../../errors";
 import Joi from "joi";
-
-const linkToCategory = link => {
-  const categoryMap = {
-    electronics: "Electronics",
-    clothing: "Clothing",
-    "home-garden": "Home & Garden",
-    books: "Books",
-    "health-beauty": "Health & Beauty",
-    sports: "Sports",
-    toys: "Toys",
-    "cars-motorcycles": "Cars & Motorcycles",
-    "groceries-food": "Groceries & Food",
-    "office-supplies-stationery": "Office Supplies & Stationery",
-  };
-
-  return categoryMap[link] || null;
-};
+import { linkToCategory } from "../../../../../utils/helper";
 
 export async function POST(req) {
   try {
