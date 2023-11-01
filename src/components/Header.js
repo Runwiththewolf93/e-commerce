@@ -7,14 +7,23 @@ import SearchForm from "../subcomponents/SearchForm";
 import { BsCart3 } from "react-icons/bs";
 import { BiUser, BiLogOut } from "react-icons/bi";
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { PURGE } from "redux-persist";
 
 export default function Header() {
   const { data: session } = useSession();
   const user = session?.user;
   const [sticky, setSticky] = useState(false);
+  const dispatch = useDispatch();
 
   const logoutHandler = async () => {
     await signOut({ callbackUrl: "http://localhost:3000/login" });
+    localStorage.removeItem("persist:root");
+    dispatch({
+      type: PURGE,
+      key: "root",
+      result: () => null,
+    });
   };
 
   const handleScroll = () => {
