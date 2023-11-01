@@ -4,7 +4,7 @@
 import { useState } from "react";
 
 export default function ProductImages({ productImages }) {
-  const [zoom, setZoom] = useState(Array(productImages.length).fill(false));
+  const [zoom, setZoom] = useState(Array(productImages?.length).fill(false));
 
   const handleMouseOver = index => {
     const newZoom = [...zoom];
@@ -18,14 +18,10 @@ export default function ProductImages({ productImages }) {
     setZoom(newZoom);
   };
 
-  const oneProductImage = productImages.slice(-1);
-  const fourProductImages = productImages.concat(oneProductImage);
-  console.log(
-    "🚀 ~ file: ProductImages.js:23 ~ ProductImages ~ fourProductImages:",
-    fourProductImages
-  );
+  const oneProductImage = productImages?.slice(-1);
+  const fourProductImages = productImages?.concat(oneProductImage);
 
-  if (fourProductImages.length === 3) {
+  if (fourProductImages?.length === 3) {
     return (
       <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
         {fourProductImages.map((image, index) => (
@@ -50,7 +46,7 @@ export default function ProductImages({ productImages }) {
     );
   }
 
-  if (fourProductImages.length === 4) {
+  if (fourProductImages?.length === 4) {
     return (
       <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
         <div

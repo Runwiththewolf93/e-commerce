@@ -3,8 +3,10 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export const RegisterForm = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     name: "",
@@ -12,6 +14,9 @@ export const RegisterForm = () => {
     password: "",
   });
   const [error, setError] = useState("");
+
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const onSubmit = async e => {
     e.preventDefault();
@@ -33,17 +38,33 @@ export const RegisterForm = () => {
       });
 
       setLoading(false);
+
       if (!res.ok) {
         setError((await res.json()).message);
         return;
       }
 
-      setFormValues({ name: "", email: "", password: "" });
+      const signInRes = await signIn("credentials", {
+        redirect: false,
+        email: formValues.email,
+        password: formValues.password,
+        callbackUrl,
+      });
+      console.log("🚀 ~ file: form.js:53 ~ onSubmit ~ signInRes:", signInRes);
 
-      signIn(undefined, { callbackUrl: "/" });
+      if (!signInRes?.error) {
+        setFormValues({ name: "", email: "", password: "" });
+        router.push(callbackUrl);
+      } else {
+        setError(signInRes.error);
+      }
     } catch (error) {
       setLoading(false);
-      setError(error);
+      const errorMessage =
+        error.message ||
+        error.response?.data?.message ||
+        "An unknown error occurred";
+      setError(errorMessage);
     }
   };
 

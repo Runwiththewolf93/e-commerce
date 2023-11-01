@@ -97,7 +97,7 @@ export const fetchSearch = createAsyncThunk(
 
       return { products: data.products, message: data.message };
     } catch (error) {
-      rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -110,7 +110,7 @@ export const fetchCategory = createAsyncThunk(
 
       return data.products;
     } catch (error) {
-      rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -123,7 +123,7 @@ export const fetchProduct = createAsyncThunk(
       const { data } = await axios.get(`/api/products/getProduct/${id}`);
       return data.product;
     } catch (error) {
-      rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );

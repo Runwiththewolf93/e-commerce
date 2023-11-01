@@ -14,6 +14,7 @@ const reviewSchema = mongoose.Schema({
   review: {
     type: String,
     required: true,
+    maxlength: [1000, "Review cannot exceed 1000 characters"],
   },
   rating: {
     type: Number,
@@ -37,5 +38,7 @@ const reviewSchema = mongoose.Schema({
     type: Date,
   },
 });
+
+reviewSchema.index({ userId: 1, productId: 1 }, { unique: true });
 
 export default mongoose.models.Review || mongoose.model("Review", reviewSchema);

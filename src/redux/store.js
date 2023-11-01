@@ -10,6 +10,7 @@ import {
 } from "redux-persist";
 import storage from "./customStorage";
 import productReducer from "./slices/productSlice";
+import reviewReducer from "./slices/reviewSlice";
 
 const persistConfig = {
   key: "root",
@@ -19,6 +20,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   products: productReducer,
+  reviews: reviewReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

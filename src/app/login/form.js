@@ -2,8 +2,8 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -39,7 +39,6 @@ export const LoginForm = () => {
       setLoading(false);
       if (!res?.error) {
         setFormValues({ email: "", password: "" });
-        console.log("does redirect trigger");
         router.push(callbackUrl);
       } else {
         setError(res.error);

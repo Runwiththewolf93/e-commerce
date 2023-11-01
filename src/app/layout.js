@@ -5,6 +5,7 @@ import ReduxProvider from "../redux/Provider";
 import { NextAuthProvider } from "./providers";
 import { IsClientCtxProvider } from "../lib/is-client-ctx";
 import Script from "next/script";
+import TokenValidator from "../../utils/tokenValidator";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,10 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <ReduxProvider>
           <NextAuthProvider>
-            <IsClientCtxProvider>{children}</IsClientCtxProvider>
+            <IsClientCtxProvider>
+              <TokenValidator />
+              {children}
+            </IsClientCtxProvider>
           </NextAuthProvider>
         </ReduxProvider>
         <Script src="/scripts/flowbite.min.js" strategy="lazyOnload" />
