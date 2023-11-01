@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import customAxios from "../../../lib/api";
 import { useRouter, usePathname } from "next/navigation";
 import AddProduct from "./addProduct";
 import EditProduct from "./editProduct";
@@ -14,10 +14,8 @@ export default function AdminCheck({ session }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    axios
-      .get("/api/users/checkAdmin", {
-        headers: { Authorization: `Bearer ${session?.customJwt}` },
-      })
+    customAxios(session?.customJwt)
+      .get("/api/users/checkAdmin")
       .then(res => setIsAdmin(res.data.isAdmin))
       .catch(err => {
         const errorMessage =

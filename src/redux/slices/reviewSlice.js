@@ -1,8 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import axiosRetry from "axios-retry";
-
-axiosRetry(axios, { retries: 3 });
+import customAxios from "../../lib/api";
 
 export const createReview = createAsyncThunk(
   "reviews/createReview",
@@ -13,11 +10,12 @@ export const createReview = createAsyncThunk(
     try {
       dispatch(resetCreateReview());
 
-      const { data } = await axios.post(
-        "/api/reviews/addReview",
-        { userId, productId, review, rating },
-        { headers: { Authorization: `Bearer ${jwt}` } }
-      );
+      const { data } = await customAxios(jwt).post("/api/reviews/addReview", {
+        userId,
+        productId,
+        review,
+        rating,
+      });
       console.log("🚀 ~ file: reviewSlice.js:16 ~ data:", data.message);
 
       return data.message;

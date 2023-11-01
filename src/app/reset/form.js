@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import customAxios from "../../lib/api";
 import { useRouter } from "next/navigation";
 
 export function ResetPasswordForm({ token }) {
@@ -23,19 +23,11 @@ export function ResetPasswordForm({ token }) {
 
     try {
       setLoading(true);
-      await axios.post(
-        "/api/reset",
-        {
-          email,
-          currentPassword,
-          newPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await customAxios(token).post("/api/reset", {
+        email,
+        currentPassword,
+        newPassword,
+      });
       setLoading(false);
       setSuccessMessage("Password reset successful");
       setErrorMessage(null);

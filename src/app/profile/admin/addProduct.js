@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import customAxios from "../../../lib/api";
 
 export default function AddProduct({ token }) {
   const [formData, setFormData] = useState({
@@ -76,9 +76,10 @@ export default function AddProduct({ token }) {
     setErrorMessage(null);
 
     try {
-      const response = await axios.post("/api/products/addProduct", formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await customAxios(token).post(
+        "/api/products/addProduct",
+        formData
+      );
       setSuccessMessage(response.data.message);
       setFormData({
         name: "",

@@ -1,8 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import axiosRetry from "axios-retry";
-
-axiosRetry(axios, { retries: 3 });
+import customAxios from "../../lib/api";
 
 export const fetchBestSellers = createAsyncThunk(
   "products/fetchBestSellers",
@@ -11,7 +8,7 @@ export const fetchBestSellers = createAsyncThunk(
       dispatch(resetProductState());
       if (getState().products.productIds.length > 0) return;
 
-      const { data } = await axios.post("/api/products/getProducts", {
+      const { data } = await customAxios().post("/api/products/getProducts", {
         fetchedIds: [],
       });
 
@@ -30,7 +27,7 @@ export const fetchFeatured = createAsyncThunk(
   "products/fetchFeatured",
   async (existingProductIds, { dispatch, rejectWithValue }) => {
     try {
-      const { data } = await axios.post("/api/products/getProducts", {
+      const { data } = await customAxios().post("/api/products/getProducts", {
         fetchedIds: existingProductIds,
       });
 
@@ -72,7 +69,7 @@ export const fetchNewArrivals = createAsyncThunk(
   "products/fetchNewArrivals",
   async (existingProductIds, { dispatch, rejectWithValue }) => {
     try {
-      const { data } = await axios.post("/api/products/getProducts", {
+      const { data } = await customAxios().post("/api/products/getProducts", {
         fetchedIds: existingProductIds,
       });
 
@@ -90,7 +87,7 @@ export const fetchSearch = createAsyncThunk(
   "products/fetchSearch",
   async ({ productName, search }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post("/api/products/getProduct", {
+      const { data } = await customAxios().post("/api/products/getProduct", {
         productName,
         search,
       });
@@ -106,7 +103,9 @@ export const fetchCategory = createAsyncThunk(
   "products/fetchCategory",
   async (link, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post("/api/products/getCategory", { link });
+      const { data } = await customAxios().post("/api/products/getCategory", {
+        link,
+      });
 
       return data.products;
     } catch (error) {
@@ -120,7 +119,9 @@ export const fetchProduct = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     console.log("🚀 ~ file: productSlice.js:121 ~ id:", id);
     try {
-      const { data } = await axios.get(`/api/products/getProduct/${id}`);
+      const { data } = await customAxios().get(
+        `/api/products/getProduct/${id}`
+      );
       return data.product;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);

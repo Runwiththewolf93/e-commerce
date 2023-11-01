@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import customAxios from "../../../lib/api";
 
 export default function DeleteProduct({ token }) {
   const [searchName, setSearchName] = useState("");
@@ -19,12 +19,14 @@ export default function DeleteProduct({ token }) {
     setErrorMessage(null);
 
     try {
-      const response = await axios.delete(`/api/products/deleteProduct`, {
-        headers: { Authorization: `Bearer ${token}` },
-        data: {
-          productName: searchName,
-        },
-      });
+      const response = await customAxios(token).delete(
+        "/api/products/deleteProduct",
+        {
+          data: {
+            productName: searchName,
+          },
+        }
+      );
       setSuccessMessage(response.data.message);
     } catch (error) {
       setErrorMessage(error.response?.data?.message || error.message);

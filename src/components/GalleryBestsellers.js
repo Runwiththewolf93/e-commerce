@@ -54,11 +54,11 @@ export default function GalleryBestSellers() {
           return (
             <Link key={product._id} href="#">
               <div className="relative w-64">
-                {product.discount?.percentage && (
+                {product.discount?.percentage ? (
                   <div className="absolute bg-red-500 text-white text-xs font-bold rounded-full p-2 z-10">
                     -{product.discount?.percentage}%
                   </div>
-                )}
+                ) : null}
                 <div className="card card-compact w-64 bg-base-100 shadow-xl">
                   <figure className="relative h-32 w-full">
                     <div className="absolute inset-0 bg-gray-300">

@@ -32,11 +32,11 @@ export default function GalleryNewArrivals() {
               key={product._id}
               className="relative w-64 bg-white border border-gray-200 rounded-2xl shadow dark:bg-gray-800 dark:border-gray-700"
             >
-              {product.discount?.percentage && (
+              {product.discount?.percentage ? (
                 <div className="absolute bg-red-500 text-white text-xs font-bold rounded-full p-2 z-10">
                   -{product.discount?.percentage}%
                 </div>
-              )}
+              ) : null}
               <Link href="#">
                 <figure className="relative h-40 w-full">
                   <div className="absolute inset-0 bg-inherit">

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import customAxios from "../../lib/api";
 import { useRouter } from "next/navigation";
 
 export function ProfileForm({ session }) {
@@ -35,9 +35,10 @@ export function ProfileForm({ session }) {
 
     try {
       setLoading(true);
-      await axios.patch(`/api/users/address/${userId}`, formData, {
-        headers: { Authorization: `Bearer ${session.customJwt}` },
-      });
+      await customAxios(session.customJwt).patch(
+        `/api/users/address/${userId}`,
+        formData
+      );
       setLoading(false);
       setSuccessMessage("Address updated successfully");
       setErrorMessage(null);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import customAxios from "../../../lib/api";
 
 export default function EditProduct({ token }) {
   const [searchName, setSearchName] = useState("");
@@ -69,12 +69,9 @@ export default function EditProduct({ token }) {
     setErrorMessage(null);
 
     try {
-      const response = await axios.patch(
+      const response = await customAxios(token).patch(
         "/api/products/editProduct",
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        formData
       );
       setSuccessMessage(response.data.message);
       setFormData(null);
@@ -92,12 +89,11 @@ export default function EditProduct({ token }) {
     setErrorMessage(null);
 
     try {
-      const response = await axios.post(
+      const response = await customAxios(token).post(
         `/api/products/getProduct`,
         {
           productName: searchName,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
       setFormData(response.data.product);
     } catch (error) {

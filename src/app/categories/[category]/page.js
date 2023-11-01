@@ -19,6 +19,10 @@ export default function Category() {
   const { isLoadingCategory, productsCategory, errorCategory } = useSelector(
     state => state.products
   );
+  console.log(
+    "🚀 ~ file: page.js:20 ~ Category ~ productsCategory:",
+    productsCategory
+  );
   const pathname = usePathname();
   const link = pathname.split("/").pop();
   const category = productsCategory.map(p => p.category)[0];
