@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import ReduxProvider from "../redux/Provider";
 import { NextAuthProvider } from "./providers";
 import { IsClientCtxProvider } from "../lib/is-client-ctx";
+import { PurgeProvider } from "../lib/purge";
 import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,7 +20,9 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <ReduxProvider>
           <NextAuthProvider>
-            <IsClientCtxProvider>{children}</IsClientCtxProvider>
+            <IsClientCtxProvider>
+              <PurgeProvider>{children}</PurgeProvider>
+            </IsClientCtxProvider>
           </NextAuthProvider>
         </ReduxProvider>
         <Script src="/scripts/flowbite.min.js" strategy="lazyOnload" />

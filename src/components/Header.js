@@ -22,7 +22,7 @@ export default function Header() {
     dispatch({
       type: PURGE,
       key: "root",
-      result: () => null,
+      result: () => console.log("Purge successful"),
     });
   };
 

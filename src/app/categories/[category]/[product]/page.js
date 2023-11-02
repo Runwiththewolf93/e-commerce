@@ -17,7 +17,6 @@ export default function Product() {
   const dispatch = useDispatch();
   const pathname = usePathname();
   const { data: session } = useSession();
-  console.log("🚀 ~ file: page.js:20 ~ Product ~ session:", session);
 
   const pathSegments = pathname.split("/");
   const id = pathSegments[pathSegments.length - 1];
@@ -27,7 +26,7 @@ export default function Product() {
   );
 
   useEffect(() => {
-    if (!product) {
+    if (!product || Object.keys(product).length === 0) {
       dispatch(fetchProduct(id));
     }
   }, [id, dispatch, product]);

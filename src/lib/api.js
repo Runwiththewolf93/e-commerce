@@ -3,8 +3,6 @@
 import axios from "axios";
 import axiosRetry from "axios-retry";
 import { signOut } from "next-auth/react";
-import { store } from "../redux/store";
-import { PURGE } from "redux-persist";
 
 // Optional request interceptor
 const requestInterceptor = (config, token) => {
@@ -19,7 +17,10 @@ const responseInterceptor = async error => {
   if (error.response && error.response.status === 401) {
     await signOut({ callbackUrl: "http://localhost:3000/login" });
     localStorage.removeItem("persist:root");
-    store.dispatch({ type: PURGE, key: "root", result: () => null });
+
+    const event = new CustomEvent("purgeStore");
+    window.dispatchEvent(event);
+
     window.location.href = "/login";
   }
   return Promise.reject(error);
