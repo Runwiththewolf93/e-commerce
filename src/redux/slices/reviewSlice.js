@@ -61,6 +61,21 @@ export const fetchReviews = createAsyncThunk(
   }
 );
 
+export const fetchAggregateRating = createAsyncThunk(
+  "reviews/fetchAggregateRating",
+  async ({ productId }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios().get(
+        `/api/reviews/getReviews?productId=${productId}&aggregateRating=${true}`
+      );
+
+      return data.aggregateData;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const createVote = createAsyncThunk(
   "reviews/createVote",
   async ({ userId, reviewId, voteType, jwt }, { rejectWithValue }) => {
@@ -92,6 +107,9 @@ export const reviewSlice = createSlice({
     errorFetch: null,
     isLoadingVote: false,
     errorVote: null,
+    isLoadingAggregateRating: false,
+    aggregateData: [],
+    errorAggregateRating: null,
   },
   reducers: {
     resetCreateReview: state => {
@@ -132,6 +150,20 @@ export const reviewSlice = createSlice({
       .addCase(fetchReviews.rejected, (state, action) => {
         state.isLoadingFetch = false;
         state.errorFetch = action.payload;
+      })
+      // fetchAggregateRating reducer
+      .addCase(fetchAggregateRating.pending, state => {
+        state.isLoadingAggregateRating = true;
+        state.errorAggregateRating = null;
+      })
+      .addCase(fetchAggregateRating.fulfilled, (state, action) => {
+        state.aggregateData = action.payload;
+        state.isLoadingAggregateRating = false;
+        state.errorAggregateRating = null;
+      })
+      .addCase(fetchAggregateRating.rejected, (state, action) => {
+        state.isLoadingAggregateRating = false;
+        state.errorAggregateRating = action.payload;
       })
       // addVote reducer
       .addCase(createVote.pending, state => {

@@ -10,9 +10,9 @@ import { Spinner, Alert } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import ProductBreadcrumb from "../../components/ProductBreadcrumb";
 import ProductImages from "../../components/ProductImages";
-import StarRating from "../../../../subcomponents/StarRating";
 import ProductCreateReview from "../../components/ProductCreateReview";
 import ProductReviewList from "../../components/ProductReviewList";
+import ProductAggregateRating from "../../components/ProductAggregateRating";
 
 export default function Product() {
   const dispatch = useDispatch();
@@ -95,21 +95,7 @@ export default function Product() {
               </div>
             )}
 
-            <div className="mt-5">
-              <h3 className="sr-only">Reviews</h3>
-              <div className="flex items-center">
-                <div className="flex items-center">
-                  <StarRating aggregateRating={4.5} />
-                </div>
-                <p className="sr-only">4 out of 5 stars</p>
-                <a
-                  href="#"
-                  className="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  117 reviews
-                </a>
-              </div>
-            </div>
+            <ProductAggregateRating productId={product._id} />
 
             <section>
               <ProductCreateReview
@@ -168,7 +154,7 @@ export default function Product() {
               <h2 className="text-sm font-medium text-gray-900">Details</h2>
 
               <div className="mt-4 space-y-6">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 line-clamp-2">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
                   Corporis nisi repudiandae consequuntur aut ipsum asperiores
                   eveniet nesciunt vero hic distinctio assumenda, veritatis
@@ -183,3 +169,5 @@ export default function Product() {
     </div>
   );
 }
+
+// http://localhost:3000/categories/electronics/65256be84e6d44d34b376798

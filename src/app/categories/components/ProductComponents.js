@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dropdown } from "flowbite-react";
+import { Dropdown, Tooltip } from "flowbite-react";
 import { useDispatch } from "react-redux";
 import { fetchReviews } from "../../../redux/slices/reviewSlice";
 
@@ -89,3 +89,7 @@ export function SortDropdown({
     </Dropdown>
   );
 }
+
+export const TooltipStar = ({ content, children }) => {
+  return <Tooltip content={content}>{children}</Tooltip>;
+};

@@ -26,7 +26,6 @@ export default function ProductReviewList({ productId }) {
 
   useEffect(() => {
     if (!reviews && productId) {
-      console.log("does this trigger?");
       dispatch(fetchReviews({ productId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

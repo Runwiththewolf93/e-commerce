@@ -77,7 +77,7 @@ export async function GET(req) {
 
     if (aggregateRating) {
       const aggregateData = await Reviews.aggregate([
-        { $match: { productId: mongoose.Types.ObjectId(productId) } },
+        { $match: { productId: new mongoose.Types.ObjectId(productId) } },
         {
           $group: {
             _id: "$productId",
