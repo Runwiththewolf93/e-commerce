@@ -29,7 +29,7 @@ export const fetchReviews = createAsyncThunk(
   async (
     {
       productId,
-      rating,
+      filter,
       reviewType,
       sort,
       aggregateRating,
@@ -39,9 +39,15 @@ export const fetchReviews = createAsyncThunk(
     },
     { rejectWithValue }
   ) => {
+    const rating = filter?.rating;
+    const sortField = sort ? Object.keys(sort).find(key => sort[key]) : null;
+    const sortOrder = sort ? sort[sortField] : null;
+
     try {
       const { data } = await customAxios().get(
-        `/api/reviews/getReviews?productId=${productId}&rating=${rating}&reviewType=${reviewType}&sort=${sort}&aggregateRating=${aggregateRating}&page=${page}&limit=${limit}&userId=${userId}`
+        `/api/reviews/getReviews?productId=${productId}&rating=${rating}&reviewType=${reviewType}&sort=${
+          sortField && sortOrder ? `${sortField}_${sortOrder}` : undefined
+        }&aggregateRating=${aggregateRating}&page=${page}&limit=${limit}&userId=${userId}`
       );
 
       return {

@@ -93,7 +93,7 @@ export async function GET(req) {
       );
     } else {
       let filterConditions = { productId };
-      if (rating !== null) {
+      if (typeof rating === "number") {
         filterConditions.rating = rating;
       }
       if (reviewType === "positive") {
@@ -109,13 +109,25 @@ export async function GET(req) {
         sortConditions[field] = order === "desc" ? -1 : 1;
       }
 
+      console.log(
+        "🚀 ~ file: route.js:99 ~ GET ~ filterConditions:",
+        filterConditions
+      );
+      console.log(
+        "🚀 ~ file: route.js:107 ~ GET ~ sortConditions:",
+        sortConditions
+      );
+
       const skip = (page - 1) * limit;
+      console.log("🚀 ~ file: route.js:122 ~ GET ~ skip:", skip);
+      console.log("🚀 ~ file: route.js:122 ~ GET ~ limit:", limit);
 
       const reviews = await Reviews.find(filterConditions)
         .sort(sortConditions)
         .skip(skip)
         .limit(limit)
         .lean();
+      console.log("🚀 ~ file: route.js:130 ~ GET ~ reviews:", reviews);
 
       if (userId) {
         reviews.forEach(review => {

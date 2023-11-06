@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchReviews } from "../../../redux/slices/reviewSlice";
 import { Spinner, Alert } from "flowbite-react";
@@ -11,6 +11,14 @@ export default function ProductReviewList({ productId }) {
   const { isLoadingFetch, reviews, reviewsMessage, errorFetch } = useSelector(
     state => state.reviews
   );
+  const [filterSortCriteria, setFilterSortCriteria] = useState({
+    filter: null,
+    sort: {
+      createdAt: "desc",
+      updatedAt: "desc",
+    },
+  });
+
   console.log(
     "🚀 ~ file: ProductReviewList.js:10 ~ ProductReviewList ~ reviews:",
     reviews
@@ -31,9 +39,17 @@ export default function ProductReviewList({ productId }) {
           Product Reviews
         </h1>
         <div className="flex-grow"></div>
-        <FilterDropdown productId={productId} />
+        <FilterDropdown
+          productId={productId}
+          filterSortCriteria={filterSortCriteria}
+          setFilterSortCriteria={setFilterSortCriteria}
+        />
         <div className="flex-grow"></div>
-        <SortDropdown />
+        <SortDropdown
+          productId={productId}
+          filterSortCriteria={filterSortCriteria}
+          setFilterSortCriteria={setFilterSortCriteria}
+        />
         <div className="flex-grow"></div>
       </div>
       {isLoadingFetch ? (
