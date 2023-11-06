@@ -39,12 +39,14 @@ export async function POST(req) {
     }
 
     let existingReview = await Review.findOne({ userId, productId });
+    let isUpdated = false;
 
     if (existingReview) {
       existingReview.review = review;
       existingReview.rating = rating;
       existingReview.updateAt = new Date();
       await existingReview.save();
+      isUpdated = true;
     } else {
       const newReview = new Review({
         userId: new mongoose.Types.ObjectId(userId),
@@ -57,10 +59,11 @@ export async function POST(req) {
       await newReview.save();
     }
 
-    return NextResponse.json(
-      { status: "success", message: "Review created successfully" },
-      { status: 200 }
-    );
+    const message = isUpdated
+      ? "Review updated successfully"
+      : "Review created successfully";
+
+    return NextResponse.json({ status: "success", message }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       {

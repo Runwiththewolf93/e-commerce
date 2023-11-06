@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createReview } from "../../../redux/slices/reviewSlice";
+import {
+  createReview,
+  resetCreateReview,
+} from "../../../redux/slices/reviewSlice";
 import { Alert } from "flowbite-react";
 
 const CreateReview = ({ productId, userId, jwt }) => {
@@ -21,8 +24,16 @@ const CreateReview = ({ productId, userId, jwt }) => {
   return (
     <div className="bg-white p-4 rounded shadow">
       <h2 className="text-2xl font-semibold mb-4">Write a Review</h2>
-      {message && <Alert color="success">{message}</Alert>}
-      {error && <Alert color="failure">{error}</Alert>}
+      {message && (
+        <Alert color="success" onDismiss={() => dispatch(resetCreateReview())}>
+          {message}
+        </Alert>
+      )}
+      {error && (
+        <Alert color="failure" onDismiss={() => dispatch(resetCreateReview())}>
+          {error}
+        </Alert>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label

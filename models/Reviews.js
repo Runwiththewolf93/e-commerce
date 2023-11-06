@@ -22,14 +22,16 @@ const reviewSchema = mongoose.Schema({
     min: 1,
     max: 5,
   },
-  upvotes: {
+  upvotesCount: {
     type: Number,
     default: 0,
   },
-  downvotes: {
+  downvotesCount: {
     type: Number,
     default: 0,
   },
+  upvotedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  downvotedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   createdAt: {
     type: Date,
     default: Date.now,

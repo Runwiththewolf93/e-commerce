@@ -12,6 +12,7 @@ import ProductBreadcrumb from "../../components/ProductBreadcrumb";
 import ProductImages from "../../components/ProductImages";
 import StarRating from "../../../../subcomponents/StarRating";
 import ProductCreateReview from "../../components/ProductCreateReview";
+import ProductReviewList from "../../components/ProductReviewList";
 
 export default function Product() {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ export default function Product() {
   const { isLoadingProduct, product, errorProduct } = useSelector(
     state => state.products
   );
+  console.log("🚀 ~ file: page.js:26 ~ Product ~ product:", product);
 
   useEffect(() => {
     if (!product || Object.keys(product).length === 0) {
@@ -48,7 +50,7 @@ export default function Product() {
   // testing purposes
 
   if (isLoadingProduct) {
-    return <Spinner />;
+    return <Spinner size="xl" />;
   }
 
   if (errorProduct) {
@@ -125,7 +127,7 @@ export default function Product() {
             </section>
           </div>
 
-          <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6">
+          <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-12 lg:pr-8 lg:pt-6">
             <div>
               <h3 className="sr-only">Description</h3>
               <div className="space-y-6">
@@ -140,22 +142,22 @@ export default function Product() {
                 <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
                   <li className="text-gray-400">
                     <span className="text-gray-600">
-                      Hand cut and sewn locally
+                      Lorem ipsum dolor sit amet.
                     </span>
                   </li>
                   <li className="text-gray-400">
                     <span className="text-gray-600">
-                      Dyed with our proprietary colors
+                      Lorem ipsum dolor sit amet.
                     </span>
                   </li>
                   <li className="text-gray-400">
                     <span className="text-gray-600">
-                      Pre-washed &amp; pre-shrunk
+                      Lorem ipsum dolor sit amet.
                     </span>
                   </li>
                   <li className="text-gray-400">
                     <span className="text-gray-600">
-                      Ultra-soft 100% cotton
+                      Lorem ipsum dolor sit amet.
                     </span>
                   </li>
                 </ul>
@@ -167,14 +169,15 @@ export default function Product() {
 
               <div className="mt-4 space-y-6">
                 <p className="text-sm text-gray-600">
-                  The 6-Pack includes two black, two white, and two heather gray
-                  Basic Tees. Sign up for our subscription service and be the
-                  first to get new, exciting colors, like our upcoming
-                  &quot;Charcoal Gray&quot; limited release.
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Corporis nisi repudiandae consequuntur aut ipsum asperiores
+                  eveniet nesciunt vero hic distinctio assumenda, veritatis
+                  fugiat temporibus sint.
                 </p>
               </div>
             </div>
           </div>
+          <ProductReviewList productId={product._id} />
         </div>
       </div>
     </div>

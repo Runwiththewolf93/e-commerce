@@ -15,6 +15,8 @@ const requestInterceptor = (config, token) => {
 // Response interceptor
 const responseInterceptor = async error => {
   if (error.response && error.response.status === 401) {
+    alert("Your session has expired or is invalid. Please log in again.");
+
     await signOut({ callbackUrl: "http://localhost:3000/login" });
     localStorage.removeItem("persist:root");
 
