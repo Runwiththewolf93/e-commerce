@@ -32,7 +32,7 @@ export async function GET(req) {
     const params = {
       productId: searchParams.get("productId"),
       page: parseInt(searchParams.get("page"), 10) || 1,
-      limit: parseInt(searchParams.get("limit"), 10) || 3,
+      limit: parseInt(searchParams.get("limit"), 10) || 1,
     };
 
     const optionalParams = {
@@ -65,10 +65,6 @@ export async function GET(req) {
       page,
       limit,
     } = value;
-
-    if (!productId) {
-      throw new customAPIError.BadRequestError("Product ID is required");
-    }
 
     const product = await Product.findById(productId);
     if (!product) {

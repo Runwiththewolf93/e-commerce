@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Dropdown, Tooltip } from "flowbite-react";
+import { Dropdown, Tooltip, Button } from "flowbite-react";
 import { useDispatch } from "react-redux";
 import { fetchReviews } from "../../../redux/slices/reviewSlice";
+import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi";
 
 export function FilterDropdown({
   productId,
@@ -92,4 +93,51 @@ export function SortDropdown({
 
 export const TooltipStar = ({ content, children }) => {
   return <Tooltip content={content}>{children}</Tooltip>;
+};
+
+export const ReviewNavigation = ({
+  productId,
+  pagination,
+  filterSortCriteria,
+}) => {
+  console.log(
+    "🚀 ~ file: ProductComponents.js:99 ~ ReviewNavigation ~ pagination:",
+    pagination
+  );
+  const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(pagination.page);
+  const limit = pagination.limit;
+
+  const handleNavigation = newPage => {
+    setCurrentPage(newPage);
+    dispatch(
+      fetchReviews({ productId, page: newPage, limit, ...filterSortCriteria })
+    );
+  };
+
+  return (
+    <div className="flex">
+      <Button
+        outline
+        color="blue"
+        gradientDuoTone="purpleToBlue"
+        className="mr-3"
+        onClick={() => handleNavigation(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        <HiOutlineArrowLeft className="mr-1" />
+        Previous page
+      </Button>
+      <Button
+        outline
+        color="blue"
+        gradientDuoTone="purpleToBlue"
+        onClick={() => handleNavigation(currentPage + 1)}
+        disabled={currentPage === pagination.pages}
+      >
+        Next page
+        <HiOutlineArrowRight className="ml-1" />
+      </Button>
+    </div>
+  );
 };

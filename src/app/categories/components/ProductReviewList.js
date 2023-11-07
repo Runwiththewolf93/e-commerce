@@ -4,13 +4,16 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchReviews } from "../../../redux/slices/reviewSlice";
 import { Spinner, Alert } from "flowbite-react";
-import { FilterDropdown, SortDropdown } from "./ProductComponents";
+import {
+  FilterDropdown,
+  SortDropdown,
+  ReviewNavigation,
+} from "./ProductComponents";
 
 export default function ProductReviewList({ productId }) {
   const dispatch = useDispatch();
-  const { isLoadingFetch, reviews, reviewsMessage, errorFetch } = useSelector(
-    state => state.reviews
-  );
+  const { isLoadingFetch, reviews, pagination, reviewsMessage, errorFetch } =
+    useSelector(state => state.reviews);
   const [filterSortCriteria, setFilterSortCriteria] = useState({
     filter: null,
     sort: {
@@ -25,7 +28,7 @@ export default function ProductReviewList({ productId }) {
   );
 
   useEffect(() => {
-    if (!reviews && productId) {
+    if ((!reviews || reviews.length === 0) && productId) {
       dispatch(fetchReviews({ productId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,6 +86,11 @@ export default function ProductReviewList({ productId }) {
           </div>
         ))
       )}
+      <ReviewNavigation
+        productId={productId}
+        pagination={pagination}
+        filterSortCriteria={filterSortCriteria}
+      />
     </div>
   );
 }

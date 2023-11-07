@@ -49,6 +49,7 @@ export const fetchReviews = createAsyncThunk(
           sortField && sortOrder ? `${sortField}_${sortOrder}` : undefined
         }&aggregateRating=${aggregateRating}&page=${page}&limit=${limit}&userId=${userId}`
       );
+      console.log("🚀 ~ file: reviewSlice.js:48 ~ data:", data);
 
       return {
         reviews: data.reviews,
