@@ -39,6 +39,7 @@ export const fetchReviews = createAsyncThunk(
     },
     { rejectWithValue }
   ) => {
+    console.log("🚀 ~ file: reviewSlice.js:42 ~ userId:", userId);
     const rating = filter?.rating;
     const sortField = sort ? Object.keys(sort).find(key => sort[key]) : null;
     const sortOrder = sort ? sort[sortField] : null;
@@ -79,13 +80,11 @@ export const fetchAggregateRating = createAsyncThunk(
 
 export const createVote = createAsyncThunk(
   "reviews/createVote",
-  async ({ userId, reviewId, voteType, jwt }, { rejectWithValue }) => {
+  async ({ reviewId, voteType, jwt }, { rejectWithValue }) => {
     try {
       const { data } = await customAxios(jwt).patch("/api/reviews/addVote", {
-        userId,
         reviewId,
         voteType,
-        jwt,
       });
 
       return data;
@@ -107,6 +106,8 @@ export const reviewSlice = createSlice({
     reviewsMessage: "",
     errorFetch: null,
     isLoadingVote: false,
+    prevReviewState: null,
+    latestVoteRequestId: null,
     errorVote: null,
     isLoadingAggregateRating: false,
     aggregateData: [],
@@ -166,28 +167,55 @@ export const reviewSlice = createSlice({
         state.isLoadingAggregateRating = false;
         state.errorAggregateRating = action.payload;
       })
-      // addVote reducer
-      .addCase(createVote.pending, state => {
-        state.isLoadingVote = true;
-        state.errorVote = null;
-      })
-      .addCase(createVote.fulfilled, (state, action) => {
-        const { reviewId, userVoteType, upvotesCount, downvotesCount } =
-          action.payload;
+      // createVote reducer
+      .addCase(createVote.pending, (state, action) => {
+        // Store the previous state before the optimistic update
+        const { reviewId } = action.meta.arg;
         const reviewIndex = state.reviews.findIndex(
           review => review._id === reviewId
         );
         if (reviewIndex !== -1) {
-          state.reviews[reviewIndex].upvotesCount = upvotesCount;
-          state.reviews[reviewIndex].downvotesCount = downvotesCount;
-          state.reviews[reviewIndex].userVoteType = userVoteType;
+          state.prevReviewState = { ...state.reviews[reviewIndex] };
         }
+        state.isLoadingVote = true;
+        state.errorVote = null;
+        state.latestVoteRequestId = action.meta.requestId;
+      })
+      .addCase(createVote.fulfilled, (state, action) => {
+        if (action.meta.requestId === state.latestVoteRequestId) {
+          const { reviewId, userVoteType, upvotesCount, downvotesCount } =
+            action.payload;
+          const reviewIndex = state.reviews.findIndex(
+            review => review._id === reviewId
+          );
+          if (reviewIndex !== -1) {
+            state.reviews[reviewIndex].upvotesCount = upvotesCount;
+            state.reviews[reviewIndex].downvotesCount = downvotesCount;
+            state.reviews[reviewIndex].userVoteType = userVoteType;
+          }
+        }
+        // Clear previous state if updated confirmed
+        state.prevReviewState = null;
         state.isLoadingVote = false;
         state.errorVote = null;
+        state.latestVoteRequestId = null;
       })
       .addCase(createVote.rejected, (state, action) => {
+        // Rollback to previous state if the API call fails
+        if (action.meta.requestId === state.latestVoteRequestId) {
+          if (state.prevReviewState) {
+            const reviewIndex = state.reviews.findIndex(
+              review => review._id === state.prevReviewState._id
+            );
+            if (reviewIndex !== -1) {
+              state.reviews[reviewIndex] = state.prevReviewState;
+            }
+          }
+        }
+        state.prevReviewState = null;
         state.isLoadingVote = false;
         state.errorVote = action.payload;
+        state.latestVoteRequestId = null;
       });
   },
 });

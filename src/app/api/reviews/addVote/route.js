@@ -10,74 +10,99 @@ export async function PATCH(req) {
     validateJWT(req);
     await connect();
 
-    const { userId, reviewId, voteType } = await req.json();
+    const { reviewId, voteType } = await req.json();
 
     const schema = Joi.object({
-      userId: Joi.string()
-        .regex(/^[0-9a-fA-F]{24}$/)
-        .required(),
       reviewId: Joi.string()
         .regex(/^[0-9a-fA-F]{24}$/)
         .required(),
       voteType: Joi.string().valid("upvote", "downvote").required(),
     });
 
-    const { error } = schema.validate({ userId, reviewId, voteType });
+    const { error } = schema.validate({ reviewId, voteType });
     if (error) {
       throw new customAPIError.BadRequestError(error.details[0].message);
     }
 
-    const review = await Review.findById(reviewId);
+    let update = {};
+    let message = "Vote updated successfully";
+    let userVoteType = null;
+
+    const userId = req.user.id;
+
+    if (voteType === "upvote") {
+      // Check if the user has already downvoted
+      const hasDownvoted = await Review.findOne({
+        _id: reviewId,
+        downvotedBy: userId,
+      });
+      if (hasDownvoted) {
+        // Remove downvote and decrement downvotesCount
+        update.$pull = { downvotedBy: userId };
+        update.$inc = { downvotesCount: -1 };
+        message = "Downvote removed and upvote added";
+        userVoteType = "upvote";
+      }
+      // Check if the user has already upvoted
+      const hasUpvoted = await Review.findOne({
+        _id: reviewId,
+        upvotedBy: userId,
+      });
+      if (hasUpvoted) {
+        // Remove upvote and decrement upvotesCount
+        update.$pull = { upvotedBy: userId };
+        update.$inc = { ...update.$inc, upvotesCount: -1 };
+        message = "Upvote removed";
+        userVoteType = null;
+      } else {
+        // Add upvote and increment upvotesCount
+        update.$addToSet = { upvotedBy: userId };
+        update.$inc = { ...update.$inc, upvotesCount: 1 };
+        message = "Upvote added";
+        userVoteType = "upvote";
+      }
+    } else if (voteType === "downvote") {
+      // Check if the user has already upvoted
+      const hasUpvoted = await Review.findOne({
+        _id: reviewId,
+        upvotedBy: userId,
+      });
+      if (hasUpvoted) {
+        // Remove upvote and decrement upvotesCount
+        update.$pull = { upvotedBy: userId };
+        update.$inc = { upvotesCount: -1 };
+        message = "Upvote removed and downvote added";
+        userVoteType = "downvote";
+      }
+      // Check if the user has already downvoted
+      const hasDownvoted = await Review.findOne({
+        _id: reviewId,
+        downvotedBy: userId,
+      });
+      if (hasDownvoted) {
+        // Remove downvote and decrement downvotesCount
+        update.$pull = { downvotedBy: userId };
+        update.$inc = { ...update.$inc, downvotesCount: -1 };
+        message = "Downvote removed";
+        userVoteType = null;
+      } else {
+        // Add downvote and increment downvotesCount
+        update.$addToSet = { downvotedBy: userId };
+        update.$inc = { ...update.$inc, downvotesCount: 1 };
+        message = "Downvote added";
+        userVoteType = "downvote";
+      }
+    }
+
+    // Perform the atomic update
+    const review = await Review.findByIdAndUpdate(reviewId, update, {
+      new: true,
+    });
+    console.log("🚀 ~ file: route.js:101 ~ PATCH ~ review:", review);
+
     if (!review) {
       throw new customAPIError.NotFoundError("Review not found");
     }
-
-    let message = "Vote updated successfully";
-    let userVoteType = null;
-    if (voteType === "upvote") {
-      if (review.downvotedBy.includes(userId)) {
-        review.downvotedBy.pull(userId);
-        review.downvotesCount -= 1;
-        message = "Downvotes removed";
-        userVoteType = review.upvotedBy.includes(userId) ? "upvote" : null;
-      }
-      if (!review.upvotedBy.includes(userId)) {
-        review.upvotedBy.push(userId);
-        review.upvotesCount += 1;
-        message = "Upvote added";
-      } else {
-        // if the user upvoted, remove upvote
-        review.upvotedBy.pull(userId);
-        review.upvotesCount -= 1;
-        message = "Upvote removed";
-      }
-    } else if (voteType === "downvote") {
-      if (review.upvotedBy.includes(userId)) {
-        userVoteType = review.downvotedBy.includes(userId) ? "downvote" : null;
-        review.upvotedBy.pull(userId);
-        review.upvotesCount -= 1;
-        message = "Upvotes removed";
-      }
-      if (!review.downvotedBy.includes(userId)) {
-        review.downvotedBy.push(userId);
-        review.downvotesCount += 1;
-        message = "Downvote added";
-      } else {
-        // if the user downvoted, remove downvote
-        review.downvotedBy.pull(userId);
-        review.downvotesCount -= 1;
-        message = "Downvote removed";
-      }
-    }
-
-    // let userVoteType = null;
-    // if (voteType === "upvote") {
-    //   userVoteType = review.upvotedBy.includes(userId) ? null : "upvote";
-    // } else if (voteType === "downvote") {
-    //   userVoteType = review.downvotedBy.includes(userId) ? null : "downvote";
-    // }
-
-    await review.save();
 
     return NextResponse.json(
       {

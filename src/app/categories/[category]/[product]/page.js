@@ -18,6 +18,7 @@ export default function Product() {
   const dispatch = useDispatch();
   const pathname = usePathname();
   const { data: session } = useSession();
+  // console.log("🚀 ~ file: page.js:21 ~ Product ~ session:", session);
 
   const pathSegments = pathname.split("/");
   const id = pathSegments[pathSegments.length - 1];
@@ -25,7 +26,7 @@ export default function Product() {
   const { isLoadingProduct, product, errorProduct } = useSelector(
     state => state.products
   );
-  console.log("🚀 ~ file: page.js:26 ~ Product ~ product:", product);
+  // console.log("🚀 ~ file: page.js:26 ~ Product ~ product:", product);
 
   useEffect(() => {
     if (!product || Object.keys(product).length === 0) {
@@ -163,7 +164,10 @@ export default function Product() {
               </div>
             </div>
           </div>
-          <ProductReviewList productId={product._id} />
+          <ProductReviewList
+            productId={product._id}
+            userId={session?.user?.id}
+          />
         </div>
       </div>
     </div>

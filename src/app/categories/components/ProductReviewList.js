@@ -8,9 +8,10 @@ import {
   FilterDropdown,
   SortDropdown,
   ReviewNavigation,
+  AddVote,
 } from "./ProductComponents";
 
-export default function ProductReviewList({ productId }) {
+export default function ProductReviewList({ productId, userId }) {
   const dispatch = useDispatch();
   const { isLoadingFetch, reviews, pagination, reviewsMessage, errorFetch } =
     useSelector(state => state.reviews);
@@ -29,10 +30,14 @@ export default function ProductReviewList({ productId }) {
 
   useEffect(() => {
     if ((!reviews || reviews.length === 0) && productId) {
-      dispatch(fetchReviews({ productId }));
+      console.log(
+        "🚀 ~ file: ProductReviewList.js:34 ~ useEffect ~ userId:",
+        userId
+      );
+      dispatch(fetchReviews({ productId, userId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, productId]);
+  }, [dispatch, productId, userId]);
 
   return (
     <div className="space-y-4 col-span-2">
@@ -73,12 +78,7 @@ export default function ProductReviewList({ productId }) {
             </div>
             <p className="mt-2 text-gray-700">{review.review}</p>
             <div className="mt-4 flex items-center justify-between">
-              <div>
-                <button className="text-green-500">👍 {review.upvotes}</button>
-                <button className="ml-4 text-red-500">
-                  👎 {review.downvotes}
-                </button>
-              </div>
+              <AddVote review={review} />
               <span className="text-gray-500 text-sm">
                 {new Date(review.createdAt).toLocaleDateString()}
               </span>
@@ -90,6 +90,7 @@ export default function ProductReviewList({ productId }) {
         productId={productId}
         pagination={pagination}
         filterSortCriteria={filterSortCriteria}
+        userId={userId}
       />
     </div>
   );

@@ -122,20 +122,33 @@ export async function GET(req) {
         .sort(sortConditions)
         .skip(skip)
         .limit(limit)
+        .populate({ path: "upvotedBy", model: "User" })
+        .populate({ path: "downvotedBy", model: "User" })
         .lean();
-      console.log("🚀 ~ file: route.js:130 ~ GET ~ reviews:", reviews);
+
+      console.log("🚀 ~ file: route.js:126 ~ GET ~ reviews:", reviews);
+      console.log("🚀 ~ file: route.js:129 ~ GET ~ userId:", userId);
 
       if (userId) {
         reviews.forEach(review => {
-          if (review.upvotedBy.includes(userId)) {
+          review.upvotedBy = review.upvotedBy || [];
+          review.downvotedBy = review.downvotedBy || [];
+          // Convert ObjectId to string for comparison
+          const upvoterIds = review.upvotedBy.map(user => user._id.toString());
+          const downvoterIds = review.downvotedBy.map(user =>
+            user._id.toString()
+          );
+          if (upvoterIds.includes(userId)) {
             review.userVoteType = "upvote";
-          } else if (review.downvotedBy.includes(userId)) {
+          } else if (downvoterIds.includes(userId)) {
             review.userVoteType = "downvote";
           } else {
             review.userVoteType = null;
           }
         });
       }
+
+      console.log("🚀 ~ file: route.js:130 ~ GET ~ reviews:", reviews);
 
       const totalReviews = await Reviews.countDocuments(filterConditions);
 
