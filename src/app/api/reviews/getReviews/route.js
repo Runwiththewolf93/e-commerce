@@ -28,6 +28,8 @@ export async function GET(req) {
   try {
     await connect();
 
+    console.log("Did we pass the validation check?");
+
     const searchParams = req.nextUrl.searchParams;
     const params = {
       productId: searchParams.get("productId"),
@@ -93,16 +95,22 @@ export async function GET(req) {
         filterConditions.rating = rating;
       }
       if (reviewType === "positive") {
-        filterConditions.$expr = { $gt: ["$upvotes", "$downvotes"] };
+        filterConditions.$expr = { $gte: ["$upvotesCount", "$downvotesCount"] };
       }
       if (reviewType === "critical") {
-        filterConditions.$expr = { $gt: ["$downvotes", "$upvotes"] };
+        filterConditions.$expr = { $gte: ["$downvotesCount", "$upvotesCount"] };
       }
 
       let sortConditions = {};
       if (sort) {
         const [field, order] = sort.split("_");
         sortConditions[field] = order === "desc" ? -1 : 1;
+      }
+      if (reviewType === "positive") {
+        sortConditions.upvotesCount = -1;
+      }
+      if (reviewType === "critical") {
+        sortConditions.downvotesCount = -1;
       }
 
       console.log(
@@ -151,6 +159,10 @@ export async function GET(req) {
       console.log("🚀 ~ file: route.js:130 ~ GET ~ reviews:", reviews);
 
       const totalReviews = await Reviews.countDocuments(filterConditions);
+      console.log(
+        "🚀 ~ file: route.js:162 ~ GET ~ totalReviews:",
+        totalReviews
+      );
 
       if (reviews.length === 0) {
         return NextResponse.json(

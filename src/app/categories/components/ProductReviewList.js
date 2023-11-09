@@ -23,17 +23,8 @@ export default function ProductReviewList({ productId, userId }) {
     },
   });
 
-  console.log(
-    "🚀 ~ file: ProductReviewList.js:10 ~ ProductReviewList ~ reviews:",
-    reviews
-  );
-
   useEffect(() => {
     if ((!reviews || reviews.length === 0) && productId) {
-      console.log(
-        "🚀 ~ file: ProductReviewList.js:34 ~ useEffect ~ userId:",
-        userId
-      );
       dispatch(fetchReviews({ productId, userId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

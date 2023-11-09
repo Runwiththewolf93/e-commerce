@@ -27,28 +27,36 @@ export const createReview = createAsyncThunk(
 export const fetchReviews = createAsyncThunk(
   "reviews/fetchReviews",
   async (
-    {
-      productId,
-      filter,
-      reviewType,
-      sort,
-      aggregateRating,
-      page,
-      limit,
-      userId,
-    },
+    { productId, filter, sort, aggregateRating, page, limit, userId },
     { rejectWithValue }
   ) => {
-    console.log("🚀 ~ file: reviewSlice.js:42 ~ userId:", userId);
     const rating = filter?.rating;
+    const reviewType = filter?.reviewType;
     const sortField = sort ? Object.keys(sort).find(key => sort[key]) : null;
     const sortOrder = sort ? sort[sortField] : null;
 
+    // Initialize paramsObject with mandatory parameters
+    let paramsObject = { productId };
+
+    // Add optional parameters if they are defined
+    if (page !== undefined) paramsObject.page = page.toString();
+    if (limit !== undefined) paramsObject.limit = limit.toString();
+    if (rating !== undefined) paramsObject.rating = rating.toString();
+    if (reviewType !== undefined) paramsObject.reviewType = reviewType;
+    if (sortField && sortOrder) paramsObject.sort = `${sortField}_${sortOrder}`;
+    if (aggregateRating !== undefined)
+      paramsObject.aggregateRating = aggregateRating;
+    if (userId !== undefined) paramsObject.userId = userId;
+
+    console.log("🚀 ~ file: reviewSlice.js:45 ~ paramsObject:", paramsObject);
+
     try {
+      // Convert the parameters object to a query string
+      const queryParams = new URLSearchParams(paramsObject).toString();
+      console.log("🚀 ~ file: reviewSlice.js:48 ~ queryParams:", queryParams);
+
       const { data } = await customAxios().get(
-        `/api/reviews/getReviews?productId=${productId}&rating=${rating}&reviewType=${reviewType}&sort=${
-          sortField && sortOrder ? `${sortField}_${sortOrder}` : undefined
-        }&aggregateRating=${aggregateRating}&page=${page}&limit=${limit}&userId=${userId}`
+        `/api/reviews/getReviews?${queryParams}`
       );
       console.log("🚀 ~ file: reviewSlice.js:48 ~ data:", data);
 

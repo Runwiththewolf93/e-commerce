@@ -20,38 +20,51 @@ export function FilterDropdown({
 }) {
   const dispatch = useDispatch();
 
-  const handleRatingFilter = rating => {
+  const handleFilterChange = filterOption => {
+    const newFilter = filterOption.hasOwnProperty("rating")
+      ? { rating: filterOption.rating }
+      : { reviewType: filterOption.reviewType };
+
     setFilterSortCriteria(prev => ({
       ...prev,
-      filter: { rating },
+      filter: newFilter,
     }));
+
     dispatch(
-      fetchReviews({ ...filterSortCriteria, filter: { rating }, productId })
+      fetchReviews({ ...filterSortCriteria, filter: newFilter, productId })
     );
   };
 
   return (
     <Dropdown label="Filter" inline placement="right">
-      <Dropdown.Item onClick={() => handleRatingFilter(undefined)}>
+      <Dropdown.Item onClick={() => handleFilterChange({})}>
         All stars
       </Dropdown.Item>
-      <Dropdown.Item onClick={() => handleRatingFilter(5)}>
+      <Dropdown.Item onClick={() => handleFilterChange({ rating: 5 })}>
         5 star only
       </Dropdown.Item>
-      <Dropdown.Item onClick={() => handleRatingFilter(4)}>
+      <Dropdown.Item onClick={() => handleFilterChange({ rating: 4 })}>
         4 star only
       </Dropdown.Item>
-      <Dropdown.Item onClick={() => handleRatingFilter(3)}>
+      <Dropdown.Item onClick={() => handleFilterChange({ rating: 3 })}>
         3 star only
       </Dropdown.Item>
-      <Dropdown.Item onClick={() => handleRatingFilter(2)}>
+      <Dropdown.Item onClick={() => handleFilterChange({ rating: 2 })}>
         2 star only
       </Dropdown.Item>
-      <Dropdown.Item onClick={() => handleRatingFilter(1)}>
+      <Dropdown.Item onClick={() => handleFilterChange({ rating: 1 })}>
         1 star only
       </Dropdown.Item>
-      <Dropdown.Item>Positive</Dropdown.Item>
-      <Dropdown.Item>Critical</Dropdown.Item>
+      <Dropdown.Item
+        onClick={() => handleFilterChange({ reviewType: "positive" })}
+      >
+        Positive
+      </Dropdown.Item>
+      <Dropdown.Item
+        onClick={() => handleFilterChange({ reviewType: "critical" })}
+      >
+        Critical
+      </Dropdown.Item>
     </Dropdown>
   );
 }
@@ -68,6 +81,8 @@ export function SortDropdown({
     updatedAt: "desc",
   });
 
+  console.log("does this trigger on every render?");
+
   const handleSortFilter = field => {
     const newOrder = sortOrder[field] === "desc" ? "asc" : "desc";
     setSortOrder({ ...sortOrder, [field]: newOrder });
@@ -77,6 +92,10 @@ export function SortDropdown({
       sort: { [field]: newOrder },
     }));
 
+    console.log(
+      "🚀 ~ file: ProductComponents.js:98 ~ handleSortFilter ~ filterSortCriteria:",
+      filterSortCriteria
+    );
     dispatch(
       fetchReviews({
         ...filterSortCriteria,
@@ -109,7 +128,25 @@ export const ReviewNavigation = ({
   userId,
 }) => {
   const dispatch = useDispatch();
-  const [currentPage, setCurrentPage] = useState(pagination.page);
+  const [currentPage, setCurrentPage] = useState(Number(pagination.page));
+
+  // Update currentPage whenever pagination.page changes
+  useEffect(() => {
+    setCurrentPage(Number(pagination.page));
+  }, [pagination.page]);
+
+  console.log(
+    "🚀 ~ file: ProductComponents.js:132 ~ pagination.page:",
+    pagination.page
+  );
+  console.log(
+    "🚀 ~ file: ProductComponents.js:132 ~ currentPage:",
+    currentPage
+  );
+  console.log(
+    "🚀 ~ file: ProductComponents.js:137 ~ pagination.pages:",
+    pagination.pages
+  );
   const limit = pagination.limit;
 
   const handleNavigation = newPage => {
@@ -153,14 +190,9 @@ export const ReviewNavigation = ({
 };
 
 export const AddVote = ({ review }) => {
-  console.log(
-    "🚀 ~ file: ProductComponents.js:149 ~ AddVote ~ review:",
-    review
-  );
   const dispatch = useDispatch();
   const { data: session } = useSession();
   const jwt = session?.customJwt;
-  const userId = session?.user?.id;
 
   const { isLoadingVote, errorVote, latestVoteRequestId } = useSelector(
     state => state.reviews
@@ -172,16 +204,6 @@ export const AddVote = ({ review }) => {
   const [localUserVoteType, setLocalUserVoteType] = useState(
     review?.userVoteType || null
   );
-  const isUpvotedId = review.upvotedBy?.includes(userId);
-  // console.log(
-  //   "🚀 ~ file: ProductComponents.js:169 ~ AddVote ~ isUpvotedId:",
-  //   isUpvotedId
-  // );
-  const isDownvotedId = review.downvotedBy?.includes(userId);
-  // console.log(
-  //   "🚀 ~ file: ProductComponents.js:174 ~ AddVote ~ isDownvotedId:",
-  //   isDownvotedId
-  // );
 
   const handleVote = voteType => {
     if (localUserVoteType === voteType) {
@@ -222,10 +244,6 @@ export const AddVote = ({ review }) => {
   }, [review]);
 
   const isUpvoted = localUserVoteType === "upvote";
-  // console.log(
-  //   "🚀 ~ file: ProductComponents.js:203 ~ AddVote ~ localUserVoteType:",
-  //   localUserVoteType
-  // );
   const isDownvoted = localUserVoteType === "downvote";
 
   return (
