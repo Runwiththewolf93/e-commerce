@@ -81,8 +81,6 @@ export function SortDropdown({
     updatedAt: "desc",
   });
 
-  console.log("does this trigger on every render?");
-
   const handleSortFilter = field => {
     const newOrder = sortOrder[field] === "desc" ? "asc" : "desc";
     setSortOrder({ ...sortOrder, [field]: newOrder });
@@ -117,10 +115,6 @@ export function SortDropdown({
   );
 }
 
-export const TooltipStar = ({ content, children }) => {
-  return <Tooltip content={content}>{children}</Tooltip>;
-};
-
 export const ReviewNavigation = ({
   productId,
   pagination,
@@ -135,18 +129,6 @@ export const ReviewNavigation = ({
     setCurrentPage(Number(pagination.page));
   }, [pagination.page]);
 
-  console.log(
-    "🚀 ~ file: ProductComponents.js:132 ~ pagination.page:",
-    pagination.page
-  );
-  console.log(
-    "🚀 ~ file: ProductComponents.js:132 ~ currentPage:",
-    currentPage
-  );
-  console.log(
-    "🚀 ~ file: ProductComponents.js:137 ~ pagination.pages:",
-    pagination.pages
-  );
   const limit = pagination.limit;
 
   const handleNavigation = newPage => {
@@ -283,4 +265,12 @@ export const AddVote = ({ review }) => {
       )}
     </div>
   );
+};
+
+export const TooltipStar = ({ content, children }) => {
+  return <Tooltip content={content}>{children}</Tooltip>;
+};
+
+export const Skeleton = ({ className }) => {
+  <div className={`animate-pulse ${className} bg-gray-300 rounded-md`}></div>;
 };

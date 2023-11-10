@@ -66,7 +66,14 @@ export const LoginForm = () => {
       {error && (
         <p className="text-center bg-red-300 py-4 mb-6 rounded">{error}</p>
       )}
+      <h2 className="text-center text-2xl font-bold mb-6">Login</h2>
       <div className="mb-6">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-600"
+        >
+          Email Address
+        </label>
         <input
           required
           type="email"
@@ -78,6 +85,12 @@ export const LoginForm = () => {
         />
       </div>
       <div className="mb-6">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-600"
+        >
+          Password
+        </label>
         <input
           required
           type="password"

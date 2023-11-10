@@ -81,7 +81,14 @@ export const RegisterForm = () => {
       {error && (
         <p className="text-center bg-red-300 py-4 mb-6 rounded">{error}</p>
       )}
+      <h2 className="text-center text-2xl font-bold mb-6">Register</h2>
       <div className="mb-6">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-600"
+        >
+          Name
+        </label>
         <input
           required
           type="name"
@@ -93,6 +100,12 @@ export const RegisterForm = () => {
         />
       </div>
       <div className="mb-6">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-600"
+        >
+          Email Address
+        </label>
         <input
           required
           type="email"
@@ -104,6 +117,12 @@ export const RegisterForm = () => {
         />
       </div>
       <div className="mb-6">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-600"
+        >
+          Password
+        </label>
         <input
           required
           type="password"
@@ -121,7 +140,7 @@ export const RegisterForm = () => {
         }`}
         disabled={loading}
       >
-        {loading ? "loading..." : "Sign In"}
+        {loading ? "loading..." : "Sign Up"}
       </button>
     </form>
   );

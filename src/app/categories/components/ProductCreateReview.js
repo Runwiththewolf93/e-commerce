@@ -1,17 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createReview,
   resetCreateReview,
 } from "../../../redux/slices/reviewSlice";
-import { Alert } from "flowbite-react";
+import { Alert, Spinner } from "flowbite-react";
+import Link from "next/link";
+import ProductSizeWrapper from "./ProductSizeWrapper";
 
 const CreateReview = ({ productId, userId, jwt }) => {
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(5);
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
 
   const dispatch = useDispatch();
   const { isLoading, message, error } = useSelector(state => state.reviews);
+
+  useEffect(() => {
+    if (jwt !== undefined) {
+      setIsLoadingSession(false);
+    }
+  }, [jwt]);
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -20,6 +29,32 @@ const CreateReview = ({ productId, userId, jwt }) => {
     setReview("");
     setRating(5);
   };
+
+  if (isLoadingSession) {
+    return (
+      <ProductSizeWrapper minHeight="350px" minWidth="350px">
+        <Spinner size="xl" />
+      </ProductSizeWrapper>
+    );
+  }
+
+  if (!jwt) {
+    return (
+      <ProductSizeWrapper minHeight="350px" minWidth="350px">
+        <Alert color="info" className="mt-3">
+          You are not logged in! Please log in to add reviews. Click{" "}
+          <Link href="/register" className="underline">
+            here
+          </Link>{" "}
+          to create an account, or{" "}
+          <Link href="/login" className="underline">
+            here
+          </Link>{" "}
+          to login.
+        </Alert>
+      </ProductSizeWrapper>
+    );
+  }
 
   return (
     <div className="bg-white p-4 rounded shadow">

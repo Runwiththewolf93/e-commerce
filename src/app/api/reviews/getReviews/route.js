@@ -28,8 +28,6 @@ export async function GET(req) {
   try {
     await connect();
 
-    console.log("Did we pass the validation check?");
-
     const searchParams = req.nextUrl.searchParams;
     const params = {
       productId: searchParams.get("productId"),
@@ -123,8 +121,8 @@ export async function GET(req) {
       );
 
       const skip = (page - 1) * limit;
-      console.log("🚀 ~ file: route.js:122 ~ GET ~ skip:", skip);
-      console.log("🚀 ~ file: route.js:122 ~ GET ~ limit:", limit);
+      console.log("🚀 ~ file: route.js:124 ~ GET ~ skip:", skip);
+      console.log("🚀 ~ file: route.js:125 ~ GET ~ page:", page);
 
       const reviews = await Reviews.find(filterConditions)
         .sort(sortConditions)
@@ -159,10 +157,6 @@ export async function GET(req) {
       console.log("🚀 ~ file: route.js:130 ~ GET ~ reviews:", reviews);
 
       const totalReviews = await Reviews.countDocuments(filterConditions);
-      console.log(
-        "🚀 ~ file: route.js:162 ~ GET ~ totalReviews:",
-        totalReviews
-      );
 
       if (reviews.length === 0) {
         return NextResponse.json(

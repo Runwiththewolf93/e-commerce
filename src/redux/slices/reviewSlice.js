@@ -53,7 +53,6 @@ export const fetchReviews = createAsyncThunk(
     try {
       // Convert the parameters object to a query string
       const queryParams = new URLSearchParams(paramsObject).toString();
-      console.log("🚀 ~ file: reviewSlice.js:48 ~ queryParams:", queryParams);
 
       const { data } = await customAxios().get(
         `/api/reviews/getReviews?${queryParams}`

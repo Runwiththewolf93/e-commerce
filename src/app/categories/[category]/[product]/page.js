@@ -6,13 +6,15 @@ import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../../redux/slices/productSlice";
 import { useSession } from "next-auth/react";
-import { Spinner, Alert } from "flowbite-react";
+import { Alert } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import ProductBreadcrumb from "../../components/ProductBreadcrumb";
 import ProductImages from "../../components/ProductImages";
 import ProductCreateReview from "../../components/ProductCreateReview";
 import ProductReviewList from "../../components/ProductReviewList";
 import ProductAggregateRating from "../../components/ProductAggregateRating";
+import ProductSkeleton from "../../components/ProductSkeleton";
+import ProductCart from "../../components/ProductCart";
 
 export default function Product() {
   const dispatch = useDispatch();
@@ -26,7 +28,7 @@ export default function Product() {
   const { isLoadingProduct, product, errorProduct } = useSelector(
     state => state.products
   );
-  // console.log("🚀 ~ file: page.js:26 ~ Product ~ product:", product);
+  console.log("🚀 ~ file: page.js:26 ~ Product ~ product:", product);
 
   useEffect(() => {
     if (!product || Object.keys(product).length === 0) {
@@ -51,7 +53,7 @@ export default function Product() {
   // testing purposes
 
   if (isLoadingProduct) {
-    return <Spinner size="xl" />;
+    return <ProductSkeleton />;
   }
 
   if (errorProduct) {
@@ -105,12 +107,7 @@ export default function Product() {
                 jwt={session?.customJwt}
               />
 
-              <button
-                type="submit"
-                className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Add to cart
-              </button>
+              <ProductCart product={product} jwt={session?.customJwt} />
             </section>
           </div>
 
