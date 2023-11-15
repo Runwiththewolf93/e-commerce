@@ -12,7 +12,7 @@ export const addToWishlist = createAsyncThunk(
         }
       );
 
-      return data.message;
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -42,7 +42,7 @@ export const deleteFromWishlist = createAsyncThunk(
         `/api/wishlist/deleteFromWishlist?productId=${productId}`
       );
 
-      return data.message;
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -51,10 +51,10 @@ export const deleteFromWishlist = createAsyncThunk(
 
 export const getWishlistUser = createAsyncThunk(
   "wishlist/getWishlistUser",
-  async (jwt, { rejectWithValue }) => {
+  async ({ jwt, page = 1, limit = 8 }, { rejectWithValue }) => {
     try {
       const { data } = await customAxios(jwt).get(
-        "/api/wishlist/getWishlistUser"
+        `/api/wishlist/getWishlistUser?page=${page}&limit=${limit}`
       );
 
       return data;
@@ -70,6 +70,7 @@ export const wishlistSlice = createSlice({
     // addToWishlist
     isLoadingWishlist: false,
     messageWishlist: "",
+    addedProduct: {},
     errorWishlist: null,
     // getWishlistId
     isLoadingWishlistId: false,
@@ -78,12 +79,16 @@ export const wishlistSlice = createSlice({
     // deleteFromWishlist
     isLoadingWishlistDelete: false,
     messageWishlistDelete: "",
+    deletedProductId: "",
     errorWishlistDelete: null,
     // getWishlistUser
     isLoadingWishlistUser: false,
     wishlist: {},
     messageWishlistUser: "",
     errorWishlistUser: null,
+    currentPage: 1,
+    totalPages: 0,
+    totalItems: 0,
   },
   reducers: {
     clearSuccessMessages: state => {
@@ -106,12 +111,14 @@ export const wishlistSlice = createSlice({
         state.errorWishlist = null;
       })
       .addCase(addToWishlist.fulfilled, (state, action) => {
-        state.messageWishlist = action.payload;
-        // this approach needs to be refined, backend changes need to happen. This payload isn't good, need to mimic getWishlistUser
-        state.wishlist.products.push({
-          productId: action.payload.productId,
-          addedAt: new Date().toISOString(),
-        });
+        state.messageWishlist = action.payload.message;
+        state.addedProduct = action.payload.addedProduct;
+        if (state.wishlist && state.wishlist.products) {
+          state.wishlist.products.push({
+            productId: state.addedProduct,
+            addedAt: new Date().toISOString(),
+          });
+        }
         state.isLoadingWishlist = false;
         state.errorWishlist = null;
       })
@@ -139,7 +146,8 @@ export const wishlistSlice = createSlice({
         state.errorWishlistDelete = null;
       })
       .addCase(deleteFromWishlist.fulfilled, (state, action) => {
-        state.messageWishlistDelete = action.payload;
+        state.messageWishlistDelete = action.payload.message;
+        state.deletedProductId = action.payload.deletedProductId;
         state.wishlist.products = state.wishlist.products.filter(
           productItem => productItem.productId._id !== action.meta.arg.productId
         );
@@ -157,6 +165,9 @@ export const wishlistSlice = createSlice({
       })
       .addCase(getWishlistUser.fulfilled, (state, action) => {
         state.wishlist = action.payload.wishlist;
+        state.currentPage = action.payload.currentPage;
+        state.totalPages = action.payload.totalPages;
+        state.totalItems = action.payload.totalItems;
         state.messageWishlistUser = action.payload.message;
         state.isLoadingWishlistUser = false;
         state.errorWishlistUser = null;

@@ -144,11 +144,11 @@ export default function ProductCart({ product, jwt }) {
           className="mt-5"
           onClick={() =>
             dispatch(
-              addToWishlist({ productId: "6525773e4e6d44d34b3767cb", jwt })
+              addToWishlist({ productId: "652578974e6d44d34b3767d7", jwt })
             )
           }
         >
-          Add wish
+          Add wish - test
         </button>
         {messageWishlist || messageWishlistDelete ? (
           <Alert

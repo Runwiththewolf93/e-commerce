@@ -28,17 +28,19 @@ export async function POST(req) {
 
     const userId = req.user.id;
 
+    // Check for concurrent wishlist updates
     if (wishlistUpdateLocks[userId]) {
       throw new customAPIError.BadRequestError("Wishlist update in progress");
     }
     wishlistUpdateLocks[userId] = true;
 
+    // Fetch and check product existence
     const product = await Product.findById(productId);
     if (!product) {
       throw new customAPIError.BadRequestError("Product not found");
     }
 
-    // Find wishlist of user or create new one
+    // Find or create wishlist
     let wishlist = await Wishlist.findOne({ userId });
     if (!wishlist) {
       wishlist = new Wishlist({ userId, products: [{ productId }] });
@@ -55,13 +57,25 @@ export async function POST(req) {
     }
 
     await wishlist.save();
+    await wishlist.populate({
+      path: "products.productId",
+      model: "Product",
+      select: "name description price discount images",
+    });
 
     // Release lock after successful update
     wishlistUpdateLocks[userId] = false;
 
+    // Respond with the updated product data
+    const addedProduct = wishlist.products.find(
+      p => p.productId._id.toString() === productId
+    );
+    console.log("🚀 ~ file: route.js:74 ~ POST ~ addedProduct:", addedProduct);
+
     return NextResponse.json({
       state: "success",
       message: "Product added to wishlist",
+      addedProduct: addedProduct.productId,
     });
   } catch (error) {
     // Release lock in case of error

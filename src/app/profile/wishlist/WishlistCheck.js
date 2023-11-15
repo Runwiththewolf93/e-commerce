@@ -5,11 +5,7 @@ import { deleteFromWishlist } from "../../../redux/slices/wishlistSlice";
 
 export default function WishlistCheck({ productId, jwt }) {
   const dispatch = useDispatch();
-  const {
-    isLoadingWishlistDelete,
-    messageWishlistDelete,
-    errorWishlistDelete,
-  } = useSelector(state => state.wishlist);
+  const { isLoadingWishlistDelete } = useSelector(state => state.wishlist);
 
   const deleteProductFromWishlistHandler = () => {
     dispatch(deleteFromWishlist({ productId, jwt }));

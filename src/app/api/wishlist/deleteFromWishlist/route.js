@@ -7,12 +7,12 @@ import customAPIError from "../../errors";
 import Joi from "joi";
 
 export async function DELETE(req) {
+  const { searchParams } = req.nextUrl;
+  const productId = searchParams.get("productId");
+
   try {
     validateJWT(req);
     await connect();
-
-    const { searchParams } = req.nextUrl;
-    const productId = searchParams.get("productId");
 
     const schema = Joi.object({
       productId: Joi.string()
@@ -66,12 +66,14 @@ export async function DELETE(req) {
     return NextResponse.json({
       state: "success",
       message: "Product removed from wishlist",
+      productId,
     });
   } catch (error) {
     return NextResponse.json(
       {
         status: "error",
         message: error.message || "Internal Server Error",
+        productId,
       },
       { status: error.statusCode || 500 }
     );
