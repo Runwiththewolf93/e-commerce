@@ -28,10 +28,6 @@ export default function ProductCart({ product, jwt }) {
     messageWishlistDelete,
     errorWishlistDelete,
   } = useSelector(state => state.wishlist);
-  console.log(
-    "🚀 ~ file: ProductCart.js:22 ~ ProductCart ~ inWishlist:",
-    inWishlist
-  );
 
   const [quantity, setQuantity] = useState(1);
   const [isLoadingSession, setIsLoadingSession] = useState(true);
@@ -143,6 +139,16 @@ export default function ProductCart({ product, jwt }) {
             <HiOutlineHeart className="mr-2 mb-1 text-red-500" />
           )}
           {inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+        </button>
+        <button
+          className="mt-5"
+          onClick={() =>
+            dispatch(
+              addToWishlist({ productId: "6525773e4e6d44d34b3767cb", jwt })
+            )
+          }
+        >
+          Add wish
         </button>
         {messageWishlist || messageWishlistDelete ? (
           <Alert

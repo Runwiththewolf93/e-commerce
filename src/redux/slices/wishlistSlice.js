@@ -49,28 +49,53 @@ export const deleteFromWishlist = createAsyncThunk(
   }
 );
 
+export const getWishlistUser = createAsyncThunk(
+  "wishlist/getWishlistUser",
+  async (jwt, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).get(
+        "/api/wishlist/getWishlistUser"
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const wishlistSlice = createSlice({
   name: "wishlist",
   initialState: {
+    // addToWishlist
     isLoadingWishlist: false,
     messageWishlist: "",
     errorWishlist: null,
+    // getWishlistId
     isLoadingWishlistId: false,
     inWishlist: false,
     errorWishlistId: null,
+    // deleteFromWishlist
     isLoadingWishlistDelete: false,
     messageWishlistDelete: "",
     errorWishlistDelete: null,
+    // getWishlistUser
+    isLoadingWishlistUser: false,
+    wishlist: {},
+    messageWishlistUser: "",
+    errorWishlistUser: null,
   },
   reducers: {
     clearSuccessMessages: state => {
       state.messageWishlist = "";
       state.messageWishlistDelete = "";
+      state.messageWishlistUser = "";
     },
     clearErrorMessages: state => {
       state.errorWishlist = null;
       state.errorWishlistId = null;
       state.errorWishlistDelete = null;
+      state.errorWishlistUser = null;
     },
   },
   extraReducers: builder => {
@@ -82,6 +107,11 @@ export const wishlistSlice = createSlice({
       })
       .addCase(addToWishlist.fulfilled, (state, action) => {
         state.messageWishlist = action.payload;
+        // this approach needs to be refined, backend changes need to happen. This payload isn't good, need to mimic getWishlistUser
+        state.wishlist.products.push({
+          productId: action.payload.productId,
+          addedAt: new Date().toISOString(),
+        });
         state.isLoadingWishlist = false;
         state.errorWishlist = null;
       })
@@ -110,12 +140,30 @@ export const wishlistSlice = createSlice({
       })
       .addCase(deleteFromWishlist.fulfilled, (state, action) => {
         state.messageWishlistDelete = action.payload;
+        state.wishlist.products = state.wishlist.products.filter(
+          productItem => productItem.productId._id !== action.meta.arg.productId
+        );
         state.isLoadingWishlistDelete = false;
         state.errorWishlistDelete = null;
       })
       .addCase(deleteFromWishlist.rejected, (state, action) => {
         state.errorWishlistDelete = action.payload;
         state.isLoadingWishlistDelete = false;
+      })
+      // getWishlistUser reducer
+      .addCase(getWishlistUser.pending, state => {
+        state.isLoadingWishlistUser = true;
+        state.errorWishlistUser = null;
+      })
+      .addCase(getWishlistUser.fulfilled, (state, action) => {
+        state.wishlist = action.payload.wishlist;
+        state.messageWishlistUser = action.payload.message;
+        state.isLoadingWishlistUser = false;
+        state.errorWishlistUser = null;
+      })
+      .addCase(getWishlistUser.rejected, (state, action) => {
+        state.errorWishlistUser = action.payload;
+        state.isLoadingWishlistUser = false;
       });
   },
 });

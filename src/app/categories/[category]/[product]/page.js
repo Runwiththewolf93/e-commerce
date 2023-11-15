@@ -13,7 +13,6 @@ import ProductImages from "../../components/ProductImages";
 import ProductCreateReview from "../../components/ProductCreateReview";
 import ProductReviewList from "../../components/ProductReviewList";
 import ProductAggregateRating from "../../components/ProductAggregateRating";
-import ProductSkeleton from "../../components/ProductSkeleton";
 import ProductCart from "../../components/ProductCart";
 
 export default function Product() {
@@ -53,7 +52,11 @@ export default function Product() {
   // testing purposes
 
   if (isLoadingProduct) {
-    return <ProductSkeleton />;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   if (errorProduct) {

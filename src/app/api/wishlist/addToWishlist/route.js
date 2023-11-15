@@ -6,6 +6,8 @@ import validateJWT from "../../../../../utils/protect";
 import customAPIError from "../../errors";
 import Joi from "joi";
 
+const wishlistUpdateLocks = {};
+
 export async function POST(req) {
   try {
     validateJWT(req);
@@ -25,6 +27,11 @@ export async function POST(req) {
     }
 
     const userId = req.user.id;
+
+    if (wishlistUpdateLocks[userId]) {
+      throw new customAPIError.BadRequestError("Wishlist update in progress");
+    }
+    wishlistUpdateLocks[userId] = true;
 
     const product = await Product.findById(productId);
     if (!product) {
@@ -49,11 +56,18 @@ export async function POST(req) {
 
     await wishlist.save();
 
+    // Release lock after successful update
+    wishlistUpdateLocks[userId] = false;
+
     return NextResponse.json({
       state: "success",
       message: "Product added to wishlist",
     });
   } catch (error) {
+    // Release lock in case of error
+    const userId = req.user.id;
+    wishlistUpdateLocks[userId] = false;
+
     return NextResponse.json(
       {
         status: "error",
