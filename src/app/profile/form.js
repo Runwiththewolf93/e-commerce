@@ -4,6 +4,7 @@
 import { useState } from "react";
 import customAxios from "../../lib/api";
 import { useRouter } from "next/navigation";
+import { Spinner } from "flowbite-react";
 
 export function ProfileForm({ session }) {
   console.log("🚀 ~ file: form.js:9 ~ ProfileForm ~ session:", session);
@@ -82,7 +83,7 @@ export function ProfileForm({ session }) {
             Profile Page
           </p>
           {!user ? (
-            <p>Loading...</p>
+            <Spinner />
           ) : (
             <>
               <div className="flex items-center gap-8">
@@ -96,12 +97,20 @@ export function ProfileForm({ session }) {
                 <div className="mt-3">
                   <p className="mb-3">Name: {user.name}</p>
                   <p className="mb-3">Email: {user.email}</p>
-                  <button
-                    className="bg-blue-500 text-white font-mono font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-colors duration-300 ease-in-out"
-                    onClick={() => router.push("/reset")}
-                  >
-                    Reset Password
-                  </button>
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      className="bg-blue-500 text-white font-mono font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-colors duration-300 ease-in-out"
+                      onClick={() => router.push("/reset")}
+                    >
+                      Reset Password
+                    </button>
+                    <button
+                      className="bg-green-500 text-white font-mono font-semibold py-2 px-4 rounded-md hover:bg-green-600 focus:bg-green-700 focus:outline-none focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors duration-300 ease-in-out"
+                      onClick={() => router.push("/profile/wishlist")}
+                    >
+                      Go to Wishlist
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="h-1 bg-black my-3" />

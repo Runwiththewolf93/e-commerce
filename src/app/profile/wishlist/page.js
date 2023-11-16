@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getWishlistUser,
   clearErrorMessages,
   clearSuccessMessages,
+  resetWishlistState,
 } from "../../../redux/slices/wishlistSlice";
 import { Card, Button, Alert, Breadcrumb } from "flowbite-react";
 import Image from "next/image";
@@ -27,10 +28,16 @@ export default function Wishlist({ session }) {
     totalPages,
   } = useSelector(state => state.wishlist);
   console.log("🚀 ~ file: page.js:17 ~ Wishlist ~ wishlist:", wishlist);
-  console.log("🚀 ~ file: page.js:28 ~ Wishlist ~ totalPages:", totalPages);
+
   const [currentPage, setCurrentPage] = useState(1);
+  const hasReset = useRef(false);
 
   useEffect(() => {
+    if (!hasReset.current) {
+      dispatch(resetWishlistState());
+      hasReset.current = true;
+    }
+
     if (!wishlist || Object.keys(wishlist).length === 0) {
       dispatch(getWishlistUser({ jwt: session.customJwt, page: 1, limit: 8 }));
     }

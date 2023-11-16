@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { getWishlistUser } from "../../../redux/slices/wishlistSlice";
 

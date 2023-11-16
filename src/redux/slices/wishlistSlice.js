@@ -102,6 +102,15 @@ export const wishlistSlice = createSlice({
       state.errorWishlistDelete = null;
       state.errorWishlistUser = null;
     },
+    resetWishlistState: state => {
+      state.isLoadingWishlist = false;
+      state.wishlist = {};
+      state.messageWishlistUser = "";
+      state.errorWishlistUser = null;
+      state.currentPage = 1;
+      state.totalPages = 0;
+      state.totalItems = 0;
+    },
   },
   extraReducers: builder => {
     builder
@@ -113,12 +122,12 @@ export const wishlistSlice = createSlice({
       .addCase(addToWishlist.fulfilled, (state, action) => {
         state.messageWishlist = action.payload.message;
         state.addedProduct = action.payload.addedProduct;
-        if (state.wishlist && state.wishlist.products) {
-          state.wishlist.products.push({
-            productId: state.addedProduct,
-            addedAt: new Date().toISOString(),
-          });
-        }
+        // if (state.wishlist && state.wishlist.products) {
+        //   state.wishlist.products.push({
+        //     productId: state.addedProduct,
+        //     addedAt: new Date().toISOString(),
+        //   });
+        // }
         state.isLoadingWishlist = false;
         state.errorWishlist = null;
       })
@@ -179,7 +188,7 @@ export const wishlistSlice = createSlice({
   },
 });
 
-export const { clearSuccessMessages, clearErrorMessages } =
+export const { clearSuccessMessages, clearErrorMessages, resetWishlistState } =
   wishlistSlice.actions;
 
 export default wishlistSlice.reducer;

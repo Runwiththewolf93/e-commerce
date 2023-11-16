@@ -7,7 +7,6 @@ import Wishlist from "./page";
 
 export default async function WishlistLayout() {
   const session = await getServerSession(authOptions);
-  // const session = false;
 
   return (
     <>
@@ -33,5 +32,3 @@ export default async function WishlistLayout() {
     </>
   );
 }
-
-// create route to fetch wishlist from db

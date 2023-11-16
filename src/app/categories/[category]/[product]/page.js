@@ -13,7 +13,7 @@ import ProductImages from "../../components/ProductImages";
 import ProductCreateReview from "../../components/ProductCreateReview";
 import ProductReviewList from "../../components/ProductReviewList";
 import ProductAggregateRating from "../../components/ProductAggregateRating";
-import ProductCart from "../../components/ProductCart";
+import ProductActions from "../../components/ProductActions";
 
 export default function Product() {
   const dispatch = useDispatch();
@@ -110,7 +110,7 @@ export default function Product() {
                 jwt={session?.customJwt}
               />
 
-              <ProductCart product={product} jwt={session?.customJwt} />
+              <ProductActions product={product} jwt={session?.customJwt} />
             </section>
           </div>
 
