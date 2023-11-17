@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchReviews } from "../../../redux/slices/reviewSlice";
 import { Spinner, Alert } from "flowbite-react";
@@ -12,6 +12,10 @@ import {
 } from "./ProductComponents";
 
 export default function ProductReviewList({ productId, userId }) {
+  // console.log(
+  //   "🚀 ~ file: ProductReviewList.js:15 ~ ProductReviewList ~ productId:",
+  //   productId
+  // );
   const dispatch = useDispatch();
   const { isLoadingFetch, reviews, pagination, reviewsMessage, errorFetch } =
     useSelector(state => state.reviews);
@@ -22,12 +26,17 @@ export default function ProductReviewList({ productId, userId }) {
       updatedAt: "desc",
     },
   });
+  const lastFetchedProductIdRef = useRef(null);
+  // console.log(
+  //   "🚀 ~ file: ProductReviewList.js:30 ~ ProductReviewList ~ lastFetchedProductIdRef:",
+  //   lastFetchedProductIdRef
+  // );
 
   useEffect(() => {
-    if ((!reviews || reviews.length === 0) && productId) {
+    if (productId && productId !== lastFetchedProductIdRef.current) {
       dispatch(fetchReviews({ productId, userId }));
+      lastFetchedProductIdRef.current = productId;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, productId, userId]);
 
   return (
@@ -53,9 +62,13 @@ export default function ProductReviewList({ productId, userId }) {
       {isLoadingFetch ? (
         <Spinner size="xl" />
       ) : errorFetch ? (
-        <Alert color="failure">{errorFetch}</Alert>
+        <Alert color="failure" className="text-base">
+          {errorFetch}
+        </Alert>
       ) : reviews.length === 0 && reviewsMessage ? (
-        <Alert color="info">{reviewsMessage}</Alert>
+        <Alert color="info" className="text-base">
+          {reviewsMessage}
+        </Alert>
       ) : (
         reviews?.map((review, index) => (
           <div key={index} className="bg-white p-4 rounded shadow">
@@ -77,12 +90,14 @@ export default function ProductReviewList({ productId, userId }) {
           </div>
         ))
       )}
-      <ReviewNavigation
-        productId={productId}
-        pagination={pagination}
-        filterSortCriteria={filterSortCriteria}
-        userId={userId}
-      />
+      {reviews.length === 0 ? null : (
+        <ReviewNavigation
+          productId={productId}
+          pagination={pagination}
+          filterSortCriteria={filterSortCriteria}
+          userId={userId}
+        />
+      )}
     </div>
   );
 }

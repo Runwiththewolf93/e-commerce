@@ -8,15 +8,13 @@ import { IoMdClose } from "react-icons/io";
 import { Dialog, Transition } from "@headlessui/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { categoryToLink } from "../../../../utils/helper";
 
 const CartOverlay = () => {
   const dispatch = useDispatch();
-  const { isCartOpen, isLoadingGetCart, cart, errorGetCart } = useSelector(
-    state => state.cart
-  );
+  const { isCartOpen, cart, errorGetCart } = useSelector(state => state.cart);
   console.log("🚀 ~ file: page.js:14 ~ CartOverlay ~ cart:", cart);
   const { data: session } = useSession();
-  console.log("🚀 ~ file: page.js:15 ~ CartOverlay ~ session:", session);
 
   useEffect(() => {
     if (session.customJwt && (!cart || Object.keys(cart).length === 0)) {
@@ -31,7 +29,7 @@ const CartOverlay = () => {
   if (!isCartOpen) return null;
 
   return (
-    <Transition.Root show={isCartOpen} as={Fragment}>
+    <Transition.Root show={isCartOpen} as={Fragment} className="z-50">
       <Dialog as="div" className="relative z-10" onClose={handleClose}>
         <Transition.Child
           as={Fragment}
@@ -68,7 +66,7 @@ const CartOverlay = () => {
                           <button
                             type="button"
                             className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
-                            onClick={() => setOpen(false)}
+                            onClick={handleClose}
                           >
                             <span className="absolute -inset-0.5" />
                             <span className="sr-only">Close panel</span>
@@ -83,7 +81,7 @@ const CartOverlay = () => {
                             role="list"
                             className="-my-6 divide-y divide-gray-200"
                           >
-                            {cart.items.map(item => (
+                            {cart.items?.map(item => (
                               <li key={item._id} className="flex py-6">
                                 <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                   <img
@@ -96,15 +94,17 @@ const CartOverlay = () => {
                                 <div className="ml-4 flex flex-1 flex-col">
                                   <div>
                                     <div className="flex justify-between text-base font-medium text-gray-900">
-                                      <h3>
-                                        {/* <Link
-                                          href={`/categories/${product.slug}/${item.product._id}`}
+                                      <h3 className="text-indigo-600 hover:text-indigo-800 hover:underline">
+                                        <Link
+                                          href={`/categories/${categoryToLink(
+                                            item.product.category
+                                          )}/${item.product._id}`}
                                         >
                                           {item.product.name}
-                                        </Link> */}
+                                        </Link>
                                       </h3>
                                       <p className="ml-4">
-                                        {item.product.price}
+                                        €{item.product.price}
                                       </p>
                                     </div>
                                   </div>
@@ -151,8 +151,8 @@ const CartOverlay = () => {
                           or
                           <button
                             type="button"
-                            className="font-medium text-indigo-600 hover:text-indigo-500"
-                            onClick={() => setOpen(false)}
+                            className="font-medium text-indigo-600 hover:text-indigo-500 ml-1"
+                            onClick={handleClose}
                           >
                             Continue Shopping
                             <span aria-hidden="true"> &rarr;</span>

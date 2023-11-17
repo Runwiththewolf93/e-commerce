@@ -118,6 +118,7 @@ export const fetchProduct = createAsyncThunk(
   "products/fetchProduct",
   async (id, { rejectWithValue }) => {
     try {
+      console.log("🚀 ~ file: productSlice.js:120 ~ id:", id);
       const { data } = await customAxios().get(
         `/api/products/getProduct/${id}`
       );

@@ -30,6 +30,21 @@ export const getUserCart = createAsyncThunk(
   }
 );
 
+export const deleteFromCart = createAsyncThunk(
+  "cart/deleteFromCart",
+  async ({ productId, quantity, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).delete(
+        "/api/cart/deleteFromCart",
+        { data: { productId, quantity } }
+      );
+      console.log("from the fucking top");
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 // either return the full cart, or part of it (the product)
 export const cartSlice = createSlice({
   name: "cart",

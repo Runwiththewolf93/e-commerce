@@ -37,7 +37,7 @@ cartSchema.pre("save", async function (next) {
   let totalWithoutDiscount = 0;
 
   for (const item of this.items) {
-    const product = await Product.findById(item.product).exec();
+    const product = await Product.findById(item.product);
     if (!product) {
       throw new customAPIError.BadRequestError("Product not found");
     }
@@ -48,10 +48,11 @@ cartSchema.pre("save", async function (next) {
     if (product.discount && product.discount.percentage > 0) {
       const now = new Date();
       if (
-        product.discount.startDate <= now &&
-        product.discount.endDate >= now
+        (!product.discount.startDate || product.discount.startDate <= now) &&
+        (!product.discount.endDate || product.discount.endDate >= now)
       ) {
-        price -= (priceWithDiscount * product.discount.percentage) / 100;
+        priceWithDiscount -=
+          (priceWithDiscount * product.discount.percentage) / 100;
       }
     }
 

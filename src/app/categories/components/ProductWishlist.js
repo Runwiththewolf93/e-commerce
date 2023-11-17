@@ -26,11 +26,16 @@ export default function ProductWishlist({ product, jwt }) {
     errorWishlistDelete,
   } = useSelector(state => state.wishlist);
   const isFirstRender = useRef(true);
+  const prevProductId = useRef(product._id);
 
   useEffect(() => {
-    if (jwt && isFirstRender.current) {
+    if (
+      jwt &&
+      (isFirstRender.current || prevProductId.current !== product._id)
+    ) {
       dispatch(getWishlistId({ productId: product._id, jwt }));
       isFirstRender.current = false;
+      prevProductId.current = product._id;
     }
   }, [dispatch, product._id, jwt]);
 

@@ -23,6 +23,7 @@ export default function Product() {
 
   const pathSegments = pathname.split("/");
   const id = pathSegments[pathSegments.length - 1];
+  console.log("🚀 ~ file: page.js:26 ~ Product ~ id:", id);
 
   const { isLoadingProduct, product, errorProduct } = useSelector(
     state => state.products
@@ -30,7 +31,8 @@ export default function Product() {
   console.log("🚀 ~ file: page.js:26 ~ Product ~ product:", product);
 
   useEffect(() => {
-    if (!product || Object.keys(product).length === 0) {
+    if (Object.keys(product).length === 0 || product._id !== id) {
+      console.log("why does it trigger product?");
       dispatch(fetchProduct(id));
     }
   }, [id, dispatch, product]);
@@ -101,11 +103,11 @@ export default function Product() {
               </div>
             )}
 
-            <ProductAggregateRating productId={product._id} />
+            <ProductAggregateRating productId={product?._id} />
 
             <section>
               <ProductCreateReview
-                productId={product._id}
+                productId={product?._id}
                 userId={session?.user?.id}
                 jwt={session?.customJwt}
               />
@@ -118,7 +120,9 @@ export default function Product() {
             <div>
               <h3 className="sr-only">Description</h3>
               <div className="space-y-6">
-                <p className="text-base text-gray-900">{product.description}</p>
+                <p className="text-base text-gray-900">
+                  {product?.description}
+                </p>
               </div>
             </div>
 
@@ -164,10 +168,12 @@ export default function Product() {
               </div>
             </div>
           </div>
-          <ProductReviewList
-            productId={product._id}
-            userId={session?.user?.id}
-          />
+          {product?._id ? (
+            <ProductReviewList
+              productId={product?._id}
+              userId={session?.user?.id}
+            />
+          ) : null}
         </div>
       </div>
     </div>

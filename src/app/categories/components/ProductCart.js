@@ -9,13 +9,9 @@ import CartOverlay from "../../cart/overlay/page";
 
 export default function ProductCart({ product, jwt }) {
   const dispatch = useDispatch();
-  const { isCartOpen } = useSelector(state => state.cart);
+  const { isCartOpen, isLoadingGetCart } = useSelector(state => state.cart);
 
   const [quantity, setQuantity] = useState(1);
-  console.log(
-    "🚀 ~ file: ProductCart.js:15 ~ ProductCart ~ quantity:",
-    quantity
-  );
 
   const handleQuantityChange = newQuantity => {
     if (newQuantity > 0 && newQuantity <= product.stock) {
@@ -61,8 +57,9 @@ export default function ProductCart({ product, jwt }) {
         type="submit"
         className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         onClick={handleAddToCart}
+        disabled={isLoadingGetCart}
       >
-        Add to cart
+        {isLoadingGetCart ? "Adding..." : "Add to cart"}
       </button>
 
       {isCartOpen ? <CartOverlay /> : null}

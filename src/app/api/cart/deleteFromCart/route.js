@@ -32,17 +32,12 @@ export async function POST(req) {
       throw new customAPIError.NotFoundError("Product not found");
     }
 
-    // Check stock availability
-    if (quantity > product.stock) {
-      throw new customAPIError.BadRequestError("Insufficient stock available");
-    }
-
     const userId = req.user.id;
 
     // Find or create cart
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
-      cart = new Cart({ user: userId, items: [] });
+      throw new customAPIError.NotFoundError("Cart not found");
     }
 
     // Add or update item in cart
@@ -51,15 +46,18 @@ export async function POST(req) {
     );
 
     if (itemIndex > -1) {
-      // Increase quantity in cart
-      cart.items[itemIndex].quantity += quantity;
+      // Decrease quantity in cart or remove item if quantity 0
+      cart.items[itemIndex].quantity -= quantity;
+      if (cart.items[itemIndex].quantity <= 0) {
+        cart.items.splice(itemIndex, 1);
+      }
     } else {
-      // Add new item to cart
-      cart.items.push({ product: productId, quantity });
+      // No item in cart, throw error
+      throw new customAPIError.NotFoundError("Item not found in cart");
     }
 
     // Prepare update for product
-    const updatedStock = product.stock - quantity;
+    const updatedStock = product.stock + quantity;
     console.log("🚀 ~ file: route.js:56 ~ POST ~ updatedStock:", updatedStock);
     const originalVersion = product.__v;
     console.log(
@@ -98,7 +96,7 @@ export async function POST(req) {
     const updatedItem = cart.items.find(
       item => item.product._id.toString() === productId
     );
-    console.log("🚀 ~ file: route.js:100 ~ POST ~ updatedItem:", updatedItem);
+    console.log("🚀 ~ file: route.js:99 ~ POST ~ updatedItem:", updatedItem);
 
     return NextResponse.json({
       status: "success",

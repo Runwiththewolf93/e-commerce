@@ -6,7 +6,7 @@ import { useState, memo, useEffect } from "react";
 
 export function BreadCrumb({ category }) {
   return (
-    <Breadcrumb aria-label="Default breadcrumb example">
+    <Breadcrumb aria-label="Breadcrumb category" className="ml-20">
       <Breadcrumb.Item href="/" icon={HiHome}>
         <p>Home</p>
       </Breadcrumb.Item>
