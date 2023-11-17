@@ -38,7 +38,7 @@ export const deleteFromCart = createAsyncThunk(
         "/api/cart/deleteFromCart",
         { data: { productId, quantity } }
       );
-      console.log("from the fucking top");
+      console.log("Why is this fucking state not working properlY???");
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
