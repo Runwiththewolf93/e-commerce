@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HiHeart, HiOutlineHeart } from "react-icons/hi";
 import {
@@ -25,10 +25,12 @@ export default function ProductWishlist({ product, jwt }) {
     messageWishlistDelete,
     errorWishlistDelete,
   } = useSelector(state => state.wishlist);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    if (jwt) {
+    if (jwt && isFirstRender.current) {
       dispatch(getWishlistId({ productId: product._id, jwt }));
+      isFirstRender.current = false;
     }
   }, [dispatch, product._id, jwt]);
 

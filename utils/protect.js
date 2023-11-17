@@ -23,6 +23,7 @@ export default function validateJWT(req) {
   } catch (error) {
     decoded = null;
   }
+  // console.log("🚀 ~ file: protect.js:25 ~ validateJWT ~ decoded:", decoded);
 
   if (!decoded) {
     throw new CustomAPIError.UnauthenticatedError(

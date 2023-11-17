@@ -4,7 +4,7 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 import { signOut } from "next-auth/react";
 
-// Optional request interceptor
+// Request interceptor
 const requestInterceptor = (config, token) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

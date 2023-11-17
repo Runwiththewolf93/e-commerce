@@ -3,9 +3,19 @@
 import { useState } from "react";
 import { HiMinusSm, HiPlusSm } from "react-icons/hi";
 import styles from "./ProductCart.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart, openCartOverlay } from "../../../redux/slices/cartSlice";
+import CartOverlay from "../../cart/overlay/page";
 
 export default function ProductCart({ product, jwt }) {
+  const dispatch = useDispatch();
+  const { isCartOpen } = useSelector(state => state.cart);
+
   const [quantity, setQuantity] = useState(1);
+  console.log(
+    "🚀 ~ file: ProductCart.js:15 ~ ProductCart ~ quantity:",
+    quantity
+  );
 
   const handleQuantityChange = newQuantity => {
     if (newQuantity > 0 && newQuantity <= product.stock) {
@@ -13,8 +23,11 @@ export default function ProductCart({ product, jwt }) {
     }
   };
 
-  const addToCart = () => {
-    console.log(`Added ${quantity} of ${product.name} to cart.`);
+  const handleAddToCart = () => {
+    // Dispatch action to add item to cart
+    // dispatch(addToCart({ productId: product._id, quantity, jwt }));
+    // Open the cart overlay
+    dispatch(openCartOverlay());
   };
 
   return (
@@ -47,10 +60,12 @@ export default function ProductCart({ product, jwt }) {
       <button
         type="submit"
         className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        onClick={addToCart}
+        onClick={handleAddToCart}
       >
         Add to cart
       </button>
+
+      {isCartOpen ? <CartOverlay /> : null}
     </div>
   );
 }
