@@ -18,6 +18,7 @@ const CartOverlay = () => {
 
   useEffect(() => {
     if (session.customJwt && (!cart || Object.keys(cart).length === 0)) {
+      console.log("What's going on here? CART FETCH");
       dispatch(getUserCart(session.customJwt));
     }
   }, [dispatch, session.customJwt, cart]);

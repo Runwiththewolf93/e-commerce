@@ -84,7 +84,7 @@ export async function POST(req) {
     // Save the updated cart
     await cart.save();
 
-    // Populate product details
+    // Populate  details
     await cart.populate({
       path: "items.product",
       model: "Product",

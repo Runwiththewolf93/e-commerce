@@ -1,3 +1,5 @@
+'use client'
+
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customAxios from "../../lib/api";
 

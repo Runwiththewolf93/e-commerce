@@ -1,3 +1,5 @@
+'use client'
+
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customAxios from "../../lib/api";
 
@@ -118,10 +120,10 @@ export const fetchProduct = createAsyncThunk(
   "products/fetchProduct",
   async (id, { rejectWithValue }) => {
     try {
-      console.log("🚀 ~ file: productSlice.js:120 ~ id:", id);
       const { data } = await customAxios().get(
         `/api/products/getProduct/${id}`
       );
+
       return data.product;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -132,6 +134,7 @@ export const fetchProduct = createAsyncThunk(
 export const productSlice = createSlice({
   name: "products",
   initialState: {
+    // fetchBestSellers, featured, newArrivals
     isLoading: false,
     productIds: [],
     bestSellers: [],
@@ -139,13 +142,16 @@ export const productSlice = createSlice({
     newArrivals: [],
     error: null,
     currentGallery: "bestSellers",
+    // fetchSearch
     isLoadingSearch: false,
     searchMessage: "",
     products: [],
     errorSearch: null,
+    // fetchCategory
     isLoadingCategory: false,
     productsCategory: [],
     errorCategory: null,
+    // fetchProduct
     isLoadingProduct: false,
     product: {},
     errorProduct: null,

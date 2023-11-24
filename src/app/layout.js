@@ -6,6 +6,7 @@ import { NextAuthProvider } from "./providers";
 import { IsClientCtxProvider } from "../lib/is-client-ctx";
 import { PurgeProvider } from "../lib/purge";
 import Script from "next/script";
+import { StrictMode } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,13 +19,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ReduxProvider>
-          <NextAuthProvider>
-            <IsClientCtxProvider>
-              <PurgeProvider>{children}</PurgeProvider>
-            </IsClientCtxProvider>
-          </NextAuthProvider>
-        </ReduxProvider>
+        <IsClientCtxProvider>
+          <ReduxProvider>
+            <NextAuthProvider>
+              <StrictMode>
+                <PurgeProvider>{children}</PurgeProvider>
+              </StrictMode>
+            </NextAuthProvider>
+          </ReduxProvider>
+        </IsClientCtxProvider>
         <Script src="/scripts/flowbite.min.js" strategy="lazyOnload" />
       </body>
     </html>

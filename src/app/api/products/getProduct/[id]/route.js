@@ -12,6 +12,7 @@ export async function GET(req) {
     const url = new URL(req.url);
     const pathSegments = url.pathname.split("/");
     const id = pathSegments[pathSegments.length - 1];
+    console.log("🚀 ~ file: route.js:15 ~ GET ~ id:", id);
 
     // Validate the id using Joi
     const schema = Joi.object({

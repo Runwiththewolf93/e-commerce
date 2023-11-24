@@ -12,10 +12,14 @@ import {
 } from "./ProductComponents";
 
 export default function ProductReviewList({ productId, userId }) {
-  // console.log(
-  //   "🚀 ~ file: ProductReviewList.js:15 ~ ProductReviewList ~ productId:",
-  //   productId
-  // );
+  console.log(
+    "🚀 ~ file: ProductReviewList.js:15 ~ ProductReviewList ~ userId:",
+    userId
+  );
+  console.log(
+    "🚀 ~ file: ProductReviewList.js:15 ~ ProductReviewList ~ productId:",
+    productId
+  );
   const dispatch = useDispatch();
   const { isLoadingFetch, reviews, pagination, reviewsMessage, errorFetch } =
     useSelector(state => state.reviews);
@@ -27,10 +31,10 @@ export default function ProductReviewList({ productId, userId }) {
     },
   });
   const lastFetchedProductIdRef = useRef(null);
-  // console.log(
-  //   "🚀 ~ file: ProductReviewList.js:30 ~ ProductReviewList ~ lastFetchedProductIdRef:",
-  //   lastFetchedProductIdRef
-  // );
+  console.log(
+    "🚀 ~ file: ProductReviewList.js:30 ~ ProductReviewList ~ lastFetchedProductIdRef:",
+    lastFetchedProductIdRef
+  );
 
   useEffect(() => {
     if (productId && productId !== lastFetchedProductIdRef.current) {
@@ -60,7 +64,9 @@ export default function ProductReviewList({ productId, userId }) {
         <div className="flex-grow"></div>
       </div>
       {isLoadingFetch ? (
-        <Spinner size="xl" />
+        <div className="flex justify-center">
+          <Spinner size="xl" />
+        </div>
       ) : errorFetch ? (
         <Alert color="failure" className="text-base">
           {errorFetch}

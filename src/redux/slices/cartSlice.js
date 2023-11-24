@@ -1,3 +1,5 @@
+"use client";
+
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customAxios from "../../lib/api";
 
@@ -38,7 +40,9 @@ export const deleteFromCart = createAsyncThunk(
         "/api/cart/deleteFromCart",
         { data: { productId, quantity } }
       );
-      console.log("Why is this fucking state not working properlY???");
+      console.log("Write something and all goes to shit yet again.");
+
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -58,6 +62,9 @@ export const cartSlice = createSlice({
     isLoadingGetCart: false,
     cart: {},
     errorGetCart: null,
+    // deleteFromCart
+    isLoadingDeleteCart: false,
+    errorDeleteCart: null,
   },
   reducers: {
     openCartOverlay: state => {
@@ -96,6 +103,20 @@ export const cartSlice = createSlice({
       .addCase(getUserCart.rejected, (state, action) => {
         state.isLoadingGetCart = false;
         state.errorGetCart = action.payload;
+      })
+      // deleteFromCart reducer
+      .addCase(deleteFromCart.pending, state => {
+        state.isLoadingDeleteCart = true;
+        state.errorDeleteCart = null;
+      })
+      .addCase(deleteFromCart.fulfilled, (state, action) => {
+        state.cart = action.payload.cart;
+        state.isLoadingDeleteCart = false;
+        state.errorDeleteCart = null;
+      })
+      .addCase(deleteFromCart.rejected, (state, action) => {
+        state.isLoadingDeleteCart = false;
+        state.errorDeleteCart = action.payload;
       });
   },
 });

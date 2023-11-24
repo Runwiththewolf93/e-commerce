@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import StarRating from "../../../subcomponents/StarRating";
 import { fetchAggregateRating } from "../../../redux/slices/reviewSlice";
@@ -8,14 +8,14 @@ export default function ProductAggregateRating({ productId }) {
   const dispatch = useDispatch();
   const { isLoadingAggregateRating, aggregateData, errorAggregateRating } =
     useSelector(state => state.reviews);
-  const [lastFetchedProductId, setLastFetchedProductId] = useState(null);
+  const lastFetchedProductIdRef = useRef(null);
 
   useEffect(() => {
-    if (productId && productId !== lastFetchedProductId) {
+    if (productId && productId !== lastFetchedProductIdRef.current) {
       dispatch(fetchAggregateRating({ productId }));
-      setLastFetchedProductId(productId);
+      lastFetchedProductIdRef.current = productId;
     }
-  }, [dispatch, productId, lastFetchedProductId]);
+  }, [dispatch, productId]);
 
   const rating = aggregateData.length
     ? aggregateData[0].averageRating.toFixed(2)

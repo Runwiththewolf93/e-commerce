@@ -122,5 +122,3 @@ const CreateReview = ({ productId, userId, jwt }) => {
 };
 
 export default CreateReview;
-
-// login as stevan1 and add a review tomorrow

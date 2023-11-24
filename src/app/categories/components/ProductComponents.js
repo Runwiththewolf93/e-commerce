@@ -90,10 +90,6 @@ export function SortDropdown({
       sort: { [field]: newOrder },
     }));
 
-    console.log(
-      "🚀 ~ file: ProductComponents.js:98 ~ handleSortFilter ~ filterSortCriteria:",
-      filterSortCriteria
-    );
     dispatch(
       fetchReviews({
         ...filterSortCriteria,

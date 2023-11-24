@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
+import { useIsClient } from "../lib/is-client-ctx";
 
 /**
  * Renders a provider component with the given children.
@@ -13,13 +14,18 @@ import { PersistGate } from "redux-persist/integration/react";
  * @return {ReactNode} The rendered Provider component.
  */
 function ReduxProvider({ children }) {
-  let persistor = persistStore(store);
+  const isClient = useIsClient();
+  let persistor = isClient ? persistStore(store) : null;
 
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        {children}
-      </PersistGate>
+      {isClient ? (
+        <PersistGate loading={null} persistor={persistor}>
+          {children}
+        </PersistGate>
+      ) : (
+        children
+      )}
     </Provider>
   );
 }

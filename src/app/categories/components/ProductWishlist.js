@@ -13,6 +13,10 @@ import {
 import { Alert } from "flowbite-react";
 
 export default function ProductWishlist({ product, jwt }) {
+  // console.log(
+  //   "🚀 ~ file: ProductWishlist.js:16 ~ ProductWishlist ~ product:",
+  //   product
+  // );
   const dispatch = useDispatch();
   const {
     isLoadingWishlist,
@@ -26,20 +30,23 @@ export default function ProductWishlist({ product, jwt }) {
     errorWishlistDelete,
   } = useSelector(state => state.wishlist);
   const isFirstRender = useRef(true);
-  const prevProductId = useRef(product._id);
+  const prevProductId = useRef(product?._id);
 
   useEffect(() => {
     if (
       jwt &&
+      product?._id &&
       (isFirstRender.current || prevProductId.current !== product._id)
     ) {
       dispatch(getWishlistId({ productId: product._id, jwt }));
       isFirstRender.current = false;
       prevProductId.current = product._id;
     }
-  }, [dispatch, product._id, jwt]);
+  }, [dispatch, product?._id, jwt]);
 
   const handleWishlistAction = () => {
+    if (!product?._id) return;
+
     const action = inWishlist
       ? deleteFromWishlist({ productId: product._id, jwt })
       : addToWishlist({ productId: product._id, jwt });

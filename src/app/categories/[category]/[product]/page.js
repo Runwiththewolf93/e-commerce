@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../../redux/slices/productSlice";
@@ -14,6 +14,7 @@ import ProductCreateReview from "../../components/ProductCreateReview";
 import ProductReviewList from "../../components/ProductReviewList";
 import ProductAggregateRating from "../../components/ProductAggregateRating";
 import ProductActions from "../../components/ProductActions";
+import _ from "lodash";
 
 export default function Product() {
   const dispatch = useDispatch();
@@ -30,12 +31,22 @@ export default function Product() {
   );
   console.log("🚀 ~ file: page.js:26 ~ Product ~ product:", product);
 
+  const isFirstRender = useRef(true);
+  console.log(
+    "🚀 ~ file: page.js:37 ~ Product ~ isFirstRender:",
+    isFirstRender
+  );
+
   useEffect(() => {
-    if (Object.keys(product).length === 0 || product._id !== id) {
-      console.log("why does it trigger product?");
+    if (
+      isFirstRender.current ||
+      Object.keys(product).length === 0 ||
+      product._id !== id
+    ) {
       dispatch(fetchProduct(id));
+      isFirstRender.current = false;
     }
-  }, [id, dispatch, product]);
+  }, [dispatch, product, id]);
 
   // testing purposes
   const productWithDiscount = { ...product };
@@ -168,7 +179,7 @@ export default function Product() {
               </div>
             </div>
           </div>
-          {product?._id ? (
+          {product?._id && session?.user?.id ? (
             <ProductReviewList
               productId={product?._id}
               userId={session?.user?.id}
