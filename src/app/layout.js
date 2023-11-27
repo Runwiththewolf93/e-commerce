@@ -1,7 +1,7 @@
 import "./globals.css";
 import "../../utils/scheduler";
 import { Inter } from "next/font/google";
-import ReduxProvider from "../redux/Provider";
+import ReduxProvider from "../redux/ReduxProvider";
 import { NextAuthProvider } from "./providers";
 import { IsClientCtxProvider } from "../lib/is-client-ctx";
 import { PurgeProvider } from "../lib/purge";

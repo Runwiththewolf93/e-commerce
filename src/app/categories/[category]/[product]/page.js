@@ -24,18 +24,17 @@ export default function Product() {
 
   const pathSegments = pathname.split("/");
   const id = pathSegments[pathSegments.length - 1];
-  console.log("🚀 ~ file: page.js:26 ~ Product ~ id:", id);
+  // console.log("🚀 ~ file: page.js:26 ~ Product ~ id:", id);
 
   const { isLoadingProduct, product, errorProduct } = useSelector(
     state => state.products
   );
-  console.log("🚀 ~ file: page.js:26 ~ Product ~ product:", product);
 
   const isFirstRender = useRef(true);
-  console.log(
-    "🚀 ~ file: page.js:37 ~ Product ~ isFirstRender:",
-    isFirstRender
-  );
+  // console.log(
+  //   "🚀 ~ file: page.js:37 ~ Product ~ isFirstRender:",
+  //   isFirstRender
+  // );
 
   useEffect(() => {
     if (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { persistStore } from "redux-persist";
@@ -15,7 +16,9 @@ import { useIsClient } from "../lib/is-client-ctx";
  */
 function ReduxProvider({ children }) {
   const isClient = useIsClient();
-  let persistor = isClient ? persistStore(store) : null;
+  let persistor = useMemo(() => {
+    return isClient ? persistStore(store) : null;
+  }, [isClient]);
 
   return (
     <Provider store={store}>
