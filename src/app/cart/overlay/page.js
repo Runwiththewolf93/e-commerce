@@ -9,16 +9,19 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { categoryToLink } from "../../../../utils/helper";
+import CartSkeletonItem from "./components/CartSkeletonItem";
+import { Alert } from "flowbite-react";
 
 const CartOverlay = () => {
   const dispatch = useDispatch();
-  const { isCartOpen, cart, errorGetCart } = useSelector(state => state.cart);
+  const { isCartOpen, isLoadingGetCart, cart, errorGetCart } = useSelector(
+    state => state.cart
+  );
   console.log("🚀 ~ file: page.js:14 ~ CartOverlay ~ cart:", cart);
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.customJwt && (!cart || Object.keys(cart).length === 0)) {
-      console.log("What's going on here? CART FETCH");
       dispatch(getUserCart(session.customJwt));
     }
   }, [dispatch, session?.customJwt, cart]);
@@ -82,50 +85,58 @@ const CartOverlay = () => {
                             role="list"
                             className="-my-6 divide-y divide-gray-200"
                           >
-                            {cart.items?.map(item => (
-                              <li key={item._id} className="flex py-6">
-                                <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                  <img
-                                    src={item.product.images[0].url}
-                                    alt={item.product.images[0].alt}
-                                    className="h-full w-full object-cover object-center"
-                                  />
-                                </div>
+                            {isLoadingGetCart ? (
+                              <CartSkeletonItem /> ? (
+                                errorGetCart
+                              ) : (
+                                <Alert color="failure">{errorGetCart}</Alert>
+                              )
+                            ) : (
+                              cart.items?.map(item => (
+                                <li key={item._id} className="flex py-6">
+                                  <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                    <img
+                                      src={item.product.images[0].url}
+                                      alt={item.product.images[0].alt}
+                                      className="h-full w-full object-cover object-center"
+                                    />
+                                  </div>
 
-                                <div className="ml-4 flex flex-1 flex-col">
-                                  <div>
-                                    <div className="flex justify-between text-base font-medium text-gray-900">
-                                      <h3 className="text-indigo-600 hover:text-indigo-800 hover:underline">
-                                        <Link
-                                          href={`/categories/${categoryToLink(
-                                            item.product.category
-                                          )}/${item.product._id}`}
-                                        >
-                                          {item.product.name}
-                                        </Link>
-                                      </h3>
-                                      <p className="ml-4">
-                                        €{item.product.price}
+                                  <div className="ml-4 flex flex-1 flex-col">
+                                    <div>
+                                      <div className="flex justify-between text-base font-medium text-gray-900">
+                                        <h3 className="text-indigo-600 hover:text-indigo-800 hover:underline">
+                                          <Link
+                                            href={`/categories/${categoryToLink(
+                                              item.product.category
+                                            )}/${item.product._id}`}
+                                          >
+                                            {item.product.name}
+                                          </Link>
+                                        </h3>
+                                        <p className="ml-4">
+                                          €{item.product.price}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-1 items-end justify-between text-sm">
+                                      <p className="text-gray-500">
+                                        Qty {item.quantity}
                                       </p>
-                                    </div>
-                                  </div>
-                                  <div className="flex flex-1 items-end justify-between text-sm">
-                                    <p className="text-gray-500">
-                                      Qty {item.quantity}
-                                    </p>
 
-                                    <div className="flex">
-                                      <button
-                                        type="button"
-                                        className="font-medium text-indigo-600 hover:text-indigo-500"
-                                      >
-                                        Remove
-                                      </button>
+                                      <div className="flex">
+                                        <button
+                                          type="button"
+                                          className="font-medium text-indigo-600 hover:text-indigo-500"
+                                        >
+                                          Remove
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </li>
-                            ))}
+                                </li>
+                              ))
+                            )}
                           </ul>
                         </div>
                       </div>

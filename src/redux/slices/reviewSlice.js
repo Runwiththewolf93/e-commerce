@@ -50,7 +50,7 @@ export const fetchReviews = createAsyncThunk(
       paramsObject.aggregateRating = aggregateRating;
     if (userId !== undefined) paramsObject.userId = userId;
 
-    console.log("🚀 ~ file: reviewSlice.js:45 ~ paramsObject:", paramsObject);
+    // console.log("🚀 ~ file: reviewSlice.js:45 ~ paramsObject:", paramsObject);
 
     try {
       // Convert the parameters object to a query string
@@ -59,7 +59,7 @@ export const fetchReviews = createAsyncThunk(
       const { data } = await customAxios().get(
         `/api/reviews/getReviews?${queryParams}`
       );
-      console.log("🚀 ~ file: reviewSlice.js:48 ~ data:", data);
+      // console.log("🚀 ~ file: reviewSlice.js:48 ~ data:", data);
 
       return {
         reviews: data.reviews,

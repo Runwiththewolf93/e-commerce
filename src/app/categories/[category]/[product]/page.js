@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../../redux/slices/productSlice";
@@ -14,7 +14,7 @@ import ProductCreateReview from "../../components/ProductCreateReview";
 import ProductReviewList from "../../components/ProductReviewList";
 import ProductAggregateRating from "../../components/ProductAggregateRating";
 import ProductActions from "../../components/ProductActions";
-import _ from "lodash";
+import ProductDescription from "../../components/ProductDescription";
 
 export default function Product() {
   const dispatch = useDispatch();
@@ -29,21 +29,11 @@ export default function Product() {
   const { isLoadingProduct, product, errorProduct } = useSelector(
     state => state.products
   );
-
-  const isFirstRender = useRef(true);
-  // console.log(
-  //   "🚀 ~ file: page.js:37 ~ Product ~ isFirstRender:",
-  //   isFirstRender
-  // );
+  // console.log("🚀 ~ file: page.js:30 ~ Product ~ product:", product);
 
   useEffect(() => {
-    if (
-      isFirstRender.current ||
-      Object.keys(product).length === 0 ||
-      product._id !== id
-    ) {
+    if (Object.keys(product).length === 0 || product._id !== id) {
       dispatch(fetchProduct(id));
-      isFirstRender.current = false;
     }
   }, [dispatch, product, id]);
 
@@ -79,6 +69,8 @@ export default function Product() {
     );
   }
 
+  const isProductAndUserLoaded = product && product._id && session?.user?.id;
+
   return (
     <div className="bg-white">
       <div className="pt-6">
@@ -94,20 +86,20 @@ export default function Product() {
 
           <div className="mt-4 lg:row-span-3 lg:mt-0">
             <h2 className="sr-only">Product information</h2>
-            {!productWithDiscount.discount ? (
+            {!productWithDiscount?.discount ? (
               <p className="text-3xl tracking-tight text-gray-900">
-                €{productWithDiscount.price}
+                €{productWithDiscount?.price}
               </p>
             ) : (
               <div className="flex items-center">
                 <del className="text-3xl tracking-tight text-red-600 mr-3">
-                  €{productWithDiscount.price}
+                  €{productWithDiscount?.price}
                 </del>
                 <p className="text-3xl tracking-tight text-green-600">
                   €
                   {Math.round(
-                    productWithDiscount.price *
-                      (1 - productWithDiscount.discount.percentage / 100)
+                    productWithDiscount?.price *
+                      (1 - productWithDiscount?.discount?.percentage / 100)
                   )}
                 </p>
               </div>
@@ -121,67 +113,16 @@ export default function Product() {
                 userId={session?.user?.id}
                 jwt={session?.customJwt}
               />
-
               <ProductActions product={product} jwt={session?.customJwt} />
             </section>
           </div>
 
-          <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-12 lg:pr-8 lg:pt-6">
-            <div>
-              <h3 className="sr-only">Description</h3>
-              <div className="space-y-6">
-                <p className="text-base text-gray-900">
-                  {product?.description}
-                </p>
-              </div>
-            </div>
+          <ProductDescription productDescription={product?.description} />
 
-            <div className="mt-10">
-              <h3 className="text-sm font-medium text-gray-900">Highlights</h3>
-
-              <div className="mt-4">
-                <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                  <li className="text-gray-400">
-                    <span className="text-gray-600">
-                      Lorem ipsum dolor sit amet.
-                    </span>
-                  </li>
-                  <li className="text-gray-400">
-                    <span className="text-gray-600">
-                      Lorem ipsum dolor sit amet.
-                    </span>
-                  </li>
-                  <li className="text-gray-400">
-                    <span className="text-gray-600">
-                      Lorem ipsum dolor sit amet.
-                    </span>
-                  </li>
-                  <li className="text-gray-400">
-                    <span className="text-gray-600">
-                      Lorem ipsum dolor sit amet.
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h2 className="text-sm font-medium text-gray-900">Details</h2>
-
-              <div className="mt-4 space-y-6">
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Corporis nisi repudiandae consequuntur aut ipsum asperiores
-                  eveniet nesciunt vero hic distinctio assumenda, veritatis
-                  fugiat temporibus sint.
-                </p>
-              </div>
-            </div>
-          </div>
-          {product?._id && session?.user?.id ? (
+          {isProductAndUserLoaded ? (
             <ProductReviewList
-              productId={product?._id}
-              userId={session?.user?.id}
+              productId={product._id}
+              userId={session.user.id}
             />
           ) : null}
         </div>

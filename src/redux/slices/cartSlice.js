@@ -40,7 +40,6 @@ export const deleteFromCart = createAsyncThunk(
         "/api/cart/deleteFromCart",
         { data: { productId, quantity } }
       );
-      console.log("Write something and all goes to shit yet again.");
 
       return data;
     } catch (error) {
@@ -49,7 +48,6 @@ export const deleteFromCart = createAsyncThunk(
   }
 );
 
-// either return the full cart, or part of it (the product)
 export const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -65,6 +63,8 @@ export const cartSlice = createSlice({
     // deleteFromCart
     isLoadingDeleteCart: false,
     errorDeleteCart: null,
+    // quantity
+    quantity: 1,
   },
   reducers: {
     openCartOverlay: state => {
@@ -72,6 +72,10 @@ export const cartSlice = createSlice({
     },
     closeCartOverlay: state => {
       state.isCartOpen = false;
+    },
+    setQuantity: (state, action) => {
+      console.log("SET QUANTITY REDUCER CALLED");
+      state.quantity = action.payload;
     },
   },
   extraReducers: builder => {
@@ -121,7 +125,8 @@ export const cartSlice = createSlice({
   },
 });
 
-export const { openCartOverlay, closeCartOverlay } = cartSlice.actions;
+export const { openCartOverlay, closeCartOverlay, setQuantity } =
+  cartSlice.actions;
 
 export default cartSlice.reducer;
 

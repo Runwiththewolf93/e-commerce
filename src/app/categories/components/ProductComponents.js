@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Dropdown, Tooltip, Button, Alert } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchReviews, createVote } from "../../../redux/slices/reviewSlice";
@@ -13,27 +13,39 @@ import {
 } from "react-icons/ai";
 import { useSession } from "next-auth/react";
 
-export function FilterDropdown({
+export const FilterDropdown = React.memo(function FilterDropdown({
   productId,
   filterSortCriteria,
   setFilterSortCriteria,
 }) {
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:21 ~ setFilterSortCriteria:",
+  //   setFilterSortCriteria
+  // );
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:21 ~ filterSortCriteria:",
+  //   filterSortCriteria
+  // );
+  // console.log("🚀 ~ file: ProductComponents.js:21 ~ productId:", productId);
   const dispatch = useDispatch();
 
-  const handleFilterChange = filterOption => {
-    const newFilter = filterOption.hasOwnProperty("rating")
-      ? { rating: filterOption.rating }
-      : { reviewType: filterOption.reviewType };
+  const handleFilterChange = useCallback(
+    filterOption => {
+      const newFilter = filterOption.hasOwnProperty("rating")
+        ? { rating: filterOption.rating }
+        : { reviewType: filterOption.reviewType };
 
-    setFilterSortCriteria(prev => ({
-      ...prev,
-      filter: newFilter,
-    }));
+      setFilterSortCriteria(prev => ({
+        ...prev,
+        filter: newFilter,
+      }));
 
-    dispatch(
-      fetchReviews({ ...filterSortCriteria, filter: newFilter, productId })
-    );
-  };
+      dispatch(
+        fetchReviews({ ...filterSortCriteria, filter: newFilter, productId })
+      );
+    },
+    [dispatch, filterSortCriteria, productId, setFilterSortCriteria]
+  );
 
   return (
     <Dropdown label="Filter" inline placement="right">
@@ -67,13 +79,22 @@ export function FilterDropdown({
       </Dropdown.Item>
     </Dropdown>
   );
-}
+});
 
-export function SortDropdown({
+export const SortDropdown = React.memo(function SortDropdown({
   productId,
   filterSortCriteria,
   setFilterSortCriteria,
 }) {
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:87 ~ setFilterSortCriteria:",
+  //   setFilterSortCriteria
+  // );
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:87 ~ filterSortCriteria:",
+  //   filterSortCriteria
+  // );
+  // console.log("🚀 ~ file: ProductComponents.js:87 ~ productId:", productId);
   const dispatch = useDispatch();
 
   const [sortOrder, setSortOrder] = useState({
@@ -81,23 +102,33 @@ export function SortDropdown({
     updatedAt: "desc",
   });
 
-  const handleSortFilter = field => {
-    const newOrder = sortOrder[field] === "desc" ? "asc" : "desc";
-    setSortOrder({ ...sortOrder, [field]: newOrder });
+  const handleSortFilter = useCallback(
+    field => {
+      const newOrder = sortOrder[field] === "desc" ? "asc" : "desc";
+      setSortOrder({ ...sortOrder, [field]: newOrder });
 
-    setFilterSortCriteria(prev => ({
-      ...prev,
-      sort: { [field]: newOrder },
-    }));
-
-    dispatch(
-      fetchReviews({
-        ...filterSortCriteria,
+      setFilterSortCriteria(prev => ({
+        ...prev,
         sort: { [field]: newOrder },
-        productId,
-      })
-    );
-  };
+      }));
+
+      dispatch(
+        fetchReviews({
+          ...filterSortCriteria,
+          sort: { [field]: newOrder },
+          productId,
+        })
+      );
+    },
+    [
+      sortOrder,
+      setSortOrder,
+      setFilterSortCriteria,
+      dispatch,
+      filterSortCriteria,
+      productId,
+    ]
+  );
 
   return (
     <Dropdown label="Sort By" inline placement="right">
@@ -109,36 +140,51 @@ export function SortDropdown({
       </Dropdown.Item>
     </Dropdown>
   );
-}
+});
 
-export const ReviewNavigation = ({
+export const ReviewNavigation = React.memo(function ReviewNavigation({
   productId,
   pagination,
   filterSortCriteria,
   userId,
-}) => {
+}) {
+  // console.log("🚀 ~ file: ProductComponents.js:151 ~ userId:", userId);
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:122 ~ filterSortCriteria:",
+  //   filterSortCriteria
+  // );
+  // console.log("🚀 ~ file: ProductComponents.js:122 ~ pagination:", pagination);
+  // console.log("🚀 ~ file: ProductComponents.js:122 ~ productId:", productId);
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(Number(pagination.page));
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:124 ~ pagination:",
+  //   pagination.page
+  // );
 
   // Update currentPage whenever pagination.page changes
   useEffect(() => {
+    // console.log("how often does this render?");
     setCurrentPage(Number(pagination.page));
   }, [pagination.page]);
 
   const limit = pagination.limit;
 
-  const handleNavigation = newPage => {
-    setCurrentPage(newPage);
-    dispatch(
-      fetchReviews({
-        productId,
-        userId,
-        page: newPage,
-        limit,
-        ...filterSortCriteria,
-      })
-    );
-  };
+  const handleNavigation = useCallback(
+    newPage => {
+      setCurrentPage(newPage);
+      dispatch(
+        fetchReviews({
+          productId,
+          userId,
+          page: newPage,
+          limit,
+          ...filterSortCriteria,
+        })
+      );
+    },
+    [dispatch, filterSortCriteria, limit, productId, userId]
+  );
 
   return (
     <div className="flex">
@@ -165,9 +211,13 @@ export const ReviewNavigation = ({
       </Button>
     </div>
   );
-};
+});
 
-export const AddVote = ({ review }) => {
+export const AddVote = React.memo(function SortDropdown({ review }) {
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:177 ~ AddVote ~ review:",
+  //   review
+  // );
   const dispatch = useDispatch();
   const { data: session } = useSession();
   const jwt = session?.customJwt;
@@ -175,6 +225,18 @@ export const AddVote = ({ review }) => {
   const { isLoadingVote, errorVote, latestVoteRequestId } = useSelector(
     state => state.reviews
   );
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:226 ~ AddVote ~ latestVoteRequestId:",
+  //   latestVoteRequestId
+  // );
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:226 ~ AddVote ~ errorVote:",
+  //   errorVote
+  // );
+  // console.log(
+  //   "🚀 ~ file: ProductComponents.js:226 ~ AddVote ~ isLoadingVote:",
+  //   isLoadingVote
+  // );
   const [localUpvotes, setLocalUpvotes] = useState(review?.upvotesCount || 0);
   const [localDownvotes, setLocalDownvotes] = useState(
     review?.downvotesCount || 0
@@ -183,39 +245,43 @@ export const AddVote = ({ review }) => {
     review?.userVoteType || null
   );
 
-  const handleVote = voteType => {
-    if (localUserVoteType === voteType) {
-      // User is retracting their vote
-      setLocalUpvotes(prev => (voteType === "upvote" ? prev - 1 : prev));
-      setLocalDownvotes(prev => (voteType === "downvote" ? prev - 1 : prev));
-      setLocalUserVoteType(null);
-    } else {
-      // User is voting for the first time or changing their vote
-      if (voteType === "upvote") {
-        // If the user is changing from downvote to upvote
-        setLocalUpvotes(prev =>
-          localUserVoteType === "downvote" ? prev + 1 : prev + 1
-        );
-        setLocalDownvotes(prev =>
-          localUserVoteType === "downvote" ? prev - 1 : prev
-        );
-      } else if (voteType === "downvote") {
-        // If the user is changing from upvote to downvote
-        setLocalDownvotes(prev =>
-          localUserVoteType === "upvote" ? prev + 1 : prev + 1
-        );
-        setLocalUpvotes(prev =>
-          localUserVoteType === "upvote" ? prev - 1 : prev
-        );
+  const handleVote = useCallback(
+    voteType => {
+      if (localUserVoteType === voteType) {
+        // User is retracting their vote
+        setLocalUpvotes(prev => (voteType === "upvote" ? prev - 1 : prev));
+        setLocalDownvotes(prev => (voteType === "downvote" ? prev - 1 : prev));
+        setLocalUserVoteType(null);
+      } else {
+        // User is voting for the first time or changing their vote
+        if (voteType === "upvote") {
+          // If the user is changing from downvote to upvote
+          setLocalUpvotes(prev =>
+            localUserVoteType === "downvote" ? prev + 1 : prev + 1
+          );
+          setLocalDownvotes(prev =>
+            localUserVoteType === "downvote" ? prev - 1 : prev
+          );
+        } else if (voteType === "downvote") {
+          // If the user is changing from upvote to downvote
+          setLocalDownvotes(prev =>
+            localUserVoteType === "upvote" ? prev + 1 : prev + 1
+          );
+          setLocalUpvotes(prev =>
+            localUserVoteType === "upvote" ? prev - 1 : prev
+          );
+        }
+        setLocalUserVoteType(voteType);
       }
-      setLocalUserVoteType(voteType);
-    }
 
-    // Dispatch the vote action with the voteType
-    dispatch(createVote({ reviewId: review._id, voteType, jwt }));
-  };
+      // Dispatch the vote action with the voteType
+      dispatch(createVote({ reviewId: review._id, voteType, jwt }));
+    },
+    [localUserVoteType, dispatch, review._id, jwt]
+  );
 
   useEffect(() => {
+    // console.log("The main culprit, how often do you log?");
     setLocalUpvotes(review?.upvotesCount || 0);
     setLocalDownvotes(review?.downvotesCount || 0);
     setLocalUserVoteType(review?.userVoteType || null);
@@ -261,7 +327,7 @@ export const AddVote = ({ review }) => {
       )}
     </div>
   );
-};
+});
 
 export const TooltipStar = ({ content, children }) => {
   return <Tooltip content={content}>{children}</Tooltip>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchReviews } from "../../../redux/slices/reviewSlice";
 import { Spinner, Alert } from "flowbite-react";
@@ -11,18 +11,17 @@ import {
   AddVote,
 } from "./ProductComponents";
 
-export default function ProductReviewList({ productId, userId }) {
-  // console.log(
-  //   "🚀 ~ file: ProductReviewList.js:15 ~ ProductReviewList ~ userId:",
-  //   userId
-  // );
-  // console.log(
-  //   "🚀 ~ file: ProductReviewList.js:15 ~ ProductReviewList ~ productId:",
-  //   productId
-  // );
+const ProductReviewList = React.memo(function ProductReviewList({
+  productId,
+  userId,
+}) {
   const dispatch = useDispatch();
   const { isLoadingFetch, reviews, pagination, reviewsMessage, errorFetch } =
     useSelector(state => state.reviews);
+  // console.log(
+  //   "🚀 ~ file: ProductReviewList.js:25 ~ ProductReviewList ~ reviews:",
+  //   reviews
+  // );
   const [filterSortCriteria, setFilterSortCriteria] = useState({
     filter: null,
     sort: {
@@ -31,10 +30,6 @@ export default function ProductReviewList({ productId, userId }) {
     },
   });
   const lastFetchedProductIdRef = useRef(null);
-  // console.log(
-  //   "🚀 ~ file: ProductReviewList.js:30 ~ ProductReviewList ~ lastFetchedProductIdRef:",
-  //   lastFetchedProductIdRef
-  // );
 
   useEffect(() => {
     if (productId && productId !== lastFetchedProductIdRef.current) {
@@ -106,4 +101,6 @@ export default function ProductReviewList({ productId, userId }) {
       )}
     </div>
   );
-}
+});
+
+export default ProductReviewList;

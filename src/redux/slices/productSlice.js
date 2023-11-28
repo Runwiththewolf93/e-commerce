@@ -152,7 +152,7 @@ export const productSlice = createSlice({
     productsCategory: [],
     errorCategory: null,
     // fetchProduct
-    isLoadingProduct: false,
+    isLoadingProduct: true,
     product: {},
     errorProduct: null,
   },
