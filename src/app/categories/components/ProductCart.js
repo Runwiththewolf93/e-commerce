@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { HiMinusSm, HiPlusSm } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, openCartOverlay } from "../../../redux/slices/cartSlice";
 import CartOverlay from "../../cart/overlay/page";
@@ -22,7 +20,10 @@ export default function ProductCart({ product, jwt }) {
 
   return (
     <div>
-      <CartQuantity />
+      <div className="flex items-center justify-evenly">
+        <p>Select quantity:</p>
+        <CartQuantity />
+      </div>
 
       <button
         type="submit"

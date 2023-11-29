@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchReviews } from "../../../redux/slices/reviewSlice";
-import { Spinner, Alert } from "flowbite-react";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { Alert } from "flowbite-react";
 import {
   FilterDropdown,
   SortDropdown,
@@ -14,14 +13,12 @@ import {
 const ProductReviewList = React.memo(function ProductReviewList({
   productId,
   userId,
+  reviews,
 }) {
-  const dispatch = useDispatch();
-  const { isLoadingFetch, reviews, pagination, reviewsMessage, errorFetch } =
-    useSelector(state => state.reviews);
-  // console.log(
-  //   "🚀 ~ file: ProductReviewList.js:25 ~ ProductReviewList ~ reviews:",
-  //   reviews
-  // );
+  const { pagination, reviewsMessage, errorFetch } = useSelector(
+    state => state.reviews
+  );
+
   const [filterSortCriteria, setFilterSortCriteria] = useState({
     filter: null,
     sort: {
@@ -29,14 +26,6 @@ const ProductReviewList = React.memo(function ProductReviewList({
       updatedAt: "desc",
     },
   });
-  const lastFetchedProductIdRef = useRef(null);
-
-  useEffect(() => {
-    if (productId && productId !== lastFetchedProductIdRef.current) {
-      dispatch(fetchReviews({ productId, userId }));
-      lastFetchedProductIdRef.current = productId;
-    }
-  }, [dispatch, productId, userId]);
 
   return (
     <div className="space-y-4 col-span-2">
@@ -58,11 +47,7 @@ const ProductReviewList = React.memo(function ProductReviewList({
         />
         <div className="flex-grow"></div>
       </div>
-      {isLoadingFetch ? (
-        <div className="flex justify-center">
-          <Spinner size="xl" />
-        </div>
-      ) : errorFetch ? (
+      {errorFetch ? (
         <Alert color="failure" className="text-base">
           {errorFetch}
         </Alert>

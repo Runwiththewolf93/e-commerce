@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { HiMinusSm, HiPlusSm } from "react-icons/hi";
 import styles from "./CartQuantity.module.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +20,11 @@ export default function CartQuantity({
   //   "🚀 ~ file: CartQuantity.js:12 ~ CartQuantity ~ product:",
   //   product
   // );
-  const { quantity: quantityFromState } = useSelector(state => state.cart);
+  const {
+    quantity: quantityFromState,
+    isLoadingAddCart,
+    isLoadingDeleteCart,
+  } = useSelector(state => state.cart);
   // console.log(
   //   "🚀 ~ file: CartQuantity.js:13 ~ CartQuantity ~ quantity:",
   //   quantity
@@ -85,7 +88,7 @@ export default function CartQuantity({
           <button
             onClick={decrementQuantity}
             className="bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-l cursor-pointer"
-            disabled={quantity === 1}
+            disabled={quantity === 1 || isLoadingAddCart || isLoadingDeleteCart}
           >
             <HiMinusSm className="mx-auto" />
           </button>
@@ -97,11 +100,16 @@ export default function CartQuantity({
             onChange={e => handleQuantityChange(parseInt(e.target.value, 10))}
             min="1"
             max={product.stock}
+            disabled
           />
           <button
             onClick={incrementQuantity}
             className="bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-r cursor-pointer"
-            disabled={quantity === product.stock}
+            disabled={
+              quantity === product.stock ||
+              isLoadingAddCart ||
+              isLoadingDeleteCart
+            }
           >
             <HiPlusSm className="mx-auto" />
           </button>

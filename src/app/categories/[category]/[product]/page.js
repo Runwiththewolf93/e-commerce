@@ -5,8 +5,9 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../../redux/slices/productSlice";
+import { fetchReviews } from "../../../../redux/slices/reviewSlice";
 import { useSession } from "next-auth/react";
-import { Alert } from "flowbite-react";
+import { Alert, Spinner } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import ProductBreadcrumb from "../../components/ProductBreadcrumb";
 import ProductImages from "../../components/ProductImages";
@@ -36,6 +37,16 @@ export default function Product() {
       dispatch(fetchProduct(id));
     }
   }, [dispatch, product, id]);
+
+  const { reviews, isLoadingFetch } = useSelector(state => state.reviews);
+
+  useEffect(() => {
+    if (product && product._id && session?.user?.id && !reviews.length) {
+      dispatch(
+        fetchReviews({ productId: product._id, userId: session.user.id })
+      );
+    }
+  }, [dispatch, product, session?.user?.id, reviews.length]);
 
   // testing purposes
   const productWithDiscount = { ...product };
@@ -69,7 +80,9 @@ export default function Product() {
     );
   }
 
-  const isProductAndUserLoaded = product && product._id && session?.user?.id;
+  const isLoadingProductReviewList =
+    product && product._id && session?.user?.id;
+  const isEverythingLoaded = isLoadingProductReviewList && !isLoadingFetch;
 
   return (
     <div className="bg-white">
@@ -119,12 +132,17 @@ export default function Product() {
 
           <ProductDescription productDescription={product?.description} />
 
-          {isProductAndUserLoaded ? (
+          {isEverythingLoaded ? (
             <ProductReviewList
               productId={product._id}
               userId={session.user.id}
+              reviews={reviews}
             />
-          ) : null}
+          ) : (
+            <div className="flex justify-center">
+              <Spinner size="xl" />
+            </div>
+          )}
         </div>
       </div>
     </div>

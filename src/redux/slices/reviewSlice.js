@@ -106,18 +106,22 @@ export const createVote = createAsyncThunk(
 export const reviewSlice = createSlice({
   name: "reviews",
   initialState: {
+    // createReview
     isLoading: false,
     message: "",
     error: null,
+    // fetchReview
     isLoadingFetch: false,
     reviews: [],
     pagination: {},
     reviewsMessage: "",
     errorFetch: null,
+    // createVote
     isLoadingVote: false,
     prevReviewState: null,
     latestVoteRequestId: null,
     errorVote: null,
+    // fetchAggregateRating
     isLoadingAggregateRating: false,
     aggregateData: [],
     errorAggregateRating: null,

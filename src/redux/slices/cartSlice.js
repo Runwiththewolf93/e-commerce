@@ -76,6 +76,11 @@ export const cartSlice = createSlice({
     setQuantity: (state, action) => {
       state.quantity = action.payload;
     },
+    clearErrorMessage: state => {
+      state.errorAddCart = null;
+      state.errorGetCart = null;
+      state.errorDeleteCart = null;
+    },
   },
   extraReducers: builder => {
     builder
@@ -124,8 +129,12 @@ export const cartSlice = createSlice({
   },
 });
 
-export const { openCartOverlay, closeCartOverlay, setQuantity } =
-  cartSlice.actions;
+export const {
+  openCartOverlay,
+  closeCartOverlay,
+  setQuantity,
+  clearErrorMessage,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;
 
