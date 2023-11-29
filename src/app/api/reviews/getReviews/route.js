@@ -111,18 +111,18 @@ export async function GET(req) {
         sortConditions.downvotesCount = -1;
       }
 
-      console.log(
-        "🚀 ~ file: route.js:99 ~ GET ~ filterConditions:",
-        filterConditions
-      );
-      console.log(
-        "🚀 ~ file: route.js:107 ~ GET ~ sortConditions:",
-        sortConditions
-      );
+      // console.log(
+      //   "🚀 ~ file: route.js:99 ~ GET ~ filterConditions:",
+      //   filterConditions
+      // );
+      // console.log(
+      //   "🚀 ~ file: route.js:107 ~ GET ~ sortConditions:",
+      //   sortConditions
+      // );
 
       const skip = (page - 1) * limit;
-      console.log("🚀 ~ file: route.js:124 ~ GET ~ skip:", skip);
-      console.log("🚀 ~ file: route.js:125 ~ GET ~ page:", page);
+      // console.log("🚀 ~ file: route.js:124 ~ GET ~ skip:", skip);
+      // console.log("🚀 ~ file: route.js:125 ~ GET ~ page:", page);
 
       const reviews = await Reviews.find(filterConditions)
         .sort(sortConditions)
@@ -132,8 +132,8 @@ export async function GET(req) {
         .populate({ path: "downvotedBy", model: "User" })
         .lean();
 
-      console.log("🚀 ~ file: route.js:126 ~ GET ~ reviews:", reviews);
-      console.log("🚀 ~ file: route.js:129 ~ GET ~ userId:", userId);
+      // console.log("🚀 ~ file: route.js:126 ~ GET ~ reviews:", reviews);
+      // console.log("🚀 ~ file: route.js:129 ~ GET ~ userId:", userId);
 
       if (userId) {
         reviews.forEach(review => {
@@ -154,7 +154,7 @@ export async function GET(req) {
         });
       }
 
-      console.log("🚀 ~ file: route.js:130 ~ GET ~ reviews:", reviews);
+      // console.log("🚀 ~ file: route.js:130 ~ GET ~ reviews:", reviews);
 
       const totalReviews = await Reviews.countDocuments(filterConditions);
 

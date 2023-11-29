@@ -19,6 +19,8 @@ export async function POST(req) {
     });
 
     const { productId, quantity } = await req.json();
+    console.log("🚀 ~ file: route.js:22 ~ POST ~ productId:", productId);
+    console.log("🚀 ~ file: route.js:22 ~ POST ~ quantity:", quantity);
 
     // Joi validation
     const { error } = schema.validate({ productId, quantity });
@@ -98,7 +100,7 @@ export async function POST(req) {
     const updatedItem = cart.items.find(
       item => item.product._id.toString() === productId
     );
-    console.log("🚀 ~ file: route.js:100 ~ POST ~ updatedItem:", updatedItem);
+    // console.log("🚀 ~ file: route.js:100 ~ POST ~ updatedItem:", updatedItem);
 
     return NextResponse.json({
       status: "success",

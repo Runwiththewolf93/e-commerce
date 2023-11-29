@@ -3,7 +3,11 @@
 
 import { Fragment, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { closeCartOverlay, getUserCart } from "../../../redux/slices/cartSlice";
+import {
+  closeCartOverlay,
+  getUserCart,
+  deleteFromCart,
+} from "../../../redux/slices/cartSlice";
 import { IoMdClose } from "react-icons/io";
 import { Dialog, Transition } from "@headlessui/react";
 import { useSession } from "next-auth/react";
@@ -11,6 +15,7 @@ import Link from "next/link";
 import { categoryToLink } from "../../../../utils/helper";
 import CartSkeletonItem from "./components/CartSkeletonItem";
 import { Alert } from "flowbite-react";
+import CartQuantity from "../shared/CartQuantity";
 
 const CartOverlay = () => {
   const dispatch = useDispatch();
@@ -120,14 +125,25 @@ const CartOverlay = () => {
                                       </div>
                                     </div>
                                     <div className="flex flex-1 items-end justify-between text-sm">
-                                      <p className="text-gray-500">
-                                        Qty {item.quantity}
-                                      </p>
+                                      <CartQuantity
+                                        productFromProp={item.product}
+                                        quantityFromProp={item.quantity}
+                                        jwt={session?.customJwt}
+                                      />
 
                                       <div className="flex">
                                         <button
                                           type="button"
                                           className="font-medium text-indigo-600 hover:text-indigo-500"
+                                          onClick={() =>
+                                            dispatch(
+                                              deleteFromCart({
+                                                productId: item.product._id,
+                                                removeCartItem: true,
+                                                jwt: session?.customJwt,
+                                              })
+                                            )
+                                          }
                                         >
                                           Remove
                                         </button>
@@ -142,10 +158,19 @@ const CartOverlay = () => {
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                      <div className="flex justify-between text-base font-medium text-gray-900">
-                        <p>Subtotal</p>
-                        <p>${cart.totalAmount}</p>
+                    <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+                      <div className="flex flex-col">
+                        <div className="flex justify-between text-base font-medium text-gray-900">
+                          <p>Subtotal</p>
+                          <p>${cart.totalAmount}</p>
+                        </div>
+                        <div className="h-0.5 bg-slate-800"></div>
+                        <div className="flex justify-between text-base font-medium text-gray-900">
+                          <p className="font-bold">Total with discount</p>
+                          <p className="font-bold">
+                            ${cart.totalAmountDiscount}
+                          </p>
+                        </div>
                       </div>
                       <p className="mt-0.5 text-sm text-gray-500">
                         Shipping and taxes calculated at checkout.
@@ -158,7 +183,7 @@ const CartOverlay = () => {
                           Checkout
                         </a>
                       </div>
-                      <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
+                      <div className="mt-5 flex justify-center text-center text-sm text-gray-500">
                         <p>
                           or
                           <button

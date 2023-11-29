@@ -6,22 +6,43 @@ import validateJWT from "../../../../../utils/protect";
 import customAPIError from "../../errors";
 import Joi from "joi";
 
-export async function POST(req) {
+export async function DELETE(req) {
   try {
     validateJWT(req);
     await connect();
 
-    const schema = Joi.object({
+    const { productId, quantity, removeCartItem } = await req.json();
+    console.log("🚀 ~ file: route.js:22 ~ POST ~ productId:", productId);
+    console.log("🚀 ~ file: route.js:22 ~ POST ~ quantity:", quantity);
+    console.log(
+      "🚀 ~ file: route.js:22 ~ DELETE ~ removeCartItem:",
+      removeCartItem
+    );
+
+    // Build schema dynamically
+    let schemaFields = {
       productId: Joi.string()
         .regex(/^[0-9a-fA-F]{24}$/)
         .required(),
-      quantity: Joi.number().min(1).required(),
-    });
+    };
 
-    const { productId, quantity } = await req.json();
+    if (removeCartItem !== undefined) {
+      schemaFields.removeCartItem = Joi.boolean().required();
+    } else {
+      schemaFields.quantity = Joi.number().min(1).required();
+    }
+
+    const schema = Joi.object(schemaFields);
 
     // Joi validation
-    const { error } = schema.validate({ productId, quantity });
+    const validationObject = { productId };
+    if (removeCartItem !== undefined) {
+      validationObject.removeCartItem = removeCartItem;
+    } else {
+      validationObject.quantity = quantity;
+    }
+
+    const { error } = schema.validate(validationObject);
     if (error) {
       throw new customAPIError.BadRequestError(error.details[0].message);
     }
@@ -40,36 +61,34 @@ export async function POST(req) {
       throw new customAPIError.NotFoundError("Cart not found");
     }
 
-    // Add or update item in cart
+    // Find item in cart
     const itemIndex = cart.items.findIndex(
       item => item.product.toString() === productId
     );
+    if (itemIndex === -1) {
+      throw new customAPIError.NotFoundError("Item not found in cart");
+    }
 
-    if (itemIndex > -1) {
-      // Decrease quantity in cart or remove item if quantity 0
+    let updatedStock;
+    if (removeCartItem) {
+      // Remove item and update stock
+      const itemQuantity = cart.items[itemIndex].quantity;
+      cart.items.splice(itemIndex, 1);
+      updatedStock = product.stock + itemQuantity;
+    } else {
+      // Decrease quantity and update stock
       cart.items[itemIndex].quantity -= quantity;
       if (cart.items[itemIndex].quantity <= 0) {
         cart.items.splice(itemIndex, 1);
       }
-    } else {
-      // No item in cart, throw error
-      throw new customAPIError.NotFoundError("Item not found in cart");
+      updatedStock = product.stock + quantity;
     }
-
-    // Prepare update for product
-    const updatedStock = product.stock + quantity;
-    console.log("🚀 ~ file: route.js:56 ~ POST ~ updatedStock:", updatedStock);
-    const originalVersion = product.__v;
-    console.log(
-      "🚀 ~ file: route.js:58 ~ POST ~ originalVersion:",
-      originalVersion
-    );
 
     // Attempt to save the product with conditional check
     const updateResult = await Product.updateOne(
       {
         _id: productId,
-        __v: originalVersion,
+        __v: product.__v,
       },
       { stock: updatedStock, $inc: { __v: 1 } }
     );
@@ -96,7 +115,7 @@ export async function POST(req) {
     const updatedItem = cart.items.find(
       item => item.product._id.toString() === productId
     );
-    console.log("🚀 ~ file: route.js:99 ~ POST ~ updatedItem:", updatedItem);
+    // console.log("🚀 ~ file: route.js:99 ~ POST ~ updatedItem:", updatedItem);
 
     return NextResponse.json({
       status: "success",

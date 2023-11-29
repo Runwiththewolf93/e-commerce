@@ -4,20 +4,59 @@ import { useState } from "react";
 import { HiMinusSm, HiPlusSm } from "react-icons/hi";
 import styles from "./CartQuantity.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setQuantity } from "../../../redux/slices/cartSlice";
+import {
+  setQuantity,
+  addToCart,
+  deleteFromCart,
+} from "../../../redux/slices/cartSlice";
 
-export default function CartQuantity() {
+export default function CartQuantity({
+  productFromProp,
+  quantityFromProp,
+  jwt,
+}) {
   const dispatch = useDispatch();
-  const { product } = useSelector(state => state.products);
-  const { quantity } = useSelector(state => state.cart);
-  console.log(
-    "🚀 ~ file: CartQuantity.js:13 ~ CartQuantity ~ quantity:",
-    quantity
-  );
+  const { product: productFromState } = useSelector(state => state.products);
+  // console.log(
+  //   "🚀 ~ file: CartQuantity.js:12 ~ CartQuantity ~ product:",
+  //   product
+  // );
+  const { quantity: quantityFromState } = useSelector(state => state.cart);
+  // console.log(
+  //   "🚀 ~ file: CartQuantity.js:13 ~ CartQuantity ~ quantity:",
+  //   quantity
+  // );
+
+  // Decide whether to use props or state
+  const product = productFromProp || productFromState;
+  const quantity =
+    quantityFromProp !== undefined ? quantityFromProp : quantityFromState;
 
   const handleQuantityChange = newQuantity => {
     if (newQuantity > 0 && newQuantity <= product.stock) {
-      dispatch(setQuantity(newQuantity));
+      if (productFromProp) {
+        // Product from props, use addToCart or deleteFromCart
+        if (newQuantity > quantity) {
+          dispatch(
+            addToCart({
+              productId: product._id,
+              quantity: newQuantity - quantity,
+              jwt,
+            })
+          );
+        } else {
+          dispatch(
+            deleteFromCart({
+              productId: product._id,
+              quantity: quantity - newQuantity,
+              jwt,
+            })
+          );
+        }
+      } else {
+        // Product from state, use setQuantity
+        dispatch(setQuantity(newQuantity));
+      }
     }
   };
 
@@ -31,7 +70,11 @@ export default function CartQuantity() {
 
   return (
     <div className="flex justify-center">
-      <div className="custom-number-input h-10 w-32 mb-3">
+      <div
+        className={`custom-number-input h-10 w-32 ${
+          productFromProp ? "mb-1" : "mb-3"
+        }`}
+      >
         <label
           htmlFor="custom-input-number"
           className="w-full text-gray-700 text-sm font-semibold sr-only"

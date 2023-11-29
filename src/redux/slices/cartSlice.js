@@ -34,11 +34,11 @@ export const getUserCart = createAsyncThunk(
 
 export const deleteFromCart = createAsyncThunk(
   "cart/deleteFromCart",
-  async ({ productId, quantity, jwt }, { rejectWithValue }) => {
+  async ({ productId, quantity, jwt, removeCartItem }, { rejectWithValue }) => {
     try {
       const { data } = await customAxios(jwt).delete(
         "/api/cart/deleteFromCart",
-        { data: { productId, quantity } }
+        { data: { productId, quantity, removeCartItem } }
       );
 
       return data;
@@ -74,7 +74,6 @@ export const cartSlice = createSlice({
       state.isCartOpen = false;
     },
     setQuantity: (state, action) => {
-      console.log("SET QUANTITY REDUCER CALLED");
       state.quantity = action.payload;
     },
   },

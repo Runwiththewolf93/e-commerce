@@ -15,7 +15,7 @@ export default function ProductCart({ product, jwt }) {
 
   const handleAddToCart = () => {
     // Dispatch action to add item to cart
-    dispatch(addToCart({ productId: product._id, quantity, jwt }));
+    // dispatch(addToCart({ productId: product._id, quantity, jwt }));
     // Open the cart overlay
     dispatch(openCartOverlay());
   };
