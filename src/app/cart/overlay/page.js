@@ -3,35 +3,17 @@
 
 import { Fragment, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  closeCartOverlay,
-  getUserCart,
-  deleteFromCart,
-  clearErrorMessage,
-} from "../../../redux/slices/cartSlice";
+import { closeCartOverlay, getUserCart } from "../../../redux/slices/cartSlice";
 import { IoMdClose } from "react-icons/io";
 import { Dialog, Transition } from "@headlessui/react";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { categoryToLink } from "../../../../utils/helper";
-import CartSkeletonItem from "./components/CartSkeletonItem";
-import { Alert } from "flowbite-react";
-import CartQuantity from "../shared/CartQuantity";
+import CartItems from "./components/CartItems";
+import CartTotal from "./components/CartTotal";
+import CartButtons from "./components/CartButtons";
 
 const CartOverlay = () => {
   const dispatch = useDispatch();
-  const {
-    isCartOpen,
-    isLoadingGetCart,
-    cart,
-    errorGetCart,
-    errorAddCart,
-    errorDeleteCart,
-  } = useSelector(state => state.cart);
-  console.log(
-    "🚀 ~ file: page.js:28 ~ CartOverlay ~ errorAddCart:",
-    errorAddCart
-  );
+  const { isCartOpen, cart } = useSelector(state => state.cart);
   console.log("🚀 ~ file: page.js:14 ~ CartOverlay ~ cart:", cart);
   const { data: session } = useSession();
 
@@ -94,141 +76,16 @@ const CartOverlay = () => {
                         </div>
                       </div>
 
-                      <div className="mt-8">
+                      <div className="mt-6">
                         <div className="flow-root">
-                          <ul
-                            role="list"
-                            className="-my-6 divide-y divide-gray-200"
-                          >
-                            {isLoadingGetCart ? (
-                              <CartSkeletonItem />
-                            ) : errorGetCart ? (
-                              <Alert color="failure">{errorGetCart}</Alert>
-                            ) : (
-                              cart.items?.map(item => (
-                                <div key={item._id}>
-                                  {errorDeleteCart ||
-                                    (errorAddCart && (
-                                      <Alert
-                                        color="failure"
-                                        className="-mb-5"
-                                        onDismiss={() =>
-                                          dispatch(clearErrorMessage())
-                                        }
-                                      >
-                                        {errorDeleteCart || errorAddCart}
-                                      </Alert>
-                                    ))}
-                                  <li className="flex py-6">
-                                    <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                      <img
-                                        src={item.product.images[0].url}
-                                        alt={item.product.images[0].alt}
-                                        className="h-full w-full object-cover object-center"
-                                      />
-                                    </div>
-
-                                    <div className="ml-4 flex flex-1 flex-col">
-                                      <div>
-                                        <div className="flex justify-between text-base font-medium text-gray-900">
-                                          <h3 className="text-indigo-600 hover:text-indigo-800 hover:underline">
-                                            <Link
-                                              href={`/categories/${categoryToLink(
-                                                item.product.category
-                                              )}/${item.product._id}`}
-                                            >
-                                              {item.product.name}
-                                            </Link>
-                                          </h3>
-                                          <p className="ml-4">
-                                            €{item.product.price}
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <div className="flex flex-1 items-end justify-between text-sm">
-                                        <CartQuantity
-                                          productFromProp={item.product}
-                                          quantityFromProp={item.quantity}
-                                          jwt={session?.customJwt}
-                                        />
-
-                                        <div className="flex">
-                                          <button
-                                            type="button"
-                                            className="font-medium text-indigo-600 hover:text-indigo-500"
-                                            onClick={() =>
-                                              dispatch(
-                                                deleteFromCart({
-                                                  productId: item.product._id,
-                                                  removeCartItem: true,
-                                                  jwt: session?.customJwt,
-                                                })
-                                              )
-                                            }
-                                          >
-                                            Remove
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </li>
-                                </div>
-                              ))
-                            )}
-                          </ul>
+                          <CartItems cart={cart} session={session} />
                         </div>
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-                      <div className="flex flex-col">
-                        {cart.totalAmount === cart.totalAmountDiscount ? (
-                          <>
-                            <div className="flex justify-between text-base font-medium text-gray-900">
-                              <p>Total</p>
-                              <p>${cart.totalAmount}</p>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="flex justify-between text-base font-medium text-gray-900">
-                              <p>Subtotal</p>
-                              <p>${cart.totalAmount}</p>
-                            </div>
-                            <div className="h-0.5 bg-slate-800"></div>
-                            <div className="flex justify-between text-base font-medium text-gray-900">
-                              <p className="font-bold">Total with discount</p>
-                              <p className="font-bold">
-                                ${cart.totalAmountDiscount}
-                              </p>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                      <p className="mt-0.5 text-sm text-gray-500">
-                        Shipping and taxes calculated at checkout.
-                      </p>
-                      <div className="mt-6">
-                        <a
-                          href="#"
-                          className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                        >
-                          Checkout
-                        </a>
-                      </div>
-                      <div className="mt-5 flex justify-center text-center text-sm text-gray-500">
-                        <p>
-                          or
-                          <button
-                            type="button"
-                            className="font-medium text-indigo-600 hover:text-indigo-500 ml-1"
-                            onClick={handleClose}
-                          >
-                            Continue Shopping
-                            <span aria-hidden="true"> &rarr;</span>
-                          </button>
-                        </p>
-                      </div>
+                    <div className="border-t border-gray-200 px-3 py-3 sm:px-6">
+                      <CartTotal cart={cart} />
+                      <CartButtons handleClose={handleClose} />
                     </div>
                   </div>
                 </Dialog.Panel>
