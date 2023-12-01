@@ -1,19 +1,32 @@
 /* eslint-disable @next/next/no-img-element */
+import { useState } from "react";
 import CartSkeletonItem from "./CartSkeletonItem";
 import { Alert } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import CartQuantity from "../../shared/CartQuantity";
-import {
-  clearErrorMessage,
-  deleteFromCart,
-} from "../../../../redux/slices/cartSlice";
+import { deleteFromCart } from "../../../../redux/slices/cartSlice";
 import { categoryToLink } from "../../../../../utils/helper";
 
 export default function CartItem({ cart, session }) {
   const dispatch = useDispatch();
-  const { isLoadingGetCart, errorGetCart, errorAddCart, errorDeleteCart } =
-    useSelector(state => state.cart);
+  const { isLoadingGetCart, errorGetCart } = useSelector(state => state.cart);
+  const [errorMap, setErrorMap] = useState({});
+
+  const handleActionError = (productId, errorMessage) => {
+    setErrorMap(prevErrorMap => ({
+      ...prevErrorMap,
+      [productId]: errorMessage,
+    }));
+  };
+
+  const clearError = productId => {
+    setErrorMap(prevErrorMap => {
+      const newErrorMap = { ...prevErrorMap };
+      delete newErrorMap[productId];
+      return newErrorMap;
+    });
+  };
 
   return (
     <ul role="list" className="-my-6 divide-y divide-gray-200">
@@ -27,18 +40,19 @@ export default function CartItem({ cart, session }) {
             ? item.product.price * (1 - item.product.discount.percentage / 100)
             : item.product.price;
 
+          const errorAddOrDeleteCart = errorMap[item.product._id];
+
           return (
             <div key={item._id}>
-              {errorDeleteCart ||
-                (errorAddCart && (
-                  <Alert
-                    color="failure"
-                    className="-mb-5"
-                    onDismiss={() => dispatch(clearErrorMessage())}
-                  >
-                    {errorDeleteCart || errorAddCart}
-                  </Alert>
-                ))}
+              {errorAddOrDeleteCart && (
+                <Alert
+                  color="failure"
+                  className="-mb-5"
+                  onDismiss={() => clearError(item.product._id)}
+                >
+                  {errorAddOrDeleteCart}
+                </Alert>
+              )}
               <li className="flex py-6">
                 <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                   <img
@@ -68,6 +82,10 @@ export default function CartItem({ cart, session }) {
                       productFromProp={item.product}
                       quantityFromProp={item.quantity}
                       jwt={session?.customJwt}
+                      onError={error =>
+                        handleActionError(item.product._id, error)
+                      }
+                      onClearError={() => clearError(item.product._id)}
                     />
                     <div className="flex">
                       <button

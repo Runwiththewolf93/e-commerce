@@ -33,7 +33,7 @@ export default function Cart() {
           <CartItems cart={cart} jwt={session?.customJwt} />
           <div className="flex flex-wrap justify-between">
             <CartCoupon />
-            <CartOrder />
+            <CartOrder cart={cart} />
           </div>
         </div>
       </div>

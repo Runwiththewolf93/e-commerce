@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-export default function CartOrder() {
+export default function CartOrder({ cart }) {
   return (
     <div className="w-full px-4 mb-4 lg:w-1/2 ">
       <div className="p-6 border border-blue-100 dark:bg-gray-900 dark:border-gray-900 bg-gray-50 md:p-8">
@@ -9,7 +9,7 @@ export default function CartOrder() {
         <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-300 dark:border-gray-700 ">
           <span className="text-gray-700 dark:text-gray-400">Subtotal</span>
           <span className="text-xl font-bold text-gray-700 dark:text-gray-400 ">
-            $100
+            €{cart.totalAmountDiscount}
           </span>
         </div>
         <div className="flex items-center justify-between pb-4 mb-4 ">
@@ -21,7 +21,7 @@ export default function CartOrder() {
         <div className="flex items-center justify-between pb-4 mb-4 ">
           <span className="text-gray-700 dark:text-gray-400">Order Total</span>
           <span className="text-xl font-bold text-gray-700 dark:text-gray-400">
-            $99.00
+            €{cart.totalAmountDiscount}
           </span>
         </div>
         <h2 className="text-lg text-gray-500 dark:text-gray-400">We offer:</h2>

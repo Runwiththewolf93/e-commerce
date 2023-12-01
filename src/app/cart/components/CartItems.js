@@ -1,11 +1,32 @@
 /* eslint-disable @next/next/no-img-element */
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Alert } from "flowbite-react";
 import CartSkeletonItem from "./CartSkeletonItem";
 import CartQuantity from "./CartQuantity";
+import { useDispatch } from "react-redux";
+import { deleteFromCart } from "../../../redux/slices/cartSlice";
 
 export default function CartItems({ cart, jwt }) {
+  const dispatch = useDispatch();
   const { isLoadingGetCart, errorGetCart } = useSelector(state => state.cart);
+
+  const [errorMap, setErrorMap] = useState({});
+
+  const handleActionError = (productId, errorMessage) => {
+    setErrorMap(prevErrorMap => ({
+      ...prevErrorMap,
+      [productId]: errorMessage,
+    }));
+  };
+
+  const clearError = productId => {
+    setErrorMap(prevErrorMap => {
+      const newErrorMap = { ...prevErrorMap };
+      delete newErrorMap[productId];
+      return newErrorMap;
+    });
+  };
 
   return (
     <div className="p-6 mb-8 border bg-gray-50 dark:bg-gray-800 dark:border-gray-800">
@@ -42,11 +63,22 @@ export default function CartItems({ cart, jwt }) {
                 (1 - item.product.discount?.percentage / 100)
               : item.product.price;
 
+            const errorAddOrDeleteCart = errorMap[item.product._id];
+
             return (
               <div
                 key={item._id}
                 className="flex flex-wrap items-center mb-6 -mx-4 md:mb-8"
               >
+                {errorAddOrDeleteCart && (
+                  <Alert
+                    color="failure"
+                    className="-mb-5"
+                    onDismiss={() => clearError(item.product._id)}
+                  >
+                    {errorAddOrDeleteCart}
+                  </Alert>
+                )}
                 <div className="w-full px-4 mb-6 md:w-4/6 lg:w-6/12 md:mb-0">
                   <div className="flex flex-wrap items-center -mx-4">
                     <div className="w-full px-4 mb-3 md:w-1/3">
@@ -86,7 +118,14 @@ export default function CartItems({ cart, jwt }) {
                   )}
                 </div>
                 <div className="w-auto px-4 md:w-1/6 lg:w-2/12 ">
-                  <CartQuantity cartItem={item} jwt={jwt} />
+                  <CartQuantity
+                    cartItem={item}
+                    jwt={jwt}
+                    onError={error =>
+                      handleActionError(item.product._id, error)
+                    }
+                    onClearError={() => clearError(item.product._id)}
+                  />
                 </div>
                 <div className="w-auto px-4 text-right md:w-1/6 lg:w-2/12 ">
                   {item.product.price && item.product.discount?.percentage ? (
@@ -102,7 +141,7 @@ export default function CartItems({ cart, jwt }) {
                             deleteFromCart({
                               productId: item.product._id,
                               removeCartItem: true,
-                              jwt: session?.customJwt,
+                              jwt,
                             })
                           )
                         }
@@ -123,7 +162,7 @@ export default function CartItems({ cart, jwt }) {
                             deleteFromCart({
                               productId: item.product._id,
                               removeCartItem: true,
-                              jwt: session?.customJwt,
+                              jwt,
                             })
                           )
                         }

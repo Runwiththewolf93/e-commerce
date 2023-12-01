@@ -8,6 +8,7 @@ import Joi from "joi";
 
 export async function POST(req) {
   try {
+    throw new Error("testing");
     validateJWT(req);
     await connect();
 

@@ -13,6 +13,8 @@ export default function CartQuantity({
   productFromProp,
   quantityFromProp,
   jwt,
+  onError,
+  onClearError,
 }) {
   const dispatch = useDispatch();
   const { product: productFromState } = useSelector(state => state.products);
@@ -35,26 +37,39 @@ export default function CartQuantity({
   const quantity =
     quantityFromProp !== undefined ? quantityFromProp : quantityFromState;
 
-  const handleQuantityChange = newQuantity => {
+  const handleQuantityChange = async newQuantity => {
     if (newQuantity > 0 && newQuantity <= product.stock) {
       if (productFromProp) {
         // Product from props, use addToCart or deleteFromCart
-        if (newQuantity > quantity) {
-          dispatch(
-            addToCart({
-              productId: product._id,
-              quantity: newQuantity - quantity,
-              jwt,
-            })
-          );
-        } else {
-          dispatch(
-            deleteFromCart({
-              productId: product._id,
-              quantity: quantity - newQuantity,
-              jwt,
-            })
-          );
+        try {
+          const actionResult =
+            newQuantity > quantity
+              ? await dispatch(
+                  addToCart({
+                    productId: product._id,
+                    quantity: newQuantity - quantity,
+                    jwt,
+                  })
+                )
+              : await dispatch(
+                  deleteFromCart({
+                    productId: product._id,
+                    quantity: quantity - newQuantity,
+                    jwt,
+                  })
+                );
+
+          if (actionResult?.error) {
+            console.log(
+              "🚀 ~ file: CartQuantity.js:63 ~ handleQuantityChange ~ actionResult:",
+              actionResult
+            );
+            throw new Error(actionResult?.payload || "Error in cart operation");
+          }
+
+          onClearError();
+        } catch (error) {
+          onError(error.message);
         }
       } else {
         // Product from state, use setQuantity
