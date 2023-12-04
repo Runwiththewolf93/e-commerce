@@ -1,4 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
+
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Alert } from "flowbite-react";
@@ -7,9 +9,14 @@ import CartQuantity from "./CartQuantity";
 import { useDispatch } from "react-redux";
 import { deleteFromCart } from "../../../redux/slices/cartSlice";
 
-export default function CartItems({ cart, jwt }) {
+// CARTITEMS COMPONENT
+export default function CartItems({
+  cart,
+  jwt,
+  isLoadingGetCart,
+  errorGetCart,
+}) {
   const dispatch = useDispatch();
-  const { isLoadingGetCart, errorGetCart } = useSelector(state => state.cart);
 
   const [errorMap, setErrorMap] = useState({});
 
@@ -55,7 +62,7 @@ export default function CartItems({ cart, jwt }) {
         {isLoadingGetCart ? (
           <CartSkeletonItem />
         ) : errorGetCart ? (
-          <Alert>{errorGetCart}</Alert>
+          <Alert color="failure">{errorGetCart}</Alert>
         ) : (
           cart?.items?.map(item => {
             const discountedPrice = item.product.discount?.percentage

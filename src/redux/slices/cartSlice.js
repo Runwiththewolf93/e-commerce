@@ -22,6 +22,7 @@ export const addToCart = createAsyncThunk(
 export const getUserCart = createAsyncThunk(
   "cart/getUserCart",
   async (jwt, { rejectWithValue }) => {
+    console.log("🚀 ~ file: cartSlice.js:25 ~ jwt:", jwt);
     try {
       const { data } = await customAxios(jwt).get("/api/cart/getUserCart");
 
@@ -48,6 +49,28 @@ export const deleteFromCart = createAsyncThunk(
   }
 );
 
+export const applyCoupon = createAsyncThunk(
+  "cart/applyCoupon",
+  async ({ code, cartId, jwt }, { rejectWithValue }) => {
+    try {
+      clearCouponError();
+
+      const { data } = await customAxios(jwt).post(
+        "/api/cart/coupon/applyCoupon",
+        {
+          code,
+          cartId,
+          jwt,
+        }
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -65,6 +88,9 @@ export const cartSlice = createSlice({
     errorDeleteCart: null,
     // quantity
     quantity: 1,
+    // applyCoupon
+    isLoadingApplyCoupon: false,
+    errorApplyCoupon: null,
   },
   reducers: {
     openCartOverlay: state => {
@@ -80,6 +106,9 @@ export const cartSlice = createSlice({
       state.errorAddCart = null;
       state.errorGetCart = null;
       state.errorDeleteCart = null;
+    },
+    clearCouponError: state => {
+      state.errorApplyCoupon = null;
     },
   },
   extraReducers: builder => {
@@ -125,6 +154,20 @@ export const cartSlice = createSlice({
       .addCase(deleteFromCart.rejected, (state, action) => {
         state.isLoadingDeleteCart = false;
         state.errorDeleteCart = action.payload;
+      })
+      // applyCoupon reducer
+      .addCase(applyCoupon.pending, state => {
+        state.isLoadingApplyCoupon = true;
+        state.errorApplyCoupon = null;
+      })
+      .addCase(applyCoupon.fulfilled, (state, action) => {
+        state.cart = action.payload.cart;
+        state.isLoadingApplyCoupon = false;
+        state.errorApplyCoupon = null;
+      })
+      .addCase(applyCoupon.rejected, (state, action) => {
+        state.isLoadingApplyCoupon = false;
+        state.errorApplyCoupon = action.payload;
       });
   },
 });
@@ -134,6 +177,7 @@ export const {
   closeCartOverlay,
   setQuantity,
   clearErrorMessage,
+  clearCouponError,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

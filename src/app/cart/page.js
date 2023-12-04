@@ -8,18 +8,25 @@ import CartItems from "../cart/components/CartItems";
 import CartCoupon from "../cart/components/CartCoupon";
 import CartOrder from "../cart/components/CartOrder";
 import { useSession } from "next-auth/react";
+import { Spinner } from "flowbite-react";
 
+// CART COMPONENT
 export default function Cart() {
   const dispatch = useDispatch();
   const { isLoadingGetCart, cart, errorGetCart } = useSelector(
     state => state.cart
   );
+
   console.log("🚀 ~ file: page.js:15 ~ Cart ~ cart:", cart);
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.customJwt && (!cart || Object.keys(cart).length === 0)) {
-      dispatch(getUserCart(session.customJwt));
+      console.log(
+        "🚀 ~ file: page.js:22 ~ useEffect ~ session:",
+        session?.customJwt
+      );
+      dispatch(getUserCart(session?.customJwt));
     }
   }, [dispatch, session?.customJwt, cart]);
 
@@ -30,9 +37,14 @@ export default function Cart() {
           <h2 className="mb-8 text-4xl font-bold dark:text-gray-400">
             Your Cart
           </h2>
-          <CartItems cart={cart} jwt={session?.customJwt} />
+          <CartItems
+            cart={cart}
+            jwt={session?.customJwt}
+            isLoadingGetCart={isLoadingGetCart}
+            errorGetCart={errorGetCart}
+          />
           <div className="flex flex-wrap justify-between">
-            <CartCoupon />
+            <CartCoupon cart={cart} jwt={session?.customJwt} />
             <CartOrder cart={cart} />
           </div>
         </div>

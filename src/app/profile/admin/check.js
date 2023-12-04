@@ -6,6 +6,8 @@ import { useRouter, usePathname } from "next/navigation";
 import AddProduct from "./addProduct";
 import EditProduct from "./editProduct";
 import DeleteProduct from "./deleteProduct";
+import AddCoupon from "./coupon/AddCoupon";
+import DeleteCoupon from "./coupon/DeleteCoupon";
 
 export default function AdminCheck({ session }) {
   const [isAdmin, setIsAdmin] = useState(null);
@@ -39,7 +41,11 @@ export default function AdminCheck({ session }) {
           <span className="font-medium text-2xl">{error}</span>
         </div>
       )}
-      {isAdmin !== null && (
+      {isAdmin === null ? (
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        </div>
+      ) : (
         <div>
           {isAdmin ? (
             <>
@@ -50,6 +56,11 @@ export default function AdminCheck({ session }) {
                 <AddProduct token={session.customJwt} />
                 <EditProduct token={session.customJwt} />
                 <DeleteProduct token={session.customJwt} />
+              </div>
+              <div className="divider"></div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 justify-items-center">
+                <AddCoupon token={session.customJwt} />
+                <DeleteCoupon token={session.customJwt} />
               </div>
             </>
           ) : (

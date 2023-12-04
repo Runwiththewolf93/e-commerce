@@ -9,13 +9,19 @@ export default function CartOrder({ cart }) {
         <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-300 dark:border-gray-700 ">
           <span className="text-gray-700 dark:text-gray-400">Subtotal</span>
           <span className="text-xl font-bold text-gray-700 dark:text-gray-400 ">
-            €{cart.totalAmountDiscount}
+            €{cart.totalAmount?.toFixed(2)}
           </span>
         </div>
         <div className="flex items-center justify-between pb-4 mb-4 ">
           <span className="text-gray-700 dark:text-gray-400 ">Shipping</span>
           <span className="text-xl font-bold text-gray-700 dark:text-gray-400 ">
-            Free
+            €0.00
+          </span>
+        </div>
+        <div className="flex items-center justify-between pb-4 mb-4 ">
+          <span className="text-gray-700 dark:text-gray-400 ">You save</span>
+          <span className="text-xl font-bold text-gray-700 dark:text-gray-400 ">
+            €{(cart.totalAmount - cart.totalAmountDiscount)?.toFixed(2)}
           </span>
         </div>
         <div className="flex items-center justify-between pb-4 mb-4 ">
