@@ -1,5 +1,6 @@
 import Coupon from "../../../../../../models/Coupon";
 import Cart from "../../../../../../models/Cart";
+import Product from "../../../../../../models/Products";
 import { NextResponse } from "next/server";
 import connect from "../../../../../../utils/db";
 import validateJwt from "../../../../../../utils/protect";
@@ -26,8 +27,7 @@ export async function POST(req) {
     // Joi validation
     const { error } = schema.validate({
       code,
-      discountPercentage,
-      expirationDate,
+      cartId,
     });
     if (error) {
       throw new customAPIError.BadRequestError(error.details[0].message);
@@ -35,7 +35,7 @@ export async function POST(req) {
 
     const userId = req.user.id;
 
-    const cart = await Cart.findById(cartId);
+    let cart = await Cart.findById(cartId);
     if (!cart) {
       throw new customAPIError.NotFoundError("Cart not found");
     }
@@ -55,21 +55,55 @@ export async function POST(req) {
       );
     }
 
-    // figure out tomorrow - discountPercentage is not defined
     // Calculate discount and update cart
     const discount = (cart.totalAmount * coupon.discountPercentage) / 100;
-    cart.totalAmountDiscount = cart.totalAmountDiscount - discount;
-    cart.appliedCoupon = coupon._id;
-    await cart.save();
+    const newTotalAmountDiscount = cart.totalAmountDiscount - discount;
+
+    await Cart.updateOne(
+      { _id: cart._id },
+      {
+        $set: {
+          totalAmountDiscount: newTotalAmountDiscount.toFixed(2),
+          appliedCoupon: coupon._id,
+        },
+      }
+    );
 
     // Record coupon usage
     coupon.usedBy.push({ user: userId });
     await coupon.save();
+    console.log("🚀 ~ file: route.js:81 ~ POST ~ coupon:", coupon);
+
+    // Fetch the updated cart
+    cart = await Cart.findById(cart._id);
+
+    // Manually populate product details
+    const populatedCartItems = await Promise.all(
+      cart.items.map(async item => {
+        const product = await Product.findById(item.product).select(
+          "name price stock discount images category"
+        );
+        return { ...item.toObject(), product };
+      })
+    );
+    console.log(
+      "🚀 ~ file: route.js:79 ~ DELETE ~ populatedCartItems:",
+      populatedCartItems
+    );
+
+    const populatedCart = {
+      ...cart.toObject(),
+      items: populatedCartItems,
+    };
+    console.log(
+      "🚀 ~ file: route.js:70 ~ DELETE ~ populatedCart:",
+      populatedCart
+    );
 
     return NextResponse.json({
       status: "success",
       message: "Coupon created successfully",
-      cart,
+      cart: populatedCart,
     });
   } catch (error) {
     return NextResponse.json(

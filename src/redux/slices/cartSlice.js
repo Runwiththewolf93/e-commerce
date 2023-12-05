@@ -22,7 +22,6 @@ export const addToCart = createAsyncThunk(
 export const getUserCart = createAsyncThunk(
   "cart/getUserCart",
   async (jwt, { rejectWithValue }) => {
-    console.log("🚀 ~ file: cartSlice.js:25 ~ jwt:", jwt);
     try {
       const { data } = await customAxios(jwt).get("/api/cart/getUserCart");
 
@@ -71,6 +70,24 @@ export const applyCoupon = createAsyncThunk(
   }
 );
 
+export const excludeCoupon = createAsyncThunk(
+  "cart/excludeCoupon",
+  async ({ cartId, jwt }, { rejectWithValue }) => {
+    try {
+      clearCouponError();
+
+      const { data } = await customAxios(jwt).delete(
+        "/api/cart/coupon/excludeCoupon",
+        { data: { cartId, jwt } }
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -91,6 +108,9 @@ export const cartSlice = createSlice({
     // applyCoupon
     isLoadingApplyCoupon: false,
     errorApplyCoupon: null,
+    // excludeCoupon
+    isLoadingExcludeCoupon: false,
+    errorExcludeCoupon: null,
   },
   reducers: {
     openCartOverlay: state => {
@@ -109,6 +129,7 @@ export const cartSlice = createSlice({
     },
     clearCouponError: state => {
       state.errorApplyCoupon = null;
+      state.errorExcludeCoupon = null;
     },
   },
   extraReducers: builder => {
@@ -168,6 +189,20 @@ export const cartSlice = createSlice({
       .addCase(applyCoupon.rejected, (state, action) => {
         state.isLoadingApplyCoupon = false;
         state.errorApplyCoupon = action.payload;
+      })
+      // excludeCoupon reducer
+      .addCase(excludeCoupon.pending, state => {
+        state.isLoadingExcludeCoupon = true;
+        state.errorExcludeCoupon = null;
+      })
+      .addCase(excludeCoupon.fulfilled, (state, action) => {
+        state.cart = action.payload.cart;
+        state.isLoadingExcludeCoupon = false;
+        state.errorExcludeCoupon = null;
+      })
+      .addCase(excludeCoupon.rejected, (state, action) => {
+        state.isLoadingExcludeCoupon = false;
+        state.errorExcludeCoupon = action.payload;
       });
   },
 });

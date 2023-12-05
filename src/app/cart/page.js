@@ -22,10 +22,6 @@ export default function Cart() {
 
   useEffect(() => {
     if (session?.customJwt && (!cart || Object.keys(cart).length === 0)) {
-      console.log(
-        "🚀 ~ file: page.js:22 ~ useEffect ~ session:",
-        session?.customJwt
-      );
       dispatch(getUserCart(session?.customJwt));
     }
   }, [dispatch, session?.customJwt, cart]);
@@ -45,7 +41,7 @@ export default function Cart() {
           />
           <div className="flex flex-wrap justify-between">
             <CartCoupon cart={cart} jwt={session?.customJwt} />
-            <CartOrder cart={cart} />
+            <CartOrder cart={cart} isLoadingGetCart={isLoadingGetCart} />
           </div>
         </div>
       </div>

@@ -1,6 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-export default function CartOrder({ cart }) {
-  return (
+import CartOrderSkeleton from "./CartOrderSkeleton";
+
+// CARTORDER COMPONENT
+export default function CartOrder({ cart, isLoadingGetCart }) {
+  return isLoadingGetCart ? (
+    <CartOrderSkeleton />
+  ) : (
     <div className="w-full px-4 mb-4 lg:w-1/2 ">
       <div className="p-6 border border-blue-100 dark:bg-gray-900 dark:border-gray-900 bg-gray-50 md:p-8">
         <h2 className="mb-8 text-3xl font-bold text-gray-700 dark:text-gray-400">
@@ -21,13 +26,13 @@ export default function CartOrder({ cart }) {
         <div className="flex items-center justify-between pb-4 mb-4 ">
           <span className="text-gray-700 dark:text-gray-400 ">You save</span>
           <span className="text-xl font-bold text-gray-700 dark:text-gray-400 ">
-            €{(cart.totalAmount - cart.totalAmountDiscount)?.toFixed(2)}
+            €{(cart?.totalAmount - cart?.totalAmountDiscount)?.toFixed(2)}
           </span>
         </div>
         <div className="flex items-center justify-between pb-4 mb-4 ">
           <span className="text-gray-700 dark:text-gray-400">Order Total</span>
           <span className="text-xl font-bold text-gray-700 dark:text-gray-400">
-            €{cart.totalAmountDiscount}
+            €{cart?.totalAmountDiscount?.toFixed(2)}
           </span>
         </div>
         <h2 className="text-lg text-gray-500 dark:text-gray-400">We offer:</h2>
