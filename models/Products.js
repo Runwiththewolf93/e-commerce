@@ -80,6 +80,10 @@ const productSchema = new mongoose.Schema(
       validate: [arrayLimit, "Product must have 3 to 4 images"],
       required: true,
     },
+    weight: {
+      type: String,
+      required: true,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

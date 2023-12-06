@@ -26,11 +26,13 @@ const userSchema = new mongoose.Schema({
     default: ["customer"],
   },
   address: {
-    street: String,
-    city: String,
-    state: String,
-    zip: String,
-    country: String,
+    name: { type: String },
+    surname: { type: String },
+    street: { type: String },
+    streetNumber: { type: Number },
+    city: { type: String },
+    municipality: { type: String },
+    zip: { type: String },
   },
   createdAt: {
     type: Date,

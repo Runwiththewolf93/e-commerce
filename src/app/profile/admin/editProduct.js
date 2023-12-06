@@ -4,6 +4,10 @@ import customAxios from "../../../lib/api";
 export default function EditProduct({ token }) {
   const [searchName, setSearchName] = useState("");
   const [formData, setFormData] = useState(null);
+  console.log(
+    "🚀 ~ file: editProduct.js:7 ~ EditProduct ~ formData:",
+    formData
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -49,8 +53,17 @@ export default function EditProduct({ token }) {
   };
 
   const isFormValid = () => {
-    const { name, description, price, stock, category, images } = formData;
-    if (!name || !description || !price || !stock || !category || !images) {
+    const { name, description, price, stock, weight, category, images } =
+      formData;
+    if (
+      !name ||
+      !description ||
+      !price ||
+      !stock ||
+      !weight ||
+      !category ||
+      !images
+    ) {
       return false;
     }
     return true;
@@ -95,6 +108,7 @@ export default function EditProduct({ token }) {
           productName: searchName,
         }
       );
+
       setFormData(response.data.product);
     } catch (error) {
       setErrorMessage(error.response?.data?.message || error.message);
@@ -166,7 +180,7 @@ export default function EditProduct({ token }) {
               type="text"
               name="name"
               placeholder="Name"
-              value={formData?.name}
+              value={formData?.name || ""}
               onChange={handleInputChange}
               required
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -183,7 +197,7 @@ export default function EditProduct({ token }) {
               id="description"
               name="description"
               placeholder="Description"
-              value={formData?.description}
+              value={formData?.description || ""}
               onChange={handleInputChange}
               required
               rows="4"
@@ -202,7 +216,7 @@ export default function EditProduct({ token }) {
               type="number"
               name="price"
               placeholder="Price"
-              value={formData?.price}
+              value={formData?.price || ""}
               onChange={handleInputChange}
               required
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -220,9 +234,28 @@ export default function EditProduct({ token }) {
               type="number"
               name="stock"
               placeholder="Stock"
-              value={formData?.stock}
+              value={formData?.stock || ""}
               onChange={handleInputChange}
               required
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="stock"
+              className="block text-sm font-medium text-gray-900 dark:text-gray-900"
+            >
+              Weight
+            </label>
+            <input
+              id="weight"
+              type="number"
+              name="weight"
+              placeholder="Weight"
+              value={formData?.weight || ""}
+              onChange={handleInputChange}
+              required
+              step="any"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             />
           </div>
@@ -236,7 +269,7 @@ export default function EditProduct({ token }) {
             <select
               id="category"
               name="category"
-              value={formData?.category}
+              value={formData?.category || ""}
               onChange={handleInputChange}
               required
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

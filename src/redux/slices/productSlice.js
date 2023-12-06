@@ -131,6 +131,21 @@ export const fetchProduct = createAsyncThunk(
   }
 );
 
+export const fetchAllProducts = createAsyncThunk(
+  "products/fetchAllProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      console.log("does it trigger");
+      const { data } = await customAxios().get("/api/products/getAllProducts");
+
+      console.log("🚀 ~ file: productSlice.js:142 ~ data:", data);
+      return data.products;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const productSlice = createSlice({
   name: "products",
   initialState: {
@@ -155,6 +170,10 @@ export const productSlice = createSlice({
     isLoadingProduct: true,
     product: {},
     errorProduct: null,
+    // fetchAllProducts
+    isLoadingAllProducts: false,
+    productsAll: [],
+    errorAllProducts: null,
   },
   reducers: {
     addProductIds: (state, action) => {
@@ -262,6 +281,19 @@ export const productSlice = createSlice({
       .addCase(fetchProduct.rejected, (state, action) => {
         state.isLoadingProduct = false;
         state.errorProduct = action.payload;
+      })
+      // fetchAllProducts reducer
+      .addCase(fetchAllProducts.pending, state => {
+        state.isLoadingAllProducts = true;
+      })
+      .addCase(fetchAllProducts.fulfilled, (state, action) => {
+        state.productsAll = action.payload;
+        state.isLoadingAllProducts = false;
+        state.errorAllProducts = null;
+      })
+      .addCase(fetchAllProducts.rejected, (state, action) => {
+        state.isLoadingAllProducts = false;
+        state.errorAllProducts = action.payload;
       });
   },
 });

@@ -29,10 +29,12 @@ const shippingSchema = new mongoose.Schema({
     default: "Pending",
   },
   shippingAddress: {
+    name: { type: String, required: true },
+    surname: { type: String, required: true },
     street: { type: String, required: true },
+    streetNumber: { type: Number, required: true },
     city: { type: String, required: true },
-    state: { type: String, required: true },
-    country: { type: String, required: true },
+    municipality: { type: String, required: true },
     zip: { type: String, required: true },
   },
   createdAt: {

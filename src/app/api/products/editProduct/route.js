@@ -10,14 +10,23 @@ export async function PATCH(req) {
     await connect();
     await checkAdmin(req);
 
-    const { name, description, price, stock, category, discount, images } =
-      await req.json();
+    const {
+      name,
+      description,
+      price,
+      stock,
+      weight,
+      category,
+      discount,
+      images,
+    } = await req.json();
 
     const schema = Joi.object({
       name: Joi.string().max(100).required(),
       description: Joi.string().max(1000).required(),
       price: Joi.number().greater(0).required(),
       stock: Joi.number().greater(0).required(),
+      weight: Joi.number().greater(0).required(),
       category: Joi.string()
         .valid(
           "Electronics",
@@ -34,8 +43,8 @@ export async function PATCH(req) {
         .required(),
       discount: Joi.object({
         percentage: Joi.number().min(0).max(100),
-        startDate: Joi.date(),
-        endDate: Joi.date().greater(Joi.ref("startDate")),
+        startDate: Joi.date().allow(null),
+        endDate: Joi.date().greater(Joi.ref("startDate")).allow(null),
       }).optional(),
       images: Joi.array()
         .items(
@@ -56,6 +65,7 @@ export async function PATCH(req) {
       description,
       price,
       stock,
+      weight,
       category,
       discount,
       images,
@@ -75,12 +85,17 @@ export async function PATCH(req) {
     existingProduct.description = description;
     existingProduct.price = price;
     existingProduct.stock = stock;
+    existingProduct.weight = weight;
     existingProduct.category = category;
     existingProduct.discount = discount;
     existingProduct.images = images;
 
     // Save the updated product
     await existingProduct.save();
+    console.log(
+      "🚀 ~ file: route.js:96 ~ PATCH ~ existingProduct:",
+      existingProduct
+    );
 
     return NextResponse.json({
       message: "Product updated successfully!",
