@@ -29,6 +29,7 @@ const cartSchema = new mongoose.Schema({
   totalAmountDiscount: { type: Number, default: 0 },
   totalAmount: { type: Number, default: 0 },
   shippingCost: { type: Number, default: 0 },
+  totalWeight: { type: Number, default: 0 },
   appliedCoupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
@@ -66,14 +67,15 @@ cartSchema.pre("save", async function (next) {
 
   this.totalAmountDiscount = totalWithDiscount;
   this.totalAmount = totalWithoutDiscount;
+  this.totalWeight = totalWeight;
 
   // Calculate shipping cost based on total weight
   if (totalWeight <= 1) {
-    this.shippingCose = 5;
-  } else if (totalWeight <= 5) {
     this.shippingCost = 10;
-  } else if (totalWeight < 100) {
+  } else if (totalWeight <= 5) {
     this.shippingCost = 20;
+  } else if (totalWeight < 100) {
+    this.shippingCost = 40;
   } else {
     this.shippingCost = 0;
   }

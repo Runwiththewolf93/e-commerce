@@ -1,13 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllProducts } from "../../../redux/slices/productSlice";
-import { HiInformationCircle } from "react-icons/hi";
-import { Alert, Button } from "flowbite-react";
+import { getUserCart } from "../../../redux/slices/cartSlice";
+import { useSession } from "next-auth/react";
+import AlertComponent from "./components/AlertComponent";
+import ButtonComponent from "./components/ButtonComponent";
+import FormComponent from "./components/FormComponent";
 
 export default function Shipping() {
   const dispatch = useDispatch();
+  const { cart } = useSelector(state => state.cart);
+  const { data: session } = useSession();
+  const [selectedButton, setSelectedButton] = useState(null);
+  console.log("🚀 ~ file: page.js:14 ~ Shipping ~ cart:", cart);
+
+  useEffect(() => {
+    if (!cart || Object.keys(cart).length === 0) {
+      dispatch(getUserCart(session?.customJwt));
+    }
+  }, [cart, dispatch, session?.customJwt]);
 
   // Calculate the shipping dates
   const calculateShippingDates = () => {
@@ -19,8 +31,11 @@ export default function Shipping() {
 
     return `${startDate.toLocaleDateString()} and ${endDate.toLocaleDateString()}`;
   };
-
   const shippingDates = calculateShippingDates();
+
+  const handleButtonClick = buttonId => {
+    setSelectedButton(buttonId);
+  };
 
   return (
     <div className="p-6">
@@ -40,27 +55,15 @@ export default function Shipping() {
           </div>
         </div>
         <div>
-          <div className="mt-5">
-            <Alert color="info" icon={HiInformationCircle} className="mb-3">
-              Parcel Zones can receive packages weighing up to 15 kg. Due to
-              specific characteristics, some packages cannot be delivered in
-              this way.
-            </Alert>
-            <Alert color="info" icon={HiInformationCircle}>
-              Packages weighing up to 25 kg can be picked up from Parcel
-              Lockers. Due to specific characteristics, some packages cannot be
-              delivered in this way.
-            </Alert>
-          </div>
-          <div className="space-y-3 mt-5">
-            <Button className="w-full">Continue</Button>
-            <Button className="w-full">Continue</Button>
-            <Button className="w-full">Continue</Button>
-          </div>
+          <AlertComponent totalWeight={cart?.totalWeight} />
+          <ButtonComponent
+            totalWeight={cart?.totalWeight}
+            selectedButton={selectedButton}
+            handleButtonClick={handleButtonClick}
+          />
+          {selectedButton === 1 && <FormComponent jwt={session?.customJwt} />}
         </div>
       </div>
     </div>
   );
 }
-
-// continue tomorrow

@@ -11,12 +11,16 @@ export function ProfileForm({ session }) {
   const user = session?.user;
 
   const [formData, setFormData] = useState({
+    name: "",
+    surname: "",
     street: "",
+    streetNumber: "",
     city: "",
-    state: "",
+    municipality: "",
     zip: "",
-    country: "",
+    phoneNumber: "",
   });
+  console.log("🚀 ~ file: form.js:22 ~ ProfileForm ~ formData:", formData);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -32,17 +36,26 @@ export function ProfileForm({ session }) {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const userId = user.id;
 
     try {
       setLoading(true);
       await customAxios(session.customJwt).patch(
-        `/api/users/address/${userId}`,
+        `/api/users/address`,
         formData
       );
       setLoading(false);
       setSuccessMessage("Address updated successfully");
       setErrorMessage(null);
+      setFormData({
+        name: "",
+        surname: "",
+        street: "",
+        streetNumber: "",
+        city: "",
+        municipality: "",
+        zip: "",
+        phoneNumber: "",
+      });
     } catch (error) {
       setLoading(false);
       setErrorMessage(
@@ -54,24 +67,36 @@ export function ProfileForm({ session }) {
 
   const inputFields = [
     {
+      label: "Name",
+      name: "name",
+    },
+    {
+      label: "Surname",
+      name: "surname",
+    },
+    {
       label: "Street",
       name: "street",
+    },
+    {
+      label: "Street Number",
+      name: "streetNumber",
     },
     {
       label: "City",
       name: "city",
     },
     {
-      label: "State",
-      name: "state",
+      label: "Municipality",
+      name: "municipality",
     },
     {
       label: "ZIP Code",
       name: "zip",
     },
     {
-      label: "Country",
-      name: "country",
+      label: "Phone Number",
+      name: "phoneNumber",
     },
   ];
 
@@ -155,6 +180,7 @@ export function ProfileForm({ session }) {
                       type="text"
                       name={field.name}
                       placeholder={field.label}
+                      value={formData[field.name]}
                       onChange={handleChange}
                       className="mt-1 p-2 w-full border rounded-md hover:border-blue-400 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                     />

@@ -36,6 +36,7 @@ const shippingSchema = new mongoose.Schema({
     city: { type: String, required: true },
     municipality: { type: String, required: true },
     zip: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
   },
   createdAt: {
     type: Date,

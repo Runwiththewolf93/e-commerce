@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
     city: { type: String },
     municipality: { type: String },
     zip: { type: String },
+    phoneNumber: { type: String },
   },
   createdAt: {
     type: Date,
