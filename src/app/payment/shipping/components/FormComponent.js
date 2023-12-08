@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import customAxios from "../../../../lib/api";
 import FormSkeleton from "./FormSkeleton";
 import { Alert } from "flowbite-react";
+import InputField from "./InputField";
 
 export default function FormComponent({ jwt }) {
   const [user, setUser] = useState({});
@@ -63,6 +64,16 @@ export default function FormComponent({ jwt }) {
       // test tomorrow, add the missing overview - could add existing
 
       setSuccessMessage("Address updated successfully.");
+      setFormData({
+        name: "",
+        surname: "",
+        street: "",
+        streetNumber: "",
+        city: "",
+        municipality: "",
+        zip: "",
+        phoneNumber: "",
+      });
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -83,157 +94,78 @@ export default function FormComponent({ jwt }) {
       {successMessage && <Alert color="success">{successMessage}</Alert>}
       {error && <Alert color="failure">{error}</Alert>}
       <div className="grid md:grid-cols-2 md:gap-6">
-        <div className="relative z-0 w-full mb-5 group">
-          <input
-            type="text"
-            name="name"
-            id="floating_name"
-            className="block py-2.5 px-0 w-full text-base text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=""
-            required
-            onChange={onChangeHandler}
-            value={formData?.name}
-          />
-          <label
-            htmlFor="floating_name"
-            className="peer-focus:font-medium absolute text-base text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Name
-          </label>
-        </div>
-        <div className="relative z-0 w-full mb-5 group">
-          <input
-            type="text"
-            name="surname"
-            id="floating_surname"
-            className="block py-2.5 px-0 w-full text-base text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=" "
-            required
-            onChange={onChangeHandler}
-            value={formData?.surname}
-          />
-          <label
-            htmlFor="floating_surname"
-            className="peer-focus:font-medium absolute text-base text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Surname
-          </label>
-        </div>
+        <InputField
+          name="name"
+          type="text"
+          value={formData?.name}
+          onChange={onChangeHandler}
+          placeholder=""
+          label="Name"
+        />
+        <InputField
+          name="surname"
+          type="text"
+          value={formData?.surname}
+          onChange={onChangeHandler}
+          placeholder=""
+          label="Surname"
+        />
       </div>
       <div className="grid md:grid-cols-3 md:gap-6">
-        <div className="relative z-0 w-full mb-5 group">
-          <input
-            type="text"
-            name="street"
-            id="floating_street"
-            className="block py-2.5 px-0 w-full text-base text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=" "
-            required
-            onChange={onChangeHandler}
-            value={formData?.street}
-          />
-          <label
-            htmlFor="floating_street"
-            className="peer-focus:font-medium absolute text-base text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Street
-          </label>
-        </div>
-        <div className="relative z-0 w-full mb-5 group">
-          <input
-            type="number"
-            name="streetNumber"
-            id="floating_street_number"
-            className="block py-2.5 px-0 w-full text-base text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=""
-            required
-            onChange={onChangeHandler}
-            value={formData?.streetNumber}
-          />
-          <label
-            htmlFor="floating_street_number"
-            className="peer-focus:font-medium absolute text-base text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Street Number
-          </label>
-        </div>
-        <div className="relative z-0 w-full mb-5 group">
-          <input
-            type="text"
-            name="phoneNumber"
-            id="floating_phone_number"
-            className="block py-2.5 px-0 w-full text-base text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=""
-            required
-            onChange={onChangeHandler}
-            value={formData?.phoneNumber}
-          />
-          <label
-            htmlFor="floating_phone_number"
-            className="peer-focus:font-medium absolute text-base text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Phone Number
-          </label>
-        </div>
+        <InputField
+          name="street"
+          type="text"
+          value={formData?.surname}
+          onChange={onChangeHandler}
+          placeholder=""
+          label="Street"
+        />
+        <InputField
+          name="streetNumber"
+          type="number"
+          value={formData?.streetNumber}
+          onChange={onChangeHandler}
+          placeholder=""
+          label="Street Number"
+        />
+        <InputField
+          name="phoneNumber"
+          type="text"
+          value={formData?.phoneNumber}
+          onChange={onChangeHandler}
+          placeholder=""
+          label="Phone Number"
+        />
       </div>
       <div className="grid md:grid-cols-3 md:gap-6">
-        <div className="relative z-0 w-full mb-5 group">
-          <input
-            type="text"
-            name="city"
-            id="floating_city"
-            className="block py-2.5 px-0 w-full text-base text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=""
-            required
-            onChange={onChangeHandler}
-            value={formData?.city}
-          />
-          <label
-            htmlFor="floating_city"
-            className="peer-focus:font-medium absolute text-base text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            City
-          </label>
-        </div>
-        <div className="relative z-0 w-full mb-5 group">
-          <input
-            type="text"
-            name="municipality"
-            id="floating_municipality"
-            className="block py-2.5 px-0 w-full text-base text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=" "
-            required
-            onChange={onChangeHandler}
-            value={formData?.municipality}
-          />
-          <label
-            htmlFor="floating_municipality"
-            className="peer-focus:font-medium absolute text-base text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Municipality
-          </label>
-        </div>
-        <div className="relative z-0 w-full mb-5 group">
-          <input
-            type="text"
-            name="zip"
-            id="floating_zip"
-            className="block py-2.5 px-0 w-full text-base text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=""
-            required
-            onChange={onChangeHandler}
-            value={formData?.zip}
-          />
-          <label
-            htmlFor="floating_zip"
-            className="peer-focus:font-medium absolute text-base text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            ZIP code
-          </label>
-        </div>
+        <InputField
+          name="city"
+          type="text"
+          value={formData?.city}
+          onChange={onChangeHandler}
+          placeholder=""
+          label="City"
+        />
+        <InputField
+          name="municipality"
+          type="text"
+          value={formData?.municipality}
+          onChange={onChangeHandler}
+          placeholder=""
+          label="Municipality"
+        />
+        <InputField
+          name="zip"
+          type="text"
+          value={formData?.zip}
+          onChange={onChangeHandler}
+          placeholder=""
+          label="Zip Code"
+        />
       </div>
       <button
         type="submit"
+        disabled={isLoading}
         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-base w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
       >
         Submit
