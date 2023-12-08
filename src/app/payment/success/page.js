@@ -1,4 +1,5 @@
 import Link from "next/link";
+import OrderSummary from "./components/OrderSummary";
 
 export default function Success() {
   return (

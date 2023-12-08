@@ -1,13 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
 import CartOrderSkeleton from "./CartOrderSkeleton";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 // CARTORDER COMPONENT
-export default function CartOrder({ cart, isLoadingGetCart }) {
+export default function CartOrder({
+  cart,
+  isLoadingGetCart,
+  isAddressSubmitted,
+}) {
+  const pathname = usePathname();
+  const isShipping = pathname === "/payment/shipping";
+
   return isLoadingGetCart ? (
     <CartOrderSkeleton />
   ) : (
-    <div className="w-full px-4 mb-4 lg:w-1/2 ">
+    <div className="w-full px-4 mb-4 lg:w-1/2 min-w-max">
       <div className="p-6 border border-blue-100 dark:bg-gray-900 dark:border-gray-900 bg-gray-50 md:p-8">
         <h2 className="mb-8 text-3xl font-bold text-gray-700 dark:text-gray-400">
           Order Summary
@@ -26,7 +34,7 @@ export default function CartOrder({ cart, isLoadingGetCart }) {
         </div>
         <div className="flex items-center justify-between pb-4 mb-4 ">
           <span className="text-gray-700 dark:text-gray-400 ">You save</span>
-          <span className="text-xl font-bold text-gray-700 dark:text-gray-400 ">
+          <span className="text-xl font-bold text-red-700 dark:text-red-400">
             €{(cart?.totalAmount - cart?.totalAmountDiscount)?.toFixed(2)}
           </span>
         </div>
@@ -55,9 +63,17 @@ export default function CartOrder({ cart, isLoadingGetCart }) {
           />
         </div>
         <div className="flex items-center justify-between ">
-          <Link href="/payment/shipping" className="w-full">
-            <button className="block w-full py-4 font-bold text-center text-gray-100 uppercase bg-blue-500 rounded-md hover:bg-blue-600">
-              Checkout
+          <Link
+            href={isShipping ? "/payment/order" : "/payment/shipping"}
+            className="w-full"
+          >
+            <button
+              className={`block w-full py-4 font-bold text-center text-gray-100 uppercase bg-blue-500 rounded-md hover:bg-blue-600 ${
+                !isAddressSubmitted && "cursor-not-allowed"
+              }`}
+              disabled={!isAddressSubmitted}
+            >
+              {isShipping ? "Order Review" : "Checkout"}
             </button>
           </Link>
         </div>

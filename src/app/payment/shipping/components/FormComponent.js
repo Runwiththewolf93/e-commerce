@@ -4,7 +4,7 @@ import FormSkeleton from "./FormSkeleton";
 import { Alert } from "flowbite-react";
 import InputField from "./InputField";
 
-export default function FormComponent({ jwt }) {
+export default function FormComponent({ jwt, onAddressSubmit }) {
   const [user, setUser] = useState({});
   console.log("🚀 ~ file: FormComponent.js:6 ~ FormComponent ~ user:", user);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,11 +31,18 @@ export default function FormComponent({ jwt }) {
         .then(res => {
           setUser(res.data.user);
           setFormData(res.data.user?.address);
+
+          if (
+            res.data.user?.address &&
+            Object.keys(res.data.user?.address).length > 0
+          ) {
+            onAddressSubmit();
+          }
         })
         .catch(err => setError(err))
         .finally(() => setIsLoading(false));
     }
-  }, [jwt, user]);
+  }, [jwt, user, onAddressSubmit]);
 
   console.log(
     "🚀 ~ file: FormComponent.js:18 ~ FormComponent ~ formData:",
@@ -61,9 +68,14 @@ export default function FormComponent({ jwt }) {
         customAxios(jwt).patch("/api/users/address", formData),
         customAxios(jwt).patch("/api/shipping/address", formData),
       ]);
+      console.log(
+        "🚀 ~ file: FormComponent.js:63 ~ onSubmitHandler ~ formData:",
+        formData
+      );
       // test tomorrow, add the missing overview - could add existing
 
       setSuccessMessage("Address updated successfully.");
+      onAddressSubmit();
       setFormData({
         name: "",
         surname: "",
@@ -90,9 +102,21 @@ export default function FormComponent({ jwt }) {
 
   return (
     <form className="max-w-xl mx-auto mt-10" onSubmit={onSubmitHandler}>
-      <h3 className="mb-5">Your details for shipping:</h3>
-      {successMessage && <Alert color="success">{successMessage}</Alert>}
-      {error && <Alert color="failure">{error}</Alert>}
+      <h3 className="mb-5 text-lg">Your details for shipping:</h3>
+      {successMessage && (
+        <Alert
+          color="success"
+          className="mb-3"
+          onDismiss={() => setSuccessMessage("")}
+        >
+          {successMessage}
+        </Alert>
+      )}
+      {error && (
+        <Alert color="failure" className="mb-3" onDismiss={() => setError("")}>
+          {error}
+        </Alert>
+      )}
       <div className="grid md:grid-cols-2 md:gap-6">
         <InputField
           name="name"

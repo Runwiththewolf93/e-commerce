@@ -7,12 +7,14 @@ import { useSession } from "next-auth/react";
 import AlertComponent from "./components/AlertComponent";
 import ButtonComponent from "./components/ButtonComponent";
 import FormComponent from "./components/FormComponent";
+import CartOrder from "../../cart/components/CartOrder";
 
 export default function Shipping() {
   const dispatch = useDispatch();
-  const { cart } = useSelector(state => state.cart);
+  const { isLoadingGetCart, cart } = useSelector(state => state.cart);
   const { data: session } = useSession();
   const [selectedButton, setSelectedButton] = useState(null);
+  const [isAddressSubmitted, setIsAddressSubmitted] = useState(false);
   console.log("🚀 ~ file: page.js:14 ~ Shipping ~ cart:", cart);
 
   useEffect(() => {
@@ -37,6 +39,10 @@ export default function Shipping() {
     setSelectedButton(buttonId);
   };
 
+  const handleAddressSubmission = () => {
+    setIsAddressSubmitted(true);
+  };
+
   return (
     <div className="p-6">
       <div>
@@ -54,14 +60,28 @@ export default function Shipping() {
             <p>Your shipment will arrive between {shippingDates}</p>
           </div>
         </div>
-        <div>
-          <AlertComponent totalWeight={cart?.totalWeight} />
-          <ButtonComponent
-            totalWeight={cart?.totalWeight}
-            selectedButton={selectedButton}
-            handleButtonClick={handleButtonClick}
-          />
-          {selectedButton === 1 && <FormComponent jwt={session?.customJwt} />}
+        <div className="flex flex-col lg:flex-row lg:justify-between">
+          <div>
+            <AlertComponent totalWeight={cart?.totalWeight} />
+            <ButtonComponent
+              totalWeight={cart?.totalWeight}
+              selectedButton={selectedButton}
+              handleButtonClick={handleButtonClick}
+            />
+            {selectedButton === 1 && (
+              <FormComponent
+                jwt={session?.customJwt}
+                onAddressSubmit={handleAddressSubmission}
+              />
+            )}
+          </div>
+          <div className="flex justify-center mt-6 flex-1">
+            <CartOrder
+              cart={cart}
+              isLoadingGetCart={isLoadingGetCart}
+              isAddressSubmitted={isAddressSubmitted}
+            />
+          </div>
         </div>
       </div>
     </div>

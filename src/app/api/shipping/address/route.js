@@ -4,6 +4,7 @@ import connect from "../../../../../utils/db";
 import validateJWT from "../../../../../utils/protect";
 import CustomAPIError from "../../errors";
 import Joi from "joi";
+import mongoose from "mongoose";
 
 /**
  * PATCH function to update user model.
@@ -64,8 +65,8 @@ export async function PATCH(req) {
     if (!shipping) {
       // we are using placeholder values here, CHANGE LATER
       shipping = new Shipping({
-        userId,
-        orderId: mongoose.Types.ObjectId(),
+        userId: req.user.id,
+        orderId: new mongoose.Types.ObjectId(),
         trackingNumber: "Z 999 AA1 01 2345 6784",
         carrier: "DHL",
         estimatedDelivery: new Date(),
