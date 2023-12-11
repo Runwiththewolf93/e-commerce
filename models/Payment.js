@@ -11,15 +11,14 @@ const paymentSchema = new mongoose.Schema({
     ref: "Order",
     required: true,
   },
-  paymentMethod: {
+  stripeSessionId: {
     type: String,
-    enum: ["Credit Card", "Paypal", "Cash On Delivery"],
     required: true,
   },
   paymentStatus: {
     type: String,
-    enum: ["Pending", "Completed", "Failed"],
-    default: "Pending",
+    enum: ["paid", "unpaid", "canceled", "failed"],
+    default: "unpaid",
   },
   transactionId: {
     type: String,
@@ -34,6 +33,7 @@ const paymentSchema = new mongoose.Schema({
   },
   updatedAt: {
     type: Date,
+    default: Date.now,
   },
 });
 

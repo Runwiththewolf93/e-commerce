@@ -2,6 +2,7 @@ import stripe from "stripe";
 stripe(process.env.STRIPE_SECRET_KEY);
 import connect from "../../../../../utils/db";
 import validateJwt from "../../../../../utils/protect";
+import { NextResponse } from "next/server";
 import Cart from "../../../../../models/Cart";
 import customAPIError from "../../errors";
 import Joi from "joi";
@@ -11,7 +12,7 @@ export async function POST(req) {
     validateJwt(req);
     await connect();
 
-    // Define Joi schema for coupon validation
+    // Define Joi schema for cartId validation
     const schema = Joi.object({
       cartId: Joi.string()
         .regex(/^[a-z0-9]{24}/)
