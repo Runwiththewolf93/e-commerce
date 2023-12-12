@@ -23,17 +23,18 @@ const cartItemSchema = new mongoose.Schema({
   },
 });
 
-const cartSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  items: [cartItemSchema],
-  totalAmountDiscount: { type: Number, default: 0 },
-  totalAmount: { type: Number, default: 0 },
-  shippingCost: { type: Number, default: 0 },
-  totalWeight: { type: Number, default: 0 },
-  appliedCoupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+const cartSchema = new mongoose.Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    items: [cartItemSchema],
+    totalAmountDiscount: { type: Number, default: 0 },
+    totalAmount: { type: Number, default: 0 },
+    shippingCost: { type: Number, default: 0 },
+    totalWeight: { type: Number, default: 0 },
+    appliedCoupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
+  },
+  { timestamps: true }
+);
 
 cartSchema.pre("save", async function (next) {
   let totalWithDiscount = 0;

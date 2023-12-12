@@ -1,34 +1,37 @@
 import mongoose from "mongoose";
 
-const couponSchema = new mongoose.Schema({
-  usedBy: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+const couponSchema = new mongoose.Schema(
+  {
+    usedBy: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        usedOn: {
+          type: Date,
+          default: Date.now,
+        },
       },
-      usedOn: {
-        type: Date,
-        default: Date.now,
-      },
+    ],
+    code: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
     },
-  ],
-  code: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
+    discountPercentage: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100,
+    },
+    expirationDate: {
+      type: Date,
+      required: true,
+    },
   },
-  discountPercentage: {
-    type: Number,
-    required: true,
-    min: 0,
-    max: 100,
-  },
-  expirationDate: {
-    type: Date,
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
 export default mongoose.models.Coupon || mongoose.model("Coupon", couponSchema);

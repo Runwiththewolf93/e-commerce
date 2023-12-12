@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import customAxios from "../../../lib/api";
 import OrderSummary from "./components/OrderSummary";
+import { Alert } from "flowbite-react";
 
 export default function Success() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     async function confirmPayment() {
-      // This is bullshit, compare with checkout page - IMPORTANT - THE APPENDED QUERY PARAMS ARE DIFFERENT
+      setLoading(true);
+
       const query = new URLSearchParams(window.location.search);
       const sessionId = query.get("session_id");
 
@@ -19,6 +24,11 @@ export default function Success() {
           console.log("Payment recorded successfully.");
         } catch (error) {
           console.error("Error recording payment: ", error);
+          setError(
+            "There was an error recording your payment. Please try again."
+          );
+        } finally {
+          setLoading(false);
         }
       }
     }
@@ -28,6 +38,7 @@ export default function Success() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-green-100">
+      {error && <Alert>{error}</Alert>}
       <h1 className="text-3xl font-bold text-green-800">Payment Successful</h1>
       <p className="my-4 text-xl">Your payment was processed successfully.</p>
       <Link

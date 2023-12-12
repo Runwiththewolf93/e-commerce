@@ -38,14 +38,7 @@ const shippingSchema = new mongoose.Schema({
     zip: { type: String, required: true },
     phoneNumber: { type: String, required: true },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-  },
-});
+}, {timestamps: true});
 
 export default mongoose.models.Shipping ||
   mongoose.model("Shipping", shippingSchema);

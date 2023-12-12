@@ -33,13 +33,6 @@ const reviewSchema = mongoose.Schema(
     },
     upvotedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     downvotedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-    },
   },
   { timestamps: true }
 );

@@ -7,7 +7,6 @@ import Joi from "joi";
 import Payment from "../../../../../models/Payment";
 
 const Stripe = stripe(process.env.STRIPE_SECRET_KEY);
-
 export async function POST(req) {
   try {
     validateJwt(req);
@@ -40,13 +39,12 @@ export async function POST(req) {
     });
     if (existingPayment) {
       // Update existing payment record with latest data
-      existingPayment = { ...existingPayment, ...paymentData };
+      existingPayment.set(paymentData);
       await existingPayment.save();
     } else {
       const newPayment = new Payment(paymentData);
       await newPayment.save();
     }
-    // see how to connect this route on the frontend. Also, see what to do with orders. Will they be created before or after payment. Create the orders as well.
 
     return NextResponse.json({
       status: "success",

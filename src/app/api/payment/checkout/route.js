@@ -1,5 +1,4 @@
 import stripe from "stripe";
-stripe(process.env.STRIPE_SECRET_KEY);
 import connect from "../../../../../utils/db";
 import validateJwt from "../../../../../utils/protect";
 import { NextResponse } from "next/server";
@@ -7,6 +6,7 @@ import Cart from "../../../../../models/Cart";
 import customAPIError from "../../errors";
 import Joi from "joi";
 
+const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 export async function POST(req) {
   try {
     validateJwt(req);
@@ -51,7 +51,7 @@ export async function POST(req) {
     }));
 
     // Create Checkout Session with Stripe
-    const session = await stripe.checkout.sessions.create({
+    const session = await stripeInstance.checkout.sessions.create({
       line_items: lineItems,
       mode: "payment",
       success_url: "http://localhost:3000/payment/success",

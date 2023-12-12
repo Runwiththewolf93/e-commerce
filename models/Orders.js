@@ -1,65 +1,77 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-  userId: {
+const orderItemSchema = new mongoose.Schema({
+  product: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    ref: "Product",
   },
-  products: [
+  name: String,
+  price: Number,
+  discount: {
+    percentage: Number,
+    startDate: Date,
+    endDate: Date,
+  },
+  images: [
     {
-      productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
-        required: true,
-      },
-      quantity: {
-        type: Number,
-        required: true,
-        min: 1,
-      },
-      price: {
-        type: Number,
-        required: true,
-      },
+      url: String,
+      alt: String,
     },
   ],
-  status: {
-    type: String,
-    enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
-    default: "Pending",
-  },
-  totalAmount: {
+  quantity: {
     type: Number,
-    default: 0,
-  },
-  paymentMethod: {
-    type: String,
-    enum: ["Credit Card", "Paypal", "Cash On Delivery"],
-    required: true,
-  },
-  shippingAddress: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    country: { type: String, required: true },
-    zip: { type: String, required: true },
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
+    min: 1,
   },
 });
 
-orderSchema.pre("save", function (next) {
-  this.totalAmount = this.products.reduce((total, product) => {
-    return total + product.quantity * product.price;
-  }, 0);
-
-  next();
+const shippingAddressSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  surname: { type: String, required: true },
+  street: { type: String, required: true },
+  streetNumber: { type: Number, required: true },
+  city: { type: String, required: true },
+  municipality: { type: String, required: true },
+  zip: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
 });
+
+const orderSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    items: [orderItemSchema],
+    totalAmount: {
+      type: Number,
+      default: 0,
+    },
+    totalAmountDiscount: {
+      type: Number,
+      default: 0,
+    },
+    shippingCost: {
+      type: Number,
+      default: 0,
+    },
+    appliedCoupon: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Coupon",
+    },
+    orderStatus: {
+      type: String,
+      enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
+      default: "Pending",
+    },
+    shippingAddress: shippingAddressSchema,
+    isDelivered: {
+      type: Boolean,
+      default: false,
+    },
+    deliveredAt: Date,
+  },
+  { timestamps: true }
+);
 
 export default mongoose.models.Order || mongoose.model("Order", orderSchema);
