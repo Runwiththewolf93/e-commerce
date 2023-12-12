@@ -76,9 +76,8 @@ export async function PATCH(req) {
     if (phoneNumber) user.address.phoneNumber = phoneNumber;
 
     await user.save();
-    console.log("🚀 ~ file: route.js:79 ~ PATCH ~ user:", user);
 
-    return NextResponse.json({ message: "Address successfully updated!" });
+    return NextResponse.json({ message: "User address successfully updated!" });
   } catch (error) {
     return NextResponse.json(
       {

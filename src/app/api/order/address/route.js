@@ -1,13 +1,12 @@
-import Shipping from "../../../../../models/Shipping";
+import Order from "../../../../../models/Orders";
 import { NextResponse } from "next/server";
 import connect from "../../../../../utils/db";
 import validateJWT from "../../../../../utils/protect";
 import CustomAPIError from "../../errors";
 import Joi from "joi";
-import mongoose from "mongoose";
 
 /**
- * PATCH function to update user model.
+ * PATCH function to update order model.
  *
  * @param {Object} req - the request object
  * @return {Object} the response object
@@ -16,6 +15,8 @@ export async function PATCH(req) {
   try {
     validateJWT(req);
     await connect();
+
+    const { orderId, address } = await req.json();
 
     const {
       name,
@@ -26,7 +27,7 @@ export async function PATCH(req) {
       municipality,
       zip,
       phoneNumber,
-    } = await req.json();
+    } = address;
 
     // Joi validation
     const schema = Joi.object({
@@ -60,17 +61,29 @@ export async function PATCH(req) {
       throw new CustomAPIError.BadRequestError(error.details[0].message);
     }
 
-    // Find or create Shipping document for the user
-    let shipping = await Shipping.findOne({ _id: req.user.id });
-    if (!shipping) {
-      // we are using placeholder values here, CHANGE LATER
-      shipping = new Shipping({
+    let order;
+    if (orderId) {
+      // Find existing order by orderId
+      order = await Order.findById(orderId);
+      if (!order) {
+        throw new CustomAPIError.NotFoundError("Order not found");
+      }
+
+      // Update the shipping address in the existing order
+      order.shippingAddress = {
+        name,
+        surname,
+        street,
+        streetNumber,
+        city,
+        municipality,
+        zip,
+        phoneNumber,
+      };
+    } else {
+      // Create a new order if orderId is not provided
+      order = new Order({
         userId: req.user.id,
-        orderId: new mongoose.Types.ObjectId(),
-        trackingNumber: "Z 999 AA1 01 2345 6784",
-        carrier: "DHL",
-        estimatedDelivery: new Date(),
-        shippingStatus: "Pending",
         shippingAddress: {
           name,
           surname,
@@ -82,25 +95,12 @@ export async function PATCH(req) {
           phoneNumber,
         },
       });
-    } else {
-      // Update address fields
-      shipping.shippingAddress = {
-        name,
-        surname,
-        street,
-        streetNumber,
-        city,
-        municipality,
-        zip,
-        phoneNumber,
-      };
     }
 
-    await shipping.save();
-    console.log("🚀 ~ file: route.js:74 ~ PATCH ~ shipping:", shipping);
+    await order.save();
 
     return NextResponse.json({
-      message: "Shipping address successfully updated!",
+      message: "Order address successfully updated!",
     });
   } catch (error) {
     return NextResponse.json(

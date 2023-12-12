@@ -16,9 +16,10 @@ export default function Shipping() {
   const [selectedButton, setSelectedButton] = useState(null);
   const [isAddressSubmitted, setIsAddressSubmitted] = useState(false);
   console.log("🚀 ~ file: page.js:14 ~ Shipping ~ cart:", cart);
+  console.log("🚀 ~ file: page.js:16 ~ Shipping ~ session:", session);
 
   useEffect(() => {
-    if (!cart || Object.keys(cart).length === 0) {
+    if ((!cart || Object.keys(cart).length === 0) && session?.customJwt) {
       dispatch(getUserCart(session?.customJwt));
     }
   }, [cart, dispatch, session?.customJwt]);

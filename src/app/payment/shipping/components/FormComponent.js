@@ -1,15 +1,34 @@
 import { useState, useEffect } from "react";
-import customAxios from "../../../../lib/api";
+import { useDispatch, useSelector } from "react-redux";
 import FormSkeleton from "./FormSkeleton";
 import { Alert } from "flowbite-react";
 import InputField from "./InputField";
+import {
+  getUser,
+  userAddress,
+  clearUserMessage,
+  clearUserError,
+} from "../../../../redux/slices/userSlice";
+import {
+  orderAddress,
+  clearOrderMessage,
+  clearOrderError,
+} from "../../../../redux/slices/orderSlice";
 
 export default function FormComponent({ jwt, onAddressSubmit }) {
-  const [user, setUser] = useState({});
+  const dispatch = useDispatch();
+  const {
+    isLoadingGetUser,
+    user,
+    errorGetUser,
+    isLoadingUserAddress,
+    messageUserAddress,
+    errorUserAddress,
+  } = useSelector(state => state.user);
+  const { isLoadingOrderAddress, messageOrderAddress, errorOrderAddress } =
+    useSelector(state => state.order);
   console.log("🚀 ~ file: FormComponent.js:6 ~ FormComponent ~ user:", user);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
+
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
@@ -20,34 +39,30 @@ export default function FormComponent({ jwt, onAddressSubmit }) {
     zip: "",
     phoneNumber: "",
   });
-
-  useEffect(() => {
-    if (!user || Object.keys(user).length === 0 || !jwt) {
-      setIsLoading(true);
-      setError(null);
-
-      customAxios(jwt)
-        .get("/api/users/getUser")
-        .then(res => {
-          setUser(res.data.user);
-          setFormData(res.data.user?.address);
-
-          if (
-            res.data.user?.address &&
-            Object.keys(res.data.user?.address).length > 0
-          ) {
-            onAddressSubmit();
-          }
-        })
-        .catch(err => setError(err))
-        .finally(() => setIsLoading(false));
-    }
-  }, [jwt, user, onAddressSubmit]);
-
   console.log(
     "🚀 ~ file: FormComponent.js:18 ~ FormComponent ~ formData:",
     formData
   );
+
+  useEffect(() => {
+    // Check if user data is not present and jwt token is available
+    if ((!user || Object.keys(user).length === 0) && jwt) {
+      dispatch(getUser({ jwt })).then(returnedAction => {
+        // After dispatching getUser, check if it was successful
+        if (getUser.fulfilled.match(returnedAction)) {
+          const fetchedUser = returnedAction.payload.user;
+          if (
+            fetchedUser?.address &&
+            Object.keys(fetchedUser.address).length > 0
+          ) {
+            // Set form data and execute any additional actions
+            setFormData(fetchedUser.address);
+            onAddressSubmit();
+          }
+        }
+      });
+    }
+  }, [jwt, user, dispatch, onAddressSubmit]);
 
   const onChangeHandler = e => {
     const { name, value } = e.target;
@@ -59,22 +74,20 @@ export default function FormComponent({ jwt, onAddressSubmit }) {
 
   const onSubmitHandler = async e => {
     e.preventDefault();
-    setIsLoading(true);
-    setSuccessMessage("");
-    setError(null);
 
-    try {
-      await Promise.all([
-        customAxios(jwt).patch("/api/users/address", formData),
-        customAxios(jwt).patch("/api/shipping/address", formData),
-      ]);
-      console.log(
-        "🚀 ~ file: FormComponent.js:63 ~ onSubmitHandler ~ formData:",
-        formData
-      );
-      // test tomorrow, add the missing overview - could add existing
+    // Dispatch the update address action for user and order
+    const userAddressAction = await dispatch(
+      userAddress({ jwt, address: formData })
+    );
+    const orderAddressAction = await dispatch(
+      orderAddress({ jwt, address: formData })
+    );
 
-      setSuccessMessage("Address updated successfully.");
+    // Check if both actions were successful
+    if (
+      userAddress.fulfilled.match(userAddressAction) &&
+      orderAddress.fulfilled.match(orderAddressAction)
+    ) {
       onAddressSubmit();
       setFormData({
         name: "",
@@ -86,17 +99,14 @@ export default function FormComponent({ jwt, onAddressSubmit }) {
         zip: "",
         phoneNumber: "",
       });
-    } catch (error) {
-      setError(
-        error.response?.data?.message ||
-          "An error occurred while updating the address."
-      );
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  if (isLoading) {
+  const isLoading = isLoadingUserAddress || isLoadingOrderAddress;
+  const successMessage = messageUserAddress || messageOrderAddress;
+  const error = errorGetUser || errorUserAddress || errorOrderAddress;
+
+  if (isLoadingGetUser) {
     return <FormSkeleton />;
   }
 
@@ -107,13 +117,23 @@ export default function FormComponent({ jwt, onAddressSubmit }) {
         <Alert
           color="success"
           className="mb-3"
-          onDismiss={() => setSuccessMessage("")}
+          onDismiss={() => {
+            dispatch(clearUserMessage());
+            dispatch(clearOrderMessage());
+          }}
         >
           {successMessage}
         </Alert>
       )}
       {error && (
-        <Alert color="failure" className="mb-3" onDismiss={() => setError("")}>
+        <Alert
+          color="failure"
+          className="mb-3"
+          onDismiss={() => {
+            dispatch(clearUserError());
+            dispatch(clearOrderError());
+          }}
+        >
           {error}
         </Alert>
       )}
