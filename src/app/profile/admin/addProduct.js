@@ -1,7 +1,17 @@
 import { useState } from "react";
-import customAxios from "../../../lib/api";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addProduct,
+  clearProductMessage,
+  clearProductError,
+} from "../../../redux/slices/productSlice";
+import { Alert } from "flowbite-react";
 
 export default function AddProduct({ token }) {
+  const dispatch = useDispatch();
+  const { isLoadingAddProduct, messageAddProduct, errorAddProduct } =
+    useSelector(state => state.products);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -16,8 +26,6 @@ export default function AddProduct({ token }) {
     },
     images: [{ url: "", alt: "" }],
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleInputChange = e => {
@@ -81,16 +89,7 @@ export default function AddProduct({ token }) {
       return;
     }
 
-    setIsLoading(true);
-    setSuccessMessage(null);
-    setErrorMessage(null);
-
-    try {
-      const response = await customAxios(token).post(
-        "/api/products/addProduct",
-        formData
-      );
-      setSuccessMessage(response.data.message);
+    dispatch(addProduct({ product: formData, jwt: token })).then(() => {
       setFormData({
         name: "",
         description: "",
@@ -105,32 +104,32 @@ export default function AddProduct({ token }) {
         },
         images: [{ url: "", alt: "" }],
       });
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   return (
     <div className="bg-gray-200 my-5 rounded-lg p-5 max-w-max">
       <h1 className="text-center text-2xl font-bold mb-3">Add Product</h1>
-      {errorMessage && (
-        <div
-          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 max-w-xs"
-          role="alert"
+      {(errorMessage || errorAddProduct) && (
+        <Alert
+          color="failure"
+          onDismiss={() => {
+            setErrorMessage(null);
+            dispatch(clearProductError());
+          }}
         >
-          <span className="font-medium">{errorMessage}</span> Change a few
-          things up and try submitting again.
-        </div>
+          {errorMessage || errorAddProduct}
+        </Alert>
       )}
-      {successMessage && (
-        <div
-          className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 max-w-xs"
-          role="alert"
+      {messageAddProduct && (
+        <Alert
+          color="success"
+          onDismiss={() => {
+            dispatch(clearProductMessage());
+          }}
         >
-          <span className="font-medium">{successMessage}</span>
-        </div>
+          {messageAddProduct}
+        </Alert>
       )}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -324,17 +323,17 @@ export default function AddProduct({ token }) {
           <button
             type="button"
             onClick={addImageField}
-            disabled={isLoading}
+            disabled={isLoadingAddProduct}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mr-3 mb-3 sm:mb-0 whitespace-nowrap"
           >
             Add Image
           </button>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoadingAddProduct}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 whitespace-nowrap"
           >
-            {isLoading ? "Processing..." : "Add Product"}
+            {isLoadingAddProduct ? "Processing..." : "Add Product"}
           </button>
         </div>
       </form>

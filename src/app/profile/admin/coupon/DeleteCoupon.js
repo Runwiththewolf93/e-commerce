@@ -1,29 +1,24 @@
 import { useState } from "react";
-import customAxios from "../../../../lib/api";
+import { useDispatch, useSelector } from "react-redux";
 import { Alert } from "flowbite-react";
+import {
+  deleteCoupon,
+  clearCouponError,
+  clearCartMessage,
+} from "../../../../redux/slices/cartSlice";
 
 export default function DeleteCoupon({ token }) {
+  const dispatch = useDispatch();
+  const { isLoadingDeleteCoupon, errorDeleteCoupon, couponDeleteMessage } =
+    useSelector(state => state.cart);
   const [code, setCode] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async e => {
     e.preventDefault();
 
-    try {
-      const response = await customAxios(token).delete(
-        "api/cart/coupon/deleteCoupon",
-        { data: { code } }
-      );
-
-      setSuccessMessage(response.data.message);
-      setErrorMessage("");
+    dispatch(deleteCoupon({ code, jwt: token })).then(() => {
       setCode("");
-    } catch (error) {
-      setErrorMessage(
-        error.response?.data?.message || error.message || "An error occurred"
-      );
-    }
+    });
   };
 
   return (
@@ -32,8 +27,16 @@ export default function DeleteCoupon({ token }) {
         <h2 className="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-3xl dark:text-gray-300 text-center">
           Delete Coupon
         </h2>
-        {successMessage && <Alert color="success">{successMessage}</Alert>}
-        {errorMessage && <Alert color="failure">{errorMessage}</Alert>}
+        {couponDeleteMessage && (
+          <Alert color="success" onDismiss={() => dispatch(clearCartMessage())}>
+            {couponDeleteMessage}
+          </Alert>
+        )}
+        {errorDeleteCoupon && (
+          <Alert color="failure" onDismiss={() => dispatch(clearCouponError())}>
+            {errorDeleteCoupon}
+          </Alert>
+        )}
       </div>
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
@@ -56,8 +59,9 @@ export default function DeleteCoupon({ token }) {
         <button
           type="submit"
           className="px-4 py-2 text-base text-gray-100 bg-blue-600 rounded hover:bg-blue-500 w-1/3"
+          disabled={isLoadingDeleteCoupon}
         >
-          Delete
+          {isLoadingDeleteCoupon ? "Deleting..." : "Delete"}
         </button>
       </form>
     </section>

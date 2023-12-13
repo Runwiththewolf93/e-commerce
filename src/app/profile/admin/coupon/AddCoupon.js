@@ -1,38 +1,31 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
-import customAxios from "../../../../lib/api";
+import { useDispatch, useSelector } from "react-redux";
 import { Alert } from "flowbite-react";
+import {
+  addCoupon,
+  clearCartMessage,
+  clearCouponError,
+} from "../../../../redux/slices/cartSlice";
 
 export default function AddCoupon({ token }) {
+  const dispatch = useDispatch();
+  const { isLoadingAddCoupon, couponAddMessage, errorAddCoupon, coupon } =
+    useSelector(state => state.cart);
   const [code, setCode] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async e => {
     e.preventDefault();
 
-    try {
-      const response = await customAxios(token).post(
-        "api/cart/coupon/addCoupon",
-        {
-          code,
-          discountPercentage,
-          expirationDate,
-        }
-      );
-
-      setSuccessMessage(response.data.message);
-      setErrorMessage("");
+    dispatch(
+      addCoupon({ jwt: token, code, discountPercentage, expirationDate })
+    ).then(() => {
       setCode("");
       setDiscountPercentage("");
       setExpirationDate("");
-    } catch (error) {
-      setErrorMessage(
-        error.response?.data?.message || error.message || "An error occurred"
-      );
-    }
+    });
   };
 
   return (
@@ -41,8 +34,16 @@ export default function AddCoupon({ token }) {
         <h2 className="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-3xl dark:text-gray-300 text-center">
           Add Coupon
         </h2>
-        {successMessage && <Alert color="success">{successMessage}</Alert>}
-        {errorMessage && <Alert color="failure">{errorMessage}</Alert>}
+        {couponAddMessage && (
+          <Alert color="success" onDismiss={() => dispatch(clearCartMessage())}>
+            {couponAddMessage}
+          </Alert>
+        )}
+        {errorAddCoupon && (
+          <Alert color="failure" onDismiss={() => dispatch(clearCouponError())}>
+            {errorAddCoupon}
+          </Alert>
+        )}
       </div>
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
@@ -116,8 +117,9 @@ export default function AddCoupon({ token }) {
         <button
           type="submit"
           className="px-4 py-2 text-base text-gray-100 bg-blue-600 rounded hover:bg-blue-500 w-1/3"
+          disabled={isLoadingAddCoupon}
         >
-          Send
+          {isLoadingAddCoupon ? "Adding..." : "Send"}
         </button>
       </form>
     </section>

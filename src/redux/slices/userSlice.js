@@ -49,6 +49,23 @@ export const resetUserPassword = createAsyncThunk(
   }
 );
 
+export const registerUser = createAsyncThunk(
+  "user/registerUser",
+  async ({ name, email, password }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios().post("/api/users/register", {
+        name,
+        email,
+        password,
+      });
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -64,6 +81,10 @@ export const userSlice = createSlice({
     isLoadingResetUserPassword: false,
     messageResetUserPassword: "",
     errorResetUserPassword: null,
+    // registerUser
+    isLoadingRegisterUser: false,
+    user: {},
+    errorRegisterUser: null,
   },
   reducers: {
     clearUserMessage: state => {
@@ -74,6 +95,7 @@ export const userSlice = createSlice({
       state.errorGetUser = null;
       state.errorUserAddress = null;
       state.errorResetUserPassword = null;
+      state.errorRegisterUser = null;
     },
   },
   extraReducers: builder => {
@@ -119,6 +141,20 @@ export const userSlice = createSlice({
       .addCase(resetUserPassword.rejected, (state, action) => {
         state.errorResetUserPassword = action.payload;
         state.isLoadingResetUserPassword = false;
+      })
+      // registerUser reducer
+      .addCase(registerUser.pending, state => {
+        state.isLoadingRegisterUser = true;
+        state.errorRegisterUser = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.isLoadingRegisterUser = false;
+        state.errorRegisterUser = null;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.errorRegisterUser = action.payload;
+        state.isLoadingRegisterUser = false;
       });
   },
 });

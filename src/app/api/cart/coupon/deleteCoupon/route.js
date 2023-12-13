@@ -34,7 +34,6 @@ export async function DELETE(req) {
     return NextResponse.json({
       status: "success",
       message: "Coupon deleted successfully",
-      deletedCoupon,
     });
   } catch (error) {
     return NextResponse.json(

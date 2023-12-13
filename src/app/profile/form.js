@@ -2,14 +2,21 @@
 "use client";
 
 import { useState } from "react";
-import customAxios from "../../lib/api";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { Spinner } from "flowbite-react";
+import { Spinner, Alert } from "flowbite-react";
+import {
+  userAddress,
+  clearUserMessage,
+  clearUserError,
+} from "../../redux/slices/userSlice";
 
 export function ProfileForm({ session }) {
-  console.log("🚀 ~ file: form.js:9 ~ ProfileForm ~ session:", session);
   const user = session?.user;
-
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { isLoadingUserAddress, messageUserAddress, errorUserAddress } =
+    useSelector(state => state.user);
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
@@ -20,11 +27,8 @@ export function ProfileForm({ session }) {
     zip: "",
     phoneNumber: "",
   });
+  const [validationError, setValidationError] = useState("");
   console.log("🚀 ~ file: form.js:22 ~ ProfileForm ~ formData:", formData);
-  const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const router = useRouter();
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -37,32 +41,17 @@ export function ProfileForm({ session }) {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    try {
-      setLoading(true);
-      await customAxios(session.customJwt).patch(
-        `/api/users/address`,
-        formData
-      );
-      setLoading(false);
-      setSuccessMessage("Address updated successfully");
-      setErrorMessage(null);
-      setFormData({
-        name: "",
-        surname: "",
-        street: "",
-        streetNumber: "",
-        city: "",
-        municipality: "",
-        zip: "",
-        phoneNumber: "",
-      });
-    } catch (error) {
-      setLoading(false);
-      setErrorMessage(
-        error.response?.data?.message || "An unexpected error occurred"
-      );
-      setSuccessMessage(null);
+    // Check if all fields are filled
+    const allFieldsFilled = Object.values(formData).every(
+      field => field.trim() !== ""
+    );
+    if (!allFieldsFilled) {
+      setValidationError("Please fill in all fields");
+      return;
     }
+    setValidationError("");
+
+    dispatch(userAddress({ jwt: session?.customJwt, address: formData }));
   };
 
   const inputFields = [
@@ -151,22 +140,24 @@ export function ProfileForm({ session }) {
                     Enter your address details to complete your profile
                   </p>
                 </div>
-                {errorMessage && (
-                  <div
-                    className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-                    role="alert"
+                {errorUserAddress && (
+                  <Alert
+                    color="failure"
+                    onDismiss={() => dispatch(clearUserError())}
                   >
-                    <span className="font-medium">{errorMessage}.</span> Change
-                    a few things up and try submitting again.
-                  </div>
+                    {errorUserAddress}
+                  </Alert>
                 )}
-                {successMessage && (
-                  <div
-                    className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
-                    role="alert"
+                {validationError && (
+                  <Alert color="failure">{validationError}</Alert>
+                )}
+                {messageUserAddress && (
+                  <Alert
+                    color="success"
+                    onDismiss={() => dispatch(clearUserMessage())}
                   >
-                    <span className="font-medium">{successMessage}.</span>
-                  </div>
+                    {messageUserAddress}
+                  </Alert>
                 )}
                 {inputFields.map((field, index) => (
                   <div key={index}>
@@ -189,10 +180,11 @@ export function ProfileForm({ session }) {
                 <button
                   type="submit"
                   className={`bg-blue-500 text-white p-2 rounded-md mx-auto block hover:bg-blue-600 focus:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${
-                    loading ? "cursor-not-allowed" : ""
+                    isLoadingUserAddress ? "cursor-not-allowed" : ""
                   }`}
+                  disabled={isLoadingUserAddress}
                 >
-                  Update Address
+                  {isLoadingUserAddress ? "Updating..." : "Update Address"}
                 </button>
               </form>
             </>

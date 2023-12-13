@@ -1,8 +1,8 @@
-import User from "../../../../models/Users";
+import User from "../../../../../models/Users";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import connect from "../../../../utils/db";
-import CustomAPIError from "../errors";
+import connect from "../../../../../utils/db";
+import CustomAPIError from "../../errors";
 import Joi from "joi";
 
 export async function POST(req) {

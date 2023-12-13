@@ -146,6 +146,22 @@ export const fetchAllProducts = createAsyncThunk(
   }
 );
 
+export const addProduct = createAsyncThunk(
+  "products/addProduct",
+  async ({ product, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).post(
+        "/api/products/addProduct",
+        product
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const productSlice = createSlice({
   name: "products",
   initialState: {
@@ -174,6 +190,10 @@ export const productSlice = createSlice({
     isLoadingAllProducts: false,
     productsAll: [],
     errorAllProducts: null,
+    // addProduct
+    isLoadingAddProduct: false,
+    messageAddProduct: "",
+    errorAddProduct: null,
   },
   reducers: {
     addProductIds: (state, action) => {
@@ -199,6 +219,12 @@ export const productSlice = createSlice({
       state.searchMessage = "";
       state.isLoadingSearch = false;
       state.errorSearch = null;
+    },
+    clearProductMessage: state => {
+      state.messageAddProduct = "";
+    },
+    clearProductError: state => {
+      state.errorAddProduct = null;
     },
   },
   extraReducers: builder => {
@@ -294,6 +320,20 @@ export const productSlice = createSlice({
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.isLoadingAllProducts = false;
         state.errorAllProducts = action.payload;
+      })
+      // addProduct reducer
+      .addCase(addProduct.pending, state => {
+        state.isLoadingAddProduct = true;
+        state.errorAddProduct = null;
+      })
+      .addCase(addProduct.fulfilled, (state, action) => {
+        state.messageAddProduct = action.payload.message;
+        state.isLoadingAddProduct = false;
+        state.errorAddProduct = null;
+      })
+      .addCase(addProduct.rejected, (state, action) => {
+        state.isLoadingAddProduct = false;
+        state.errorAddProduct = action.payload;
       });
   },
 });
@@ -303,6 +343,8 @@ export const {
   resetProductState,
   setCurrentGallery,
   clearProducts,
+  clearProductMessage,
+  clearProductError,
 } = productSlice.actions;
 
 export default productSlice.reducer;

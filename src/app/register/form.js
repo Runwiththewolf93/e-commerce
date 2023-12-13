@@ -2,12 +2,17 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { registerUser } from "../../redux/slices/userSlice";
 
 export const RegisterForm = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { isLoadingRegisterUser, errorRegisterUser } = useSelector(
+    state => state.user
+  );
   const [formValues, setFormValues] = useState({
     name: "",
     email: "",
@@ -26,46 +31,26 @@ export const RegisterForm = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-
-      const res = await fetch("/api/register", {
-        method: "POST",
-        body: JSON.stringify(formValues),
-        headers: {
-          "Content-Type": "application/json",
-        },
+    dispatch(registerUser(formValues))
+      .unwrap()
+      .then(() => {
+        // Handle successful registration
+        // Sign in the user after successful registration
+        return signIn("credentials", {
+          redirect: false,
+          email: formValues.email,
+          password: formValues.password,
+          callbackUrl,
+        });
+      })
+      .then(signInRes => {
+        if (!signInRes?.error) {
+          setFormValues({ name: "", email: "", password: "" });
+          router.push(callbackUrl);
+        } else {
+          setError(signInRes.error);
+        }
       });
-
-      setLoading(false);
-
-      if (!res.ok) {
-        setError((await res.json()).message);
-        return;
-      }
-
-      const signInRes = await signIn("credentials", {
-        redirect: false,
-        email: formValues.email,
-        password: formValues.password,
-        callbackUrl,
-      });
-      console.log("🚀 ~ file: form.js:53 ~ onSubmit ~ signInRes:", signInRes);
-
-      if (!signInRes?.error) {
-        setFormValues({ name: "", email: "", password: "" });
-        router.push(callbackUrl);
-      } else {
-        setError(signInRes.error);
-      }
-    } catch (error) {
-      setLoading(false);
-      const errorMessage =
-        error.message ||
-        error.response?.data?.message ||
-        "An unknown error occurred";
-      setError(errorMessage);
-    }
   };
 
   const handleChange = e => {
@@ -78,8 +63,10 @@ export const RegisterForm = () => {
 
   return (
     <form onSubmit={onSubmit}>
-      {error && (
-        <p className="text-center bg-red-300 py-4 mb-6 rounded">{error}</p>
+      {(error || errorRegisterUser) && (
+        <p className="text-center bg-red-300 py-4 mb-6 rounded">
+          {error || errorRegisterUser}
+        </p>
       )}
       <h2 className="text-center text-2xl font-bold mb-6">Register</h2>
       <div className="mb-6">
@@ -136,11 +123,11 @@ export const RegisterForm = () => {
       <button
         type="submit"
         className={`inline-block px-7 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out w-full ${
-          loading ? "bg-gray-300" : "bg-blue-600"
+          isLoadingRegisterUser ? "bg-gray-300" : "bg-blue-600"
         }`}
-        disabled={loading}
+        disabled={isLoadingRegisterUser}
       >
-        {loading ? "loading..." : "Sign Up"}
+        {isLoadingRegisterUser ? "Loading..." : "Sign Up"}
       </button>
     </form>
   );

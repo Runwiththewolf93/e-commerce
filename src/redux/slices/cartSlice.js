@@ -88,6 +88,41 @@ export const excludeCoupon = createAsyncThunk(
   }
 );
 
+export const addCoupon = createAsyncThunk(
+  "cart/addCoupon",
+  async (
+    { code, discountPercentage, expirationDate, jwt },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await customAxios(jwt).post(
+        "api/cart/coupon/addCoupon",
+        { code, discountPercentage, expirationDate }
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const deleteCoupon = createAsyncThunk(
+  "cart/deleteCoupon",
+  async ({ code, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).delete(
+        "api/cart/coupon/deleteCoupon",
+        { data: { code } }
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -111,6 +146,15 @@ export const cartSlice = createSlice({
     // excludeCoupon
     isLoadingExcludeCoupon: false,
     errorExcludeCoupon: null,
+    // addCoupon
+    isLoadingAddCoupon: false,
+    coupon: {},
+    couponAddMessage: "",
+    errorAddCoupon: null,
+    // deleteCoupon
+    isLoadingDeleteCoupon: false,
+    couponDeleteMessage: '',
+    errorDeleteCoupon: null,
   },
   reducers: {
     openCartOverlay: state => {
@@ -130,6 +174,12 @@ export const cartSlice = createSlice({
     clearCouponError: state => {
       state.errorApplyCoupon = null;
       state.errorExcludeCoupon = null;
+      state.errorAddCoupon = null;
+      state.errorDeleteCoupon = null;
+    },
+    clearCartMessage: state => {
+      state.couponAddMessage = "";
+      state.couponDeleteMessage = "";
     },
   },
   extraReducers: builder => {
@@ -203,6 +253,35 @@ export const cartSlice = createSlice({
       .addCase(excludeCoupon.rejected, (state, action) => {
         state.isLoadingExcludeCoupon = false;
         state.errorExcludeCoupon = action.payload;
+      })
+      // addCoupon reducer
+      .addCase(addCoupon.pending, state => {
+        state.isLoadingAddCoupon = true;
+        state.errorAddCoupon = null;
+      })
+      .addCase(addCoupon.fulfilled, (state, action) => {
+        state.coupon = action.payload.coupon;
+        state.couponMessage = action.payload.message;
+        state.isLoadingAddCoupon = false;
+        state.errorAddCoupon = null;
+      })
+      .addCase(addCoupon.rejected, (state, action) => {
+        state.isLoadingAddCoupon = false;
+        state.errorAddCoupon = action.payload;
+      })
+      // deleteCoupon reducer
+      .addCase(deleteCoupon.pending, state => {
+        state.isLoadingDeleteCoupon = true;
+        state.errorDeleteCoupon = null;
+      })
+      .addCase(deleteCoupon.fulfilled, (state, action) => {
+        state.couponMessage = action.payload.message;
+        state.isLoadingDeleteCoupon = false;
+        state.errorDeleteCoupon = null;
+      })
+      .addCase(deleteCoupon.rejected, (state, action) => {
+        state.isLoadingDeleteCoupon = false;
+        state.errorDeleteCoupon = action.payload;
       });
   },
 });
@@ -213,6 +292,7 @@ export const {
   setQuantity,
   clearErrorMessage,
   clearCouponError,
+  clearCartMessage,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
