@@ -1,16 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import customAxios from "../../lib/api";
+import { useDispatch, useSelector } from "react-redux";
+import { unwrapResult } from "@reduxjs/toolkit";
 import { useRouter } from "next/navigation";
+import {
+  resetUserPassword,
+  clearUserMessage,
+  clearUserError,
+} from "../../../redux/slices/userSlice";
+import { Alert } from "flowbite-react";
 
-export function ResetPasswordForm({ token }) {
+export function ResetPasswordForm({ jwt }) {
+  const dispatch = useDispatch();
+  const {
+    isLoadingResetUserPassword,
+    messageResetUserPassword,
+    errorResetUserPassword,
+  } = useSelector(state => state.user);
+
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
   const router = useRouter();
 
   const handleSubmit = async e => {
@@ -21,24 +32,10 @@ export function ResetPasswordForm({ token }) {
       return;
     }
 
-    try {
-      setLoading(true);
-      await customAxios(token).post("/api/reset", {
-        email,
-        currentPassword,
-        newPassword,
-      });
-      setLoading(false);
-      setSuccessMessage("Password reset successful");
-      setErrorMessage(null);
-      setTimeout(() => router.push("/"), 2000);
-    } catch (error) {
-      setLoading(false);
-      setErrorMessage(
-        error.response?.data?.message || "An unexpected error occurred"
-      );
-      setSuccessMessage(null);
-    }
+    // Handling redirection after a successful password reset
+    dispatch(resetUserPassword({ jwt, email, currentPassword, newPassword }))
+      .then(unwrapResult)
+      .then(() => setTimeout(() => router.push("/"), 2000));
   };
 
   return (
@@ -46,72 +43,75 @@ export function ResetPasswordForm({ token }) {
       onSubmit={handleSubmit}
       className="space-y-4 w-96 mx-auto mt-3 bg-slate-200 p-6 rounded-lg"
     >
-      {errorMessage && (
-        <div
-          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-          role="alert"
-        >
-          <span className="font-medium">{errorMessage}.</span> Change a few
-          things up and try submitting again.
-        </div>
+      <h2 className="text-xl font-bold text-center mb-4">
+        Reset Your Password
+      </h2>
+      {errorResetUserPassword && (
+        <Alert color="failure" onDismiss={() => dispatch(clearUserError())}>
+          {errorResetUserPassword}
+        </Alert>
       )}
-      {successMessage && (
-        <div
-          className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
-          role="alert"
-        >
-          <span className="font-medium">{successMessage}.</span>
-        </div>
+      {messageResetUserPassword && (
+        <Alert color="success" onDismiss={() => dispatch(clearUserMessage())}>
+          {messageResetUserPassword}
+        </Alert>
       )}
       <div>
         <label
           className="block text-sm font-medium text-gray-600"
-          aria-label="Email"
+          htmlFor="email"
         >
           Email
         </label>
         <input
+          id="email"
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
+          placeholder="Enter your email"
           className="mt-1 p-2 w-full border rounded-md hover:border-blue-400 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
         />
       </div>
       <div>
         <label
           className="block text-sm font-medium text-gray-600"
-          aria-label="Password"
+          htmlFor="current-password"
         >
           Current Password
         </label>
         <input
+          id="current-password"
           type="password"
           value={currentPassword}
           onChange={e => setCurrentPassword(e.target.value)}
+          placeholder="Enter your current password"
           className="mt-1 p-2 w-full border rounded-md hover:border-blue-400 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
         />
       </div>
       <div>
         <label
           className="block text-sm font-medium text-gray-600"
-          aria-label="New Password"
+          htmlFor="new-password"
         >
           New Password
         </label>
         <input
+          id="new-password"
           type="password"
           value={newPassword}
           onChange={e => setNewPassword(e.target.value)}
+          placeholder="Enter your new password"
           className="mt-1 p-2 w-full border rounded-md hover:border-blue-400 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
         />
       </div>
       <button
         type="submit"
+        disabled={isLoadingResetUserPassword}
         className={`bg-blue-500 text-white p-2 rounded-md mx-auto block hover:bg-blue-600 focus:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${
-          loading ? "cursor-not-allowed" : ""
+          isLoadingResetUserPassword ? "cursor-not-allowed" : ""
         }`}
       >
-        Reset Password
+        {isLoadingResetUserPassword ? "Resetting..." : "Reset Password"}
       </button>
     </form>
   );

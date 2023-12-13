@@ -1,9 +1,9 @@
-import User from "../../../../models/Users";
+import User from "../../../../../models/Users";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import connect from "../../../../utils/db";
-import validateJWT from "../../../../utils/protect";
-import CustomAPIError from "../errors";
+import connect from "../../../../../utils/db";
+import validateJWT from "../../../../../utils/protect";
+import CustomAPIError from "../../errors";
 import Joi from "joi";
 
 /**
@@ -19,6 +19,11 @@ export async function POST(req) {
     console.log(req.user);
 
     const { email, currentPassword, newPassword } = await req.json();
+    console.log(
+      "🚀 ~ file: route.js:22 ~ POST ~ currentPassword:",
+      currentPassword
+    );
+    console.log("🚀 ~ file: route.js:22 ~ POST ~ newPassword:", newPassword);
 
     // Joi validation
     const schema = Joi.object({

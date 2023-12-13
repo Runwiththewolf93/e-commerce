@@ -32,6 +32,23 @@ export const userAddress = createAsyncThunk(
   }
 );
 
+export const resetUserPassword = createAsyncThunk(
+  "user/resetUserPassword",
+  async ({ jwt, email, currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).post("/api/users/reset", {
+        email,
+        currentPassword,
+        newPassword,
+      });
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -43,14 +60,20 @@ export const userSlice = createSlice({
     isLoadingUserAddress: false,
     messageUserAddress: "",
     errorUserAddress: null,
+    // resetUserPassword
+    isLoadingResetUserPassword: false,
+    messageResetUserPassword: "",
+    errorResetUserPassword: null,
   },
   reducers: {
     clearUserMessage: state => {
       state.messageUserAddress = "";
+      state.messageResetUserPassword = "";
     },
     clearUserError: state => {
       state.errorGetUser = null;
       state.errorUserAddress = null;
+      state.errorResetUserPassword = null;
     },
   },
   extraReducers: builder => {
@@ -82,6 +105,20 @@ export const userSlice = createSlice({
       .addCase(userAddress.rejected, (state, action) => {
         state.errorUserAddress = action.payload;
         state.isLoadingUserAddress = false;
+      })
+      // resetUserPassword reducer
+      .addCase(resetUserPassword.pending, state => {
+        state.isLoadingResetUserPassword = true;
+        state.errorResetUserPassword = null;
+      })
+      .addCase(resetUserPassword.fulfilled, (state, action) => {
+        state.messageResetUserPassword = action.payload.message;
+        state.isLoadingResetUserPassword = false;
+        state.errorResetUserPassword = null;
+      })
+      .addCase(resetUserPassword.rejected, (state, action) => {
+        state.errorResetUserPassword = action.payload;
+        state.isLoadingResetUserPassword = false;
       });
   },
 });
