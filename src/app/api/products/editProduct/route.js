@@ -54,7 +54,7 @@ export async function PATCH(req) {
             _id: Joi.string().optional(),
           })
         )
-        .min(1)
+        .min(3)
         .max(4)
         .required(),
     });

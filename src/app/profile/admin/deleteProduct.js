@@ -1,11 +1,17 @@
 import { useState } from "react";
-import customAxios from "../../../lib/api";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteProduct,
+  clearProductMessage,
+  clearProductError,
+} from "../../../redux/slices/productSlice";
+import { Alert } from "flowbite-react";
 
 export default function DeleteProduct({ token }) {
+  const dispatch = useDispatch();
+  const { isLoadingDeleteProduct, messageDeleteProduct, errorDeleteProduct } =
+    useSelector(state => state.products);
   const [searchName, setSearchName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleSearchInputChange = e => {
     setSearchName(e.target.value);
@@ -14,46 +20,24 @@ export default function DeleteProduct({ token }) {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    setIsLoading(true);
-    setSuccessMessage(null);
-    setErrorMessage(null);
-
-    try {
-      const response = await customAxios(token).delete(
-        "/api/products/deleteProduct",
-        {
-          data: {
-            productName: searchName,
-          },
-        }
-      );
-      setSuccessMessage(response.data.message);
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    dispatch(deleteProduct({ productName: searchName, jwt: token }));
   };
 
   return (
     <div className="bg-gray-200 my-5 rounded-lg p-5 max-w-max self-start">
       <h1 className="text-center text-2xl font-bold mb-3">Delete Product</h1>
-      {errorMessage && (
-        <div
-          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 max-w-xs"
-          role="alert"
-        >
-          <span className="font-medium">{errorMessage}</span> Change a few
-          things up and try submitting again.
-        </div>
+      {errorDeleteProduct && (
+        <Alert color="failure" onDismiss={() => dispatch(clearProductError())}>
+          {errorDeleteProduct}
+        </Alert>
       )}
-      {successMessage && (
-        <div
-          className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 max-w-xs"
-          role="alert"
+      {messageDeleteProduct && (
+        <Alert
+          color="success"
+          onDismiss={() => dispatch(clearProductMessage())}
         >
-          <span className="font-medium">{successMessage}</span>
-        </div>
+          {messageDeleteProduct}
+        </Alert>
       )}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -76,10 +60,10 @@ export default function DeleteProduct({ token }) {
         </div>
         <button
           type="submit"
-          disabled={isLoading}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/3 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          disabled={isLoadingDeleteProduct}
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/3 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-w-min"
         >
-          Delete
+          {isLoadingDeleteProduct ? "Deleting..." : "Delete"}
         </button>
       </form>
     </div>

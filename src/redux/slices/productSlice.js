@@ -138,7 +138,6 @@ export const fetchAllProducts = createAsyncThunk(
       console.log("does it trigger");
       const { data } = await customAxios().get("/api/products/getAllProducts");
 
-      console.log("🚀 ~ file: productSlice.js:142 ~ data:", data);
       return data.products;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -153,6 +152,57 @@ export const addProduct = createAsyncThunk(
       const { data } = await customAxios(jwt).post(
         "/api/products/addProduct",
         product
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const editProduct = createAsyncThunk(
+  "products/editProduct",
+  async ({ product, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).patch(
+        "/api/products/editProduct",
+        product
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const getProduct = createAsyncThunk(
+  "products/getProduct",
+  async ({ productName, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).post(`/api/products/getProduct`, {
+        productName,
+      });
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const deleteProduct = createAsyncThunk(
+  "products/deleteProduct",
+  async ({ productName, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).delete(
+        "/api/products/deleteProduct",
+        {
+          data: {
+            productName,
+          },
+        }
       );
 
       return data;
@@ -194,6 +244,18 @@ export const productSlice = createSlice({
     isLoadingAddProduct: false,
     messageAddProduct: "",
     errorAddProduct: null,
+    // editProduct
+    isLoadingEditProduct: false,
+    messageEditProduct: "",
+    errorEditProduct: null,
+    // getProduct
+    isLoadingGetProduct: false,
+    productGet: {},
+    errorGetProduct: null,
+    // deleteProduct
+    isLoadingDeleteProduct: false,
+    messageDeleteProduct: "",
+    errorDeleteProduct: null,
   },
   reducers: {
     addProductIds: (state, action) => {
@@ -222,9 +284,17 @@ export const productSlice = createSlice({
     },
     clearProductMessage: state => {
       state.messageAddProduct = "";
+      state.messageEditProduct = "";
+      state.messageDeleteProduct = "";
     },
     clearProductError: state => {
       state.errorAddProduct = null;
+      state.errorEditProduct = null;
+      state.errorGetProduct = null;
+      state.errorDeleteProduct = null;
+    },
+    clearProductGet: state => {
+      state.productGet = {};
     },
   },
   extraReducers: builder => {
@@ -334,6 +404,48 @@ export const productSlice = createSlice({
       .addCase(addProduct.rejected, (state, action) => {
         state.isLoadingAddProduct = false;
         state.errorAddProduct = action.payload;
+      })
+      // editProduct reducer
+      .addCase(editProduct.pending, state => {
+        state.isLoadingEditProduct = true;
+        state.errorEditProduct = null;
+      })
+      .addCase(editProduct.fulfilled, (state, action) => {
+        state.messageEditProduct = action.payload.message;
+        state.isLoadingEditProduct = false;
+        state.errorEditProduct = null;
+      })
+      .addCase(editProduct.rejected, (state, action) => {
+        state.isLoadingEditProduct = false;
+        state.errorEditProduct = action.payload;
+      })
+      // getProduct reducer
+      .addCase(getProduct.pending, state => {
+        state.isLoadingGetProduct = true;
+        state.errorGetProduct = null;
+      })
+      .addCase(getProduct.fulfilled, (state, action) => {
+        state.productGet = action.payload.product;
+        state.isLoadingGetProduct = false;
+        state.errorGetProduct = null;
+      })
+      .addCase(getProduct.rejected, (state, action) => {
+        state.isLoadingGetProduct = false;
+        state.errorGetProduct = action.payload;
+      })
+      // deleteProduct reducer
+      .addCase(deleteProduct.pending, state => {
+        state.isLoadingDeleteProduct = true;
+        state.errorDeleteProduct = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.messageDeleteProduct = action.payload.message;
+        state.isLoadingDeleteProduct = false;
+        state.errorDeleteProduct = null;
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.isLoadingDeleteProduct = false;
+        state.errorDeleteProduct = action.payload;
       });
   },
 });
@@ -345,6 +457,7 @@ export const {
   clearProducts,
   clearProductMessage,
   clearProductError,
+  clearProductGet,
 } = productSlice.actions;
 
 export default productSlice.reducer;

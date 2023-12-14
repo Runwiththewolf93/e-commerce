@@ -1,14 +1,13 @@
+import Header from "../../../components/Header";
+import Footer from "../../../components/Footer";
 import AdminCheck from "./check";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../../lib/auth";
 
-export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
-  console.log("🚀 ~ file: page.js:7 ~ AdminPage ~ session:", session);
-
+export default function AdminPage() {
   return (
-    <>
-      <AdminCheck session={session} />
-    </>
+    <div>
+      <Header />
+      <AdminCheck />
+      <Footer />
+    </div>
   );
 }

@@ -66,6 +66,19 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const checkAdmin = createAsyncThunk(
+  "user/checkAdmin",
+  async ({ jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).get("/api/users/checkAdmin");
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -85,6 +98,10 @@ export const userSlice = createSlice({
     isLoadingRegisterUser: false,
     user: {},
     errorRegisterUser: null,
+    // checkAdmin
+    isLoadingCheckAdmin: false,
+    isAdmin: null,
+    errorCheckAdmin: null,
   },
   reducers: {
     clearUserMessage: state => {
@@ -96,6 +113,7 @@ export const userSlice = createSlice({
       state.errorUserAddress = null;
       state.errorResetUserPassword = null;
       state.errorRegisterUser = null;
+      state.errorCheckAdmin = null;
     },
   },
   extraReducers: builder => {
@@ -155,6 +173,20 @@ export const userSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.errorRegisterUser = action.payload;
         state.isLoadingRegisterUser = false;
+      })
+      // checkAdmin reducer
+      .addCase(checkAdmin.pending, state => {
+        state.isLoadingCheckAdmin = true;
+        state.errorCheckAdmin = null;
+      })
+      .addCase(checkAdmin.fulfilled, (state, action) => {
+        state.isAdmin = action.payload.isAdmin;
+        state.isLoadingCheckAdmin = false;
+        state.errorCheckAdmin = null;
+      })
+      .addCase(checkAdmin.rejected, (state, action) => {
+        state.errorCheckAdmin = action.payload;
+        state.isLoadingCheckAdmin = false;
       });
   },
 });

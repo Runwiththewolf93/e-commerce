@@ -59,6 +59,7 @@ export async function POST(req) {
       }
     }
 
+    console.log("🚀 ~ file: route.js:65 ~ POST ~ product:", product);
     return NextResponse.json(search ? { products } : { product }, {
       status: 200,
     });

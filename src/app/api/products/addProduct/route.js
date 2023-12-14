@@ -42,7 +42,7 @@ export async function POST(req) {
         )
         .required(),
       discount: Joi.object({
-        percentage: Joi.number().min(0).max(100),
+        percentage: Joi.number().min(0).max(100).allow(""),
         startDate: Joi.date().allow(""),
         endDate: Joi.date().greater(Joi.ref("startDate")).allow(""),
       }).optional(),
@@ -53,7 +53,7 @@ export async function POST(req) {
             alt: Joi.string().max(100).required(),
           })
         )
-        .min(1)
+        .min(3)
         .max(4)
         .required(),
     });

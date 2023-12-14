@@ -1,15 +1,35 @@
-import { useState } from "react";
-import customAxios from "../../../lib/api";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  editProduct,
+  clearProductMessage,
+  clearProductError,
+  getProduct,
+  clearProductGet,
+} from "../../../redux/slices/productSlice";
+import { Alert } from "flowbite-react";
 
 export default function EditProduct({ token }) {
+  const dispatch = useDispatch();
+  const {
+    isLoadingEditProduct,
+    messageEditProduct,
+    errorEditProduct,
+    isLoadingGetProduct,
+    productGet,
+    errorGetProduct,
+  } = useSelector(state => state.products);
+  console.log(
+    "🚀 ~ file: editProduct.js:21 ~ EditProduct ~ productGet:",
+    productGet
+  );
+
   const [searchName, setSearchName] = useState("");
   const [formData, setFormData] = useState(null);
   console.log(
     "🚀 ~ file: editProduct.js:7 ~ EditProduct ~ formData:",
     formData
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleSearchInputChange = e => {
@@ -53,20 +73,29 @@ export default function EditProduct({ token }) {
   };
 
   const isFormValid = () => {
-    const { name, description, price, stock, weight, category, images } =
-      formData;
-    if (
-      !name ||
-      !description ||
-      !price ||
-      !stock ||
-      !weight ||
-      !category ||
-      !images
-    ) {
-      return false;
-    }
-    return true;
+    // Validate all fields except 'discount'
+    const requiredFields = [
+      "name",
+      "description",
+      "price",
+      "stock",
+      "category",
+      "images",
+      "weight",
+    ];
+    const isValid = requiredFields.every(field => !!formData[field]);
+
+    // Separate validation for 'discount', if present
+    const isDiscountValid =
+      !formData.discount ||
+      ((formData.discount.percentage == null ||
+        !isNaN(formData.discount.percentage)) &&
+        (formData.discount.startDate == null ||
+          formData.discount.startDate instanceof Date) &&
+        (formData.discount.endDate == null ||
+          formData.discount.endDate instanceof Date));
+
+    return isValid && isDiscountValid;
   };
 
   const handleSubmit = async e => {
@@ -77,65 +106,44 @@ export default function EditProduct({ token }) {
       return;
     }
 
-    setIsLoading(true);
-    setSuccessMessage(null);
-    setErrorMessage(null);
-
-    try {
-      const response = await customAxios(token).patch(
-        "/api/products/editProduct",
-        formData
-      );
-      setSuccessMessage(response.data.message);
-      setFormData(null);
-      setSearchName("");
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    dispatch(editProduct({ product: formData, jwt: token }));
+    setFormData(null);
+    setSearchName("");
+    dispatch(clearProductGet());
   };
 
   const handleSearch = async () => {
-    setIsLoading(true);
-    setSuccessMessage(null);
-    setErrorMessage(null);
-
-    try {
-      const response = await customAxios(token).post(
-        `/api/products/getProduct`,
-        {
-          productName: searchName,
-        }
-      );
-
-      setFormData(response.data.product);
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    dispatch(getProduct({ productName: searchName, jwt: token }));
   };
+
+  useEffect(() => {
+    if (productGet && Object.keys(productGet).length > 0) {
+      setFormData(productGet);
+    }
+  }, [productGet]);
 
   return (
     <div className="bg-gray-200 my-5 rounded-lg p-5 max-w-max self-start">
       <h1 className="text-center text-2xl font-bold mb-3">Edit Product</h1>
-      {errorMessage && (
-        <div
-          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 max-w-xs"
-          role="alert"
+      {(errorEditProduct || errorGetProduct || errorMessage) && (
+        <Alert
+          color="failure"
+          onDismiss={() => {
+            dispatch(clearProductError());
+            setErrorMessage(null);
+          }}
+          className="mb-3"
         >
-          <span className="font-medium">{errorMessage}</span> Change a few
-          things up and try submitting again.
-        </div>
+          {errorEditProduct || errorGetProduct || errorMessage}
+        </Alert>
       )}
-      {successMessage && (
-        <div
-          className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 max-w-xs"
-          role="alert"
+      {messageEditProduct && (
+        <Alert
+          color="success"
+          onDismiss={() => dispatch(clearProductMessage())}
         >
-          <span className="font-medium">{successMessage}</span>
-        </div>
+          {messageEditProduct}
+        </Alert>
       )}
       {!formData && (
         <form>
@@ -159,10 +167,10 @@ export default function EditProduct({ token }) {
           </div>
           <button
             onClick={handleSearch}
-            disabled={isLoading}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/3 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            disabled={isLoadingGetProduct}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/3 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-w-min"
           >
-            Search
+            {isLoadingGetProduct ? "Searching..." : "Search"}
           </button>
         </form>
       )}
@@ -360,17 +368,17 @@ export default function EditProduct({ token }) {
             <button
               type="button"
               onClick={addImageField}
-              disabled={isLoading}
+              disabled={isLoadingEditProduct}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mr-3 mb-3 sm:mb-0"
             >
               Add Image
             </button>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoadingEditProduct}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              {isLoading ? "Processing..." : "Edit Product"}
+              {isLoadingEditProduct ? "Processing..." : "Edit Product"}
             </button>
           </div>
         </form>
