@@ -17,8 +17,10 @@ export default function AdminCheck() {
   const { isLoadingCheckAdmin, isAdmin, errorCheckAdmin } = useSelector(
     state => state.user
   );
+  console.log("🚀 ~ file: check.js:18 ~ AdminCheck ~ isAdmin:", isAdmin);
   const { data: session } = useSession();
   const jwt = session?.customJwt;
+  console.log("🚀 ~ file: check.js:23 ~ AdminCheck ~ jwt:", jwt);
 
   // Directly dispatch checkAdmin action if jwt exists
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function AdminCheck() {
     return () => clearTimeout(timeout);
   }, [isAdmin, router]);
 
-  if (isLoadingCheckAdmin) {
+  if (isLoadingCheckAdmin || isAdmin === null) {
     return (
       <div className="bg-blue-400 min-h-screen flex justify-center items-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500" />

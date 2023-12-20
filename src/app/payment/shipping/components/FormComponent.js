@@ -15,7 +15,7 @@ import {
   clearOrderError,
 } from "../../../../redux/slices/orderSlice";
 
-export default function FormComponent({ jwt, onAddressSubmit }) {
+export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
   const dispatch = useDispatch();
   const {
     isLoadingGetUser,
@@ -27,7 +27,6 @@ export default function FormComponent({ jwt, onAddressSubmit }) {
   } = useSelector(state => state.user);
   const { isLoadingOrderAddress, messageOrderAddress, errorOrderAddress } =
     useSelector(state => state.order);
-  console.log("🚀 ~ file: FormComponent.js:6 ~ FormComponent ~ user:", user);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -47,22 +46,16 @@ export default function FormComponent({ jwt, onAddressSubmit }) {
   useEffect(() => {
     // Check if user data is not present and jwt token is available
     if ((!user || Object.keys(user).length === 0) && jwt) {
-      dispatch(getUser({ jwt })).then(returnedAction => {
-        // After dispatching getUser, check if it was successful
-        if (getUser.fulfilled.match(returnedAction)) {
-          const fetchedUser = returnedAction.payload.user;
-          if (
-            fetchedUser?.address &&
-            Object.keys(fetchedUser.address).length > 0
-          ) {
-            // Set form data and execute any additional actions
-            setFormData(fetchedUser.address);
-            onAddressSubmit();
-          }
-        }
-      });
+      dispatch(getUser({ jwt }));
     }
-  }, [jwt, user, dispatch, onAddressSubmit]);
+  }, [jwt, user, dispatch]);
+
+  useEffect(() => {
+    if (user?.address && Object.keys(user.address).length > 0) {
+      setFormData(user.address);
+      onAddressSubmit();
+    }
+  }, [user, onAddressSubmit]);
 
   const onChangeHandler = e => {
     const { name, value } = e.target;
@@ -76,17 +69,15 @@ export default function FormComponent({ jwt, onAddressSubmit }) {
     e.preventDefault();
 
     // Dispatch the update address action for user and order
-    const userAddressAction = await dispatch(
-      userAddress({ jwt, address: formData })
-    );
-    const orderAddressAction = await dispatch(
-      orderAddress({ jwt, address: formData })
-    );
+    const results = await Promise.all([
+      dispatch(userAddress({ jwt, address: formData })),
+      dispatch(orderAddress({ jwt, address: formData, cartId })),
+    ]);
 
     // Check if both actions were successful
     if (
-      userAddress.fulfilled.match(userAddressAction) &&
-      orderAddress.fulfilled.match(orderAddressAction)
+      userAddress.fulfilled.match(results[0]) &&
+      orderAddress.fulfilled.match(results[1])
     ) {
       onAddressSubmit();
       setFormData({
@@ -103,7 +94,10 @@ export default function FormComponent({ jwt, onAddressSubmit }) {
   };
 
   const isLoading = isLoadingUserAddress || isLoadingOrderAddress;
-  const successMessage = messageUserAddress || messageOrderAddress;
+  const successMessage =
+    messageUserAddress && messageOrderAddress
+      ? "Address updated successfully."
+      : null;
   const error = errorGetUser || errorUserAddress || errorOrderAddress;
 
   if (isLoadingGetUser) {

@@ -16,7 +16,6 @@ export default function Shipping() {
   const [selectedButton, setSelectedButton] = useState(null);
   const [isAddressSubmitted, setIsAddressSubmitted] = useState(false);
   console.log("🚀 ~ file: page.js:14 ~ Shipping ~ cart:", cart);
-  console.log("🚀 ~ file: page.js:16 ~ Shipping ~ session:", session);
 
   useEffect(() => {
     if ((!cart || Object.keys(cart).length === 0) && session?.customJwt) {
@@ -73,6 +72,7 @@ export default function Shipping() {
               <FormComponent
                 jwt={session?.customJwt}
                 onAddressSubmit={handleAddressSubmission}
+                cartId={cart?._id}
               />
             )}
           </div>

@@ -1,12 +1,14 @@
 import Order from "../../../../../models/Orders";
+import Cart from "../../../../../models/Cart";
 import { NextResponse } from "next/server";
 import connect from "../../../../../utils/db";
 import validateJWT from "../../../../../utils/protect";
 import CustomAPIError from "../../errors";
 import Joi from "joi";
+import mongoose from "mongoose";
 
 /**
- * PATCH function to update order model.
+ * PATCH function to update order model with user address.
  *
  * @param {Object} req - the request object
  * @return {Object} the response object
@@ -16,7 +18,7 @@ export async function PATCH(req) {
     validateJWT(req);
     await connect();
 
-    const { orderId, address } = await req.json();
+    const { address, cartId } = await req.json();
 
     const {
       name,
@@ -61,39 +63,27 @@ export async function PATCH(req) {
       throw new CustomAPIError.BadRequestError(error.details[0].message);
     }
 
-    let order;
-    if (orderId) {
-      // Find existing order by orderId
-      order = await Order.findById(orderId);
-      if (!order) {
-        throw new CustomAPIError.NotFoundError("Order not found");
-      }
+    // Validate cartId
+    if (!mongoose.Types.ObjectId.isValid(cartId)) {
+      throw new CustomAPIError.BadRequestError("Invalid cartId");
+    }
 
+    // Check if cart exists
+    const cart = await Cart.findById(cartId);
+    if (!cart) {
+      throw new CustomAPIError.NotFoundError("Cart not found");
+    }
+
+    let order = await Order.findOne({ cartId });
+    if (order) {
       // Update the shipping address in the existing order
-      order.shippingAddress = {
-        name,
-        surname,
-        street,
-        streetNumber,
-        city,
-        municipality,
-        zip,
-        phoneNumber,
-      };
+      order.shippingAddress = { ...address };
     } else {
       // Create a new order if orderId is not provided
       order = new Order({
         userId: req.user.id,
-        shippingAddress: {
-          name,
-          surname,
-          street,
-          streetNumber,
-          city,
-          municipality,
-          zip,
-          phoneNumber,
-        },
+        shippingAddress: { ...address },
+        cartId,
       });
     }
 
@@ -112,3 +102,5 @@ export async function PATCH(req) {
     );
   }
 }
+
+// TEST THE ROUTE OUT TOMORROW

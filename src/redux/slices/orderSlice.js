@@ -5,11 +5,26 @@ import customAxios from "../../lib/api";
 
 export const orderAddress = createAsyncThunk(
   "user/orderAddress",
-  async ({ jwt, address, orderId }, { rejectWithValue }) => {
+  async ({ jwt, address, cartId }, { rejectWithValue }) => {
     try {
       const { data } = await customAxios(jwt).patch("/api/order/address", {
         address,
-        orderId,
+        cartId,
+      });
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const orderCart = createAsyncThunk(
+  "user/orderCart",
+  async ({ jwt, cartObject }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).patch("/api/order/cart", {
+        cartObject,
       });
 
       return data;
@@ -26,13 +41,19 @@ export const orderSlice = createSlice({
     isLoadingOrderAddress: false,
     messageOrderAddress: "",
     errorOrderAddress: null,
+    // orderCart
+    isLoadingOrderCart: false,
+    messageOrderCart: "",
+    errorOrderCart: null,
   },
   reducers: {
     clearOrderMessage: state => {
       state.messageOrderAddress = "";
+      state.messageOrderCart = "";
     },
     clearOrderError: state => {
       state.errorOrderAddress = null;
+      state.errorOrderCart = null;
     },
   },
   extraReducers: builder => {
@@ -50,6 +71,20 @@ export const orderSlice = createSlice({
       .addCase(orderAddress.rejected, (state, action) => {
         state.errorOrderAddress = action.payload;
         state.isLoadingOrderAddress = false;
+      })
+      // orderAddress reducer
+      .addCase(orderCart.pending, state => {
+        state.isLoadingOrderCart = true;
+        state.errorOrderCart = null;
+      })
+      .addCase(orderCart.fulfilled, (state, action) => {
+        state.messageOrderCart = action.payload.message;
+        state.isLoadingOrderCart = false;
+        state.errorOrderCart = null;
+      })
+      .addCase(orderCart.rejected, (state, action) => {
+        state.errorOrderCart = action.payload;
+        state.isLoadingOrderCart = false;
       });
   },
 });
