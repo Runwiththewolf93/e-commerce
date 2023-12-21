@@ -5,50 +5,73 @@ import { NextResponse } from "next/server";
 import customAPIError from "../../errors";
 import Joi from "joi";
 import Payment from "../../../../../models/Payment";
+import Order from "../../../../../models/Orders";
 
 const Stripe = stripe(process.env.STRIPE_SECRET_KEY);
 export async function POST(req) {
   try {
     validateJwt(req);
     await connect();
-    const { sessionId } = await req.json();
+    const { sessionId, cartId } = await req.json();
 
-    // format of the stripeId. cs_test_a11YYufWQzNY63zpQ6QSNRQhkUpVph4WRmzW0zWJO2znZKdVujZ0N0S22u
+    // format of our sessionId:      cs_test_b1XOQxWRZEpgcoufVNK6GDpTxzO5LXyYN6znZ5DE054pyfHYY0rDNIZ1Gl
+    // cs_test_b1i2sKmRINzUq7ruWzsNjiDpj078w1C0dlso7J8IViOtOFSk21WzWqV1rI
+
+    const schema = Joi.object({
+      sessionId: Joi.string().required(),
+      cartId: Joi.string().required().length(24).required(),
+    });
 
     // Joi validation
-    const { error } = Joi.string().required().validate(sessionId);
+    const { error } = schema.validate({ sessionId, cartId });
     if (error) {
       throw new customAPIError.BadRequestError("Invalid session ID");
     }
 
+    const order = await Order.findOne({ cartId });
+    if (!order) {
+      throw new customAPIError.NotFoundError("Order not found");
+    }
+
     const session = await Stripe.checkout.sessions.retrieve(sessionId);
+    console.log("🚀 ~ file: route.js:36 ~ POST ~ session:", session);
 
     const paymentStatus = session.payment_status;
     const paymentData = {
       userId: req.user.id,
-      orderId: session.metadata.orderId, // Adjust as needed
+      orderId: order._id,
       stripeSessionId: sessionId,
       paymentStatus: paymentStatus,
       transactionId: session.payment_intent,
       amount: session.amount_total / 100,
     };
+    console.log("🚀 ~ file: route.js:48 ~ POST ~ paymentData:", paymentData);
 
-    // Find existing payment or create new one
-    const existingPayment = await Payment.findOne({
-      stripeSessionId: sessionId,
-    });
-    if (existingPayment) {
-      // Update existing payment record with latest data
-      existingPayment.set(paymentData);
-      await existingPayment.save();
-    } else {
-      const newPayment = new Payment(paymentData);
-      await newPayment.save();
+    // If document is found update it, otherwise create a new one
+    const options = { new: true, upsert: true, setDefaultsOnInsert: true };
+
+    // Find an existing payment and update it, or insert a new one
+    const updatedOrNewPayment = await Payment.findOneAndUpdate(
+      {
+        stripeSessionId: sessionId,
+      },
+      { $set: paymentData },
+      options
+    );
+    console.log(
+      "🚀 ~ file: route.js:61 ~ POST ~ updatedOrNewPayment:",
+      updatedOrNewPayment
+    );
+
+    if (!updatedOrNewPayment) {
+      throw new customAPIError.BadRequestError(
+        "Failed to create or update the payment record"
+      );
     }
 
     return NextResponse.json({
       status: "success",
-      message: `Payment ${paymentStatus}`,
+      message: `Payment ${updatedOrNewPayment.paymentStatus}`,
     });
   } catch (error) {
     return NextResponse.json(

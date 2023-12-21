@@ -15,10 +15,6 @@ export default function SearchForm() {
     searchMessage,
   } = useSelector(state => state.products);
   const [searchTerm, setSearchTerm] = useState("");
-  console.log(
-    "🚀 ~ file: SearchForm.js:18 ~ SearchForm ~ searchTerm:",
-    searchTerm
-  );
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [isLoadingSearch, setIsLoadingSearch] = useState(false);
 

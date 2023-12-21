@@ -1,51 +1,117 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
-import customAxios from "../../../lib/api";
 import OrderSummary from "./components/OrderSummary";
 import { Alert } from "flowbite-react";
+import { useSession } from "next-auth/react";
+import {
+  paymentConfirmation,
+  clearOrderMessage,
+  clearOrderError,
+  clearSessionId,
+  orderStatus,
+} from "../../../redux/slices/orderSlice";
 
 export default function Success() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const { data: session } = useSession();
+  const jwt = session?.customJwt;
+  const {
+    sessionId,
+    isLoadingPaymentConfirmation,
+    messagePaymentConfirmation,
+    errorPaymentConfirmation,
+    isLoadingOrderStatus,
+    messageOrderStatus,
+    errorOrderStatus,
+  } = useSelector(state => state.order);
+  const { cart } = useSelector(state => state.cart);
+  const cartId = cart?._id;
+  console.log("🚀 ~ file: page.js:27 ~ Success ~ cart:", cart);
+  console.log("🚀 ~ file: page.js:17 ~ Success ~ sessionId:", sessionId);
 
   useEffect(() => {
-    async function confirmPayment() {
-      setLoading(true);
-
-      const query = new URLSearchParams(window.location.search);
-      const sessionId = query.get("session_id");
-
-      if (sessionId) {
-        try {
-          // Send request to backend to confirm and record the payment
-          await customAxios.post("/api/payment/confirmation", { sessionId });
-          console.log("Payment recorded successfully.");
-        } catch (error) {
-          console.error("Error recording payment: ", error);
-          setError(
-            "There was an error recording your payment. Please try again."
-          );
-        } finally {
-          setLoading(false);
-        }
+    const executeDispatches = async () => {
+      if (!sessionId || !cartId || !jwt) {
+        return;
       }
-    }
 
-    confirmPayment();
-  }, []);
+      try {
+        await Promise.all([
+          dispatch(paymentConfirmation({ sessionId, cartId, jwt })).unwrap(),
+          dispatch(
+            orderStatus({ orderStatus: "Processed", cartId, jwt })
+          ).unwrap(),
+        ]);
+
+        // Clear error and sessionID on successful completion of both dispatches
+        dispatch(clearOrderError());
+        dispatch(clearSessionId());
+      } catch (error) {
+        console.error("Error in one of the dispatches:", error);
+        // Handle error (e.g., show an alert or notification)
+      }
+    };
+
+    executeDispatches();
+
+    // Cleanup functions
+    return () => {
+      dispatch(clearOrderMessage());
+      dispatch(clearOrderError());
+    };
+  }, [
+    sessionId,
+    cartId,
+    jwt,
+    dispatch,
+    errorPaymentConfirmation,
+    errorOrderStatus,
+  ]);
+
+  const isLoading = isLoadingPaymentConfirmation || isLoadingOrderStatus;
+  const isSuccess = messagePaymentConfirmation && messageOrderStatus;
+  const isError = errorPaymentConfirmation || errorOrderStatus;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-green-100">
-      {error && <Alert>{error}</Alert>}
+      {isError && (
+        <Alert
+          color="failure"
+          className="text-base mb-3"
+          onDismiss={() => dispatch(clearOrderError())}
+        >
+          {isError}
+        </Alert>
+      )}
       <h1 className="text-3xl font-bold text-green-800">Payment Successful</h1>
-      <p className="my-4 text-xl">Your payment was processed successfully.</p>
+      {isSuccess && (
+        <Alert
+          color="success"
+          className="text-xl my-4"
+          onDismiss={() => dispatch(clearOrderMessage())}
+        >
+          {
+            "Thank you for your payment. You will receive an email confirmation shortly."
+          }
+        </Alert>
+      )}
+      <OrderSummary />
+      <Link href="/">
+        <button
+          className="px-4 py-2 mt-4 text-white bg-green-600 rounded hover:bg-green-700"
+          disabled={isLoading}
+        >
+          Go to Homepage
+        </button>
+      </Link>
       <Link
-        href="/"
+        href="/payment/order"
         className="px-4 py-2 mt-4 text-white bg-green-600 rounded hover:bg-green-700"
       >
-        Go to Homepage
+        TESTING
       </Link>
     </div>
   );

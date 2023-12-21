@@ -4,7 +4,6 @@ import connect from "../../../../../utils/db";
 import validateJWT from "../../../../../utils/protect";
 import CustomAPIError from "../../errors";
 import Joi from "joi";
-import util from "util";
 
 /**
  * Updates the items, amount, totalAmount, shippingCost of an order

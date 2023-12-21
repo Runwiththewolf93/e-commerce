@@ -8,9 +8,13 @@ import {
   getUserCart,
   clearErrorMessage,
 } from "../../../redux/slices/cartSlice";
-import { orderCart } from "../../../redux/slices/orderSlice";
+import {
+  orderCart,
+  clearOrderMessage,
+  clearOrderError,
+  paymentCheckout,
+} from "../../../redux/slices/orderSlice";
 import OrderPayment from "./components/OrderPayment";
-import customAxios from "../../../lib/api";
 import { Alert } from "flowbite-react";
 import ConfirmationCart from "./components/ConfirmationCart";
 
@@ -23,9 +27,14 @@ export default function PreviewPage() {
   const { isLoadingGetCart, cart, errorGetCart } = useSelector(
     state => state.cart
   );
-  const { isLoadingOrderCart, messageOrderCart, errorOrderCart } = useSelector(
-    state => state.order
-  );
+  const {
+    isLoadingOrderCart,
+    messageOrderCart,
+    errorOrderCart,
+    isLoadingPaymentCheckout,
+    sessionId,
+    errorPaymentCheckout,
+  } = useSelector(state => state.order);
   const [errorMessage, setErrorMessage] = useState("");
   console.log("🚀 ~ file: page.js:16 ~ PreviewPage ~ cart:", cart);
 
@@ -43,7 +52,6 @@ export default function PreviewPage() {
       const orderUpdateResponse = await dispatch(
         orderCart({ cartObject: cart, jwt: session?.customJwt })
       );
-
       if (orderUpdateResponse.error) {
         setErrorMessage(
           orderUpdateResponse.error.message || "Error updating order"
@@ -51,27 +59,35 @@ export default function PreviewPage() {
         return;
       }
 
-      // // Continue with Stripe payment if order update is successful
-      // const stripe = await stripePromise;
+      // Request session ID from Stripe Checkout
+      const checkoutResponse = await dispatch(
+        paymentCheckout({ cartId: cart?._id, jwt: session?.customJwt })
+      );
+      if (checkoutResponse.error) {
+        setErrorMessage(
+          checkoutResponse.error.message || "Error requesting session ID"
+        );
+        return;
+      }
 
-      // // Request session ID from backend
-      // const response = await customAxios(session?.customJwt).post(
-      //   "/api/payment/checkout",
-      //   { cartId: cart?._id }
-      // );
+      console.log("Checkout Response Payload:", checkoutResponse.payload);
+      console.log("Session ID:", checkoutResponse.payload.sessionId);
 
-      // // Redirect to Stripe Checkout
-      // const result = await stripe.redirectToCheckout({
-      //   sessionId: response.data.sessionId,
-      // });
+      // Continue with Stripe payment if order update is successful
+      const stripe = await stripePromise;
+      const result = await stripe.redirectToCheckout({
+        sessionId: checkoutResponse.payload.sessionId,
+      });
 
-      // if (result.error) {
-      //   setErrorMessage(result.error.message);
-      // }
+      if (result.error) {
+        setErrorMessage(result.error.message);
+      }
     } catch (error) {
       setErrorMessage(error.message);
     }
   };
+
+  const displayedError = errorMessage || errorOrderCart || errorPaymentCheckout;
 
   return (
     <>
@@ -85,16 +101,25 @@ export default function PreviewPage() {
         </Alert>
       )}
       <ConfirmationCart isLoadingGetCart={isLoadingGetCart} cart={cart} />
-      {errorMessage && (
+      {displayedError && (
         <Alert
           className="w-2/3 mx-auto mb-3"
-          onDismiss={() => setErrorMessage("")}
+          onDismiss={() => {
+            setErrorMessage("");
+            dispatch(clearOrderError());
+          }}
           color="failure"
         >
-          {errorMessage}
+          {displayedError}
         </Alert>
       )}
-      <OrderPayment handleSubmit={handleSubmit} />
+      <OrderPayment
+        handleSubmit={handleSubmit}
+        isLoadingOrderCart={isLoadingOrderCart}
+        messageOrderCart={messageOrderCart}
+        isLoadingPaymentCheckout={isLoadingPaymentCheckout}
+        sessionId={sessionId}
+      />
     </>
   );
 }
