@@ -14,9 +14,6 @@ export async function POST(req) {
     await connect();
     const { sessionId, cartId } = await req.json();
 
-    // format of our sessionId:      cs_test_b1XOQxWRZEpgcoufVNK6GDpTxzO5LXyYN6znZ5DE054pyfHYY0rDNIZ1Gl
-    // cs_test_b1i2sKmRINzUq7ruWzsNjiDpj078w1C0dlso7J8IViOtOFSk21WzWqV1rI
-
     const schema = Joi.object({
       sessionId: Joi.string().required(),
       cartId: Joi.string().required().length(24).required(),

@@ -63,6 +63,7 @@ export async function PATCH(req) {
 
     await order.save();
 
+    console.log("Just before returning response...");
     return NextResponse.json({
       message: "Order status successfully updated!",
     });
