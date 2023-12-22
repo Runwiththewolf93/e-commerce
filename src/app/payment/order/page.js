@@ -42,6 +42,11 @@ export default function PreviewPage() {
     if ((!cart || Object.keys(cart).length === 0) && session?.customJwt) {
       dispatch(getUserCart(session?.customJwt));
     }
+
+    return () => {
+      dispatch(clearOrderMessage());
+      dispatch(clearOrderError());
+    };
   }, [cart, dispatch, session?.customJwt]);
 
   const handleSubmit = async e => {

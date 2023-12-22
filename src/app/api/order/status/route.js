@@ -54,6 +54,13 @@ export async function PATCH(req) {
       order.orderStatus = "Delivered";
     }
 
+    if (orderStatus === "Processed") {
+      // Randomize delivery time between 10 and 60 days
+      const randomDays = Math.floor(Math.random() * (60 - 10 + 1)) + 10;
+      const deliveryTimeInMs = randomDays * 24 * 60 * 60 * 1000;
+      order.deliveryTime = new Date(Date.now() + deliveryTimeInMs);
+    }
+
     await order.save();
 
     return NextResponse.json({

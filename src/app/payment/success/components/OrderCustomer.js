@@ -1,5 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-export default function OrderCustomer() {
+export default function OrderCustomer({ orderCustomer }) {
+  console.log(
+    "🚀 ~ file: OrderCustomer.js:3 ~ OrderCustomer ~ orderCustomer:",
+    orderCustomer
+  );
+
+  const { shippingAddress, userInfo, userOrderCount } = orderCustomer;
   return (
     <div className="bg-gray-50 w-full xl:w-96 flex justify-between items-center md:items-start px-4 py-6 md:p-6 xl:p-8 flex-col ">
       <h3 className="text-xl font-semibold leading-5 text-gray-800">
@@ -11,10 +17,11 @@ export default function OrderCustomer() {
             <img src="https://i.ibb.co/5TSg7f6/Rectangle-18.png" alt="avatar" />
             <div className=" flex justify-start items-start flex-col space-y-2">
               <p className="text-base font-semibold leading-4 text-left text-gray-800">
-                David Kent
+                {shippingAddress.name} {shippingAddress.surname}
               </p>
               <p className="text-sm leading-5 text-gray-600">
-                10 Previous Orders
+                {userOrderCount} Previous{" "}
+                {userOrderCount === 1 ? "Order" : "Orders"}
               </p>
             </div>
           </div>
@@ -41,7 +48,7 @@ export default function OrderCustomer() {
               />
             </svg>
             <p className="cursor-pointer text-sm leading-5 text-gray-800">
-              david89@gmail.com
+              {userInfo.email}
             </p>
           </div>
         </div>
@@ -52,7 +59,7 @@ export default function OrderCustomer() {
                 Shipping Address
               </p>
               <p className="w-48 lg:w-full xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">
-                180 North King Street, Northhampton MA 1060
+                {`${shippingAddress.street} ${shippingAddress.streetNumber}, ${shippingAddress.city}, ${shippingAddress.municipality} ${shippingAddress.zip}`}
               </p>
             </div>
             <div className="flex justify-center md:justify-start  items-center md:items-start flex-col space-y-4 ">
@@ -60,12 +67,15 @@ export default function OrderCustomer() {
                 Billing Address
               </p>
               <p className="w-48 lg:w-full xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">
-                180 North King Street, Northhampton MA 1060
+                {`${shippingAddress.street} ${shippingAddress.streetNumber}, ${shippingAddress.city}, ${shippingAddress.municipality} ${shippingAddress.zip}`}
               </p>
             </div>
           </div>
           <div className="flex w-full justify-center items-center md:justify-start md:items-start">
-            <button className="mt-6 md:mt-0 py-5 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 border border-gray-800 font-medium w-96 2xl:w-full text-base leading-4 text-gray-800">
+            <button
+              className="mt-6 md:mt-0 py-5 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 border border-gray-800 font-medium w-96 2xl:w-full text-base leading-4 text-gray-800 cursor-not-allowed"
+              disabled
+            >
               Edit Details
             </button>
           </div>

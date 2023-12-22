@@ -85,6 +85,21 @@ export const orderStatus = createAsyncThunk(
   }
 );
 
+export const getOrder = createAsyncThunk(
+  "order/getOrder",
+  async ({ cartId, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).get(
+        `/api/order/getOrder?cartId=${cartId}`
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const orderSlice = createSlice({
   name: "order",
   initialState: {
@@ -108,6 +123,10 @@ export const orderSlice = createSlice({
     isLoadingOrderStatus: false,
     messageOrderStatus: "",
     errorOrderStatus: null,
+    // getOrder
+    isLoadingGetOrder: false,
+    order: {},
+    errorGetOrder: null,
   },
   reducers: {
     clearOrderMessage: state => {
@@ -122,6 +141,7 @@ export const orderSlice = createSlice({
       state.errorPaymentCheckout = null;
       state.errorPaymentConfirmation = null;
       state.errorOrderStatus = null;
+      state.errorGetOrder = null;
     },
     clearSessionId: state => {
       state.sessionId = "";
@@ -198,6 +218,20 @@ export const orderSlice = createSlice({
       .addCase(orderStatus.rejected, (state, action) => {
         state.errorOrderStatus = action.payload;
         state.isLoadingOrderStatus = false;
+      })
+      // getOrder reducer
+      .addCase(getOrder.pending, state => {
+        state.isLoadingGetOrder = true;
+        state.errorGetOrder = null;
+      })
+      .addCase(getOrder.fulfilled, (state, action) => {
+        state.order = action.payload.order;
+        state.isLoadingGetOrder = false;
+        state.errorGetOrder = null;
+      })
+      .addCase(getOrder.rejected, (state, action) => {
+        state.errorGetOrder = action.payload;
+        state.isLoadingGetOrder = false;
       });
   },
 });

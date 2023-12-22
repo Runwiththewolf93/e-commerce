@@ -31,6 +31,7 @@ export default function Success() {
   const cartId = cart?._id;
   console.log("🚀 ~ file: page.js:27 ~ Success ~ cart:", cart);
   console.log("🚀 ~ file: page.js:17 ~ Success ~ sessionId:", sessionId);
+  const orderRef = useRef(false);
 
   useEffect(() => {
     const executeDispatches = async () => {
@@ -86,7 +87,9 @@ export default function Success() {
           {isError}
         </Alert>
       )}
-      <h1 className="text-3xl font-bold text-green-800">Payment Successful</h1>
+      <h1 className="text-3xl font-bold text-green-800 mt-20">
+        Payment Successful
+      </h1>
       {isSuccess && (
         <Alert
           color="success"
@@ -98,10 +101,10 @@ export default function Success() {
           }
         </Alert>
       )}
-      <OrderSummary />
-      <Link href="/">
+      <OrderSummary cartId={cartId} jwt={jwt} />
+      <Link href="/" className="mb-20 mt-10">
         <button
-          className="px-4 py-2 mt-4 text-white bg-green-600 rounded hover:bg-green-700"
+          className="hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-lg font-medium leading-4 text-white min-w-96"
           disabled={isLoading}
         >
           Go to Homepage
