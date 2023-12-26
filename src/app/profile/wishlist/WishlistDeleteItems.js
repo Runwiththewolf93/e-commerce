@@ -55,7 +55,7 @@ export default function WishlistDeleteItems({ jwt, wishlist }) {
   // );
 
   const handleRemoveOrderedItems = () => {
-    if (productIdsToRemove.length > 0) {
+    if (productIdsToRemove?.length > 0) {
       dispatch(
         deleteItemsFromWishlist({ jwt, productIds: productIdsToRemove })
       );
@@ -67,14 +67,14 @@ export default function WishlistDeleteItems({ jwt, wishlist }) {
       <h1 className="font-bold text-2xl">Wishlist</h1>
       <Tooltip
         content={
-          productIdsToRemove.length === 0
+          productIdsToRemove?.length === 0
             ? "You haven't bought any items from your wishlist!"
             : "Items will be removed regardless of quantity bought!"
         }
       >
         <Button
           className={
-            productIdsToRemove.length === 0
+            productIdsToRemove?.length === 0
               ? "cursor-not-allowed mr-16"
               : "mr-16"
           }

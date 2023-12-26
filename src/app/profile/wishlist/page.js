@@ -8,15 +8,15 @@ import {
   clearSuccessMessages,
   resetWishlistState,
 } from "../../../redux/slices/wishlistSlice";
-import { Card, Button, Alert, Breadcrumb } from "flowbite-react";
+import { Card, Alert, Breadcrumb } from "flowbite-react";
 import Image from "next/image";
-import Link from "next/link";
 import WishlistCheck from "./WishlistCheck";
 import { HiHome } from "react-icons/hi";
 import SkeletonCard from "./WishlistSkeleton";
 import WishlistPagination from "./WishlistPagination";
 import WishlistDeleteItems from "./WishlistDeleteItems";
 import useFetchState from "../../hooks/useFetchState";
+import WishlistCart from "./WishlistCart";
 
 export default function Wishlist({ session }) {
   const dispatch = useDispatch();
@@ -124,7 +124,7 @@ export default function Wishlist({ session }) {
                   <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                     {product?.name}
                   </h5>
-                  <p className="font-normal text-gray-700 dark:text-gray-400 line-clamp-2">
+                  <p className="font-normal text-gray-700 dark:text-gray-400 line-clamp-2 overflow-hidden h-12 flex items-center">
                     {product?.description}
                   </p>
                   <div className="text-sm">
@@ -148,12 +148,11 @@ export default function Wishlist({ session }) {
                       </>
                     )}
                   </div>
-                  {/* Cart functionality to be implemented */}
-                  <Link href="/cart">
-                    <Button color="blue" className="w-full">
-                      <span className="text-base">Add to cart</span>
-                    </Button>
-                  </Link>
+                  <WishlistCart
+                    jwt={jwt}
+                    productId={product?._id}
+                    clearErrorMessages={clearErrorMessages}
+                  />
                   {deletedProductId === product?._id && errorWishlistDelete ? (
                     <Alert color="failure">{errorWishlistDelete}</Alert>
                   ) : null}
