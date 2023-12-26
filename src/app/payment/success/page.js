@@ -13,6 +13,7 @@ import {
   clearSessionId,
   orderStatus,
 } from "../../../redux/slices/orderSlice";
+import { getUserCart } from "../../../redux/slices/cartSlice";
 
 export default function Success() {
   const dispatch = useDispatch();
@@ -102,20 +103,37 @@ export default function Success() {
         </Alert>
       )}
       <OrderSummary cartId={cartId} jwt={jwt} />
-      <Link href="/" className="mb-20 mt-10">
-        <button
-          className="hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-lg font-medium leading-4 text-white min-w-96"
-          disabled={isLoading}
-        >
-          Go to Homepage
-        </button>
-      </Link>
-      <Link
+      <div className="flex flex-col xl:flex-row xl:space-x-10">
+        <Link href="/" className="mb-20 mt-10">
+          <button
+            className="hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-lg font-medium leading-4 text-white min-w-96"
+            disabled={isLoading}
+          >
+            Go to Homepage
+          </button>
+        </Link>
+        <Link href="/profile" className="mb-20 mt-10">
+          <button
+            className="hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-lg font-medium leading-4 text-white min-w-96"
+            disabled={isLoading}
+          >
+            Go to Profile
+          </button>
+        </Link>
+      </div>
+      {/* <Link
         href="/payment/order"
         className="px-4 py-2 mt-4 text-white bg-green-600 rounded hover:bg-green-700"
       >
         TESTING
       </Link>
+      <button
+        onClick={() =>
+          dispatch(orderStatus({ orderStatus: "Processed", cartId, jwt }))
+        }
+      >
+        getOrder
+      </button> */}
     </div>
   );
 }

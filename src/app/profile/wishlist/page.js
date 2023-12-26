@@ -15,6 +15,8 @@ import WishlistCheck from "./WishlistCheck";
 import { HiHome } from "react-icons/hi";
 import SkeletonCard from "./WishlistSkeleton";
 import WishlistPagination from "./WishlistPagination";
+import WishlistDeleteItems from "./WishlistDeleteItems";
+import useFetchState from "../../hooks/useFetchState";
 
 export default function Wishlist({ session }) {
   const dispatch = useDispatch();
@@ -32,21 +34,30 @@ export default function Wishlist({ session }) {
   const [currentPage, setCurrentPage] = useState(1);
   const hasReset = useRef(false);
 
+  // Reused state values
+  const jwt = session?.customJwt;
+  const products = wishlist?.products;
+
+  // Define fetch params
+  const fetchParams = { jwt, page: 1, limit: 8 };
+  const isDataEmpty = !wishlist || Object.keys(wishlist).length === 0;
+
+  // Use the custom hook
+  const { hasFetched } = useFetchState(
+    getWishlistUser,
+    fetchParams,
+    isDataEmpty
+  );
+
   useEffect(() => {
     if (!hasReset.current) {
       dispatch(resetWishlistState());
       hasReset.current = true;
     }
-
-    if (!wishlist || Object.keys(wishlist).length === 0) {
-      dispatch(getWishlistUser({ jwt: session.customJwt, page: 1, limit: 8 }));
-    }
-  }, [dispatch, session.customJwt, wishlist]);
-
-  const products = wishlist?.products;
+  }, [dispatch]);
 
   return (
-    <div className="p-3">
+    <div className="p-5">
       <Breadcrumb aria-label="Wishlist breadcrumb" className="mb-3">
         <Breadcrumb.Item href="/" icon={HiHome}>
           Home
@@ -54,7 +65,7 @@ export default function Wishlist({ session }) {
         <Breadcrumb.Item href="/profile">Profile</Breadcrumb.Item>
         <Breadcrumb.Item>Wishlist</Breadcrumb.Item>
       </Breadcrumb>
-      <h1 className="font-bold text-2xl">Wishlist</h1>
+      <WishlistDeleteItems jwt={jwt} wishlist={wishlist} />
       {messageWishlistUser && (
         <Alert
           color="info"
@@ -73,8 +84,12 @@ export default function Wishlist({ session }) {
           {errorWishlistUser}
         </Alert>
       )}
-      {isLoadingWishlistUser ? (
+      {isLoadingWishlistUser || !hasFetched ? (
         <SkeletonCard />
+      ) : !isLoadingWishlistUser && !products?.length && hasFetched ? (
+        <Alert color="info" className="w-1/3 text-base">
+          Your wishlist is empty.
+        </Alert>
       ) : (
         <div className="flex flex-wrap justify-start -mx-2">
           {products?.map(productItem => {

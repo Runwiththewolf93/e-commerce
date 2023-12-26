@@ -2,7 +2,7 @@ import Product from "../models/Products";
 import schedule from "node-schedule";
 import connect from "./db";
 
-const job = schedule.scheduleJob("20 16 * * *", async function () {
+const discountJob = schedule.scheduleJob("20 16 * * *", async function () {
   try {
     await connect();
 

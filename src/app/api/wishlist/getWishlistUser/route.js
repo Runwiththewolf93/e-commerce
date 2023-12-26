@@ -23,6 +23,9 @@ export async function GET(req) {
     const skip = (page - 1) * limit;
     const totalCount = wishlist.products.length;
 
+    // Extract all product IDs from the wishlist
+    const allProductIds = wishlist.products.map(item => item.productId);
+
     // Manually paginate the products array
     const paginatedProductIds = wishlist.products
       .slice(skip, skip + limit)
@@ -43,7 +46,12 @@ export async function GET(req) {
 
     return NextResponse.json({
       status: "success",
-      wishlist: { ...wishlist.toObject(), products: reconstructedProducts },
+      wishlist: {
+        ...wishlist.toObject(),
+        products: reconstructedProducts,
+        productIds: allProductIds,
+        // test this out tomorrow
+      },
       currentPage: page,
       totalPages: Math.ceil(totalCount / limit),
       totalItems: totalCount,

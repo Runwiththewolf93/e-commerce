@@ -66,6 +66,22 @@ export const getWishlistUser = createAsyncThunk(
   }
 );
 
+export const deleteItemsFromWishlist = createAsyncThunk(
+  "wishlist/deleteItemsFromWishlist",
+  async ({ productIds, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).delete(
+        `/api/wishlist/deleteItemsFromWishlist`,
+        { data: { productIds } }
+      );
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const wishlistSlice = createSlice({
   name: "wishlist",
   initialState: {
@@ -91,18 +107,25 @@ export const wishlistSlice = createSlice({
     currentPage: 1,
     totalPages: 0,
     totalItems: 0,
+    // deleteItemsFromWishlist
+    isLoadingDeleteItemsWishlist: false,
+    messageDeleteItemsWishlist: "",
+    deletedProductIds: [],
+    errorDeleteItemsWishlist: null,
   },
   reducers: {
     clearSuccessMessages: state => {
       state.messageWishlist = "";
       state.messageWishlistDelete = "";
       state.messageWishlistUser = "";
+      state.messageDeleteItemsWishlist = "";
     },
     clearErrorMessages: state => {
       state.errorWishlist = null;
       state.errorWishlistId = null;
       state.errorWishlistDelete = null;
       state.errorWishlistUser = null;
+      state.errorDeleteItemsWishlist = null;
     },
     resetWishlistState: state => {
       state.isLoadingWishlist = false;
@@ -159,11 +182,14 @@ export const wishlistSlice = createSlice({
       .addCase(deleteFromWishlist.fulfilled, (state, action) => {
         state.messageWishlistDelete = action.payload.message;
         state.deletedProductId = action.payload.deletedProductId;
-        state.wishlist.products = state.wishlist.products.filter(
-          productItem => productItem.productId._id !== action.meta.arg.productId
-        );
         state.isLoadingWishlistDelete = false;
         state.errorWishlistDelete = null;
+
+        if (state.wishlist && state.wishlist.products) {
+          state.wishlist.products = state.wishlist.products.filter(
+            product => product.productId._id !== action.meta.arg.productId
+          );
+        }
       })
       .addCase(deleteFromWishlist.rejected, (state, action) => {
         state.errorWishlistDelete = action.payload;
@@ -186,6 +212,32 @@ export const wishlistSlice = createSlice({
       .addCase(getWishlistUser.rejected, (state, action) => {
         state.errorWishlistUser = action.payload;
         state.isLoadingWishlistUser = false;
+      })
+      // deleteItemsFromWishlist reducer
+      .addCase(deleteItemsFromWishlist.pending, state => {
+        state.isLoadingDeleteItemsWishlist = true;
+        state.errorDeleteItemsWishlist = null;
+      })
+      .addCase(deleteItemsFromWishlist.fulfilled, (state, action) => {
+        state.messageDeleteItemsWishlist = action.payload.message;
+        state.deletedProductIds = action.payload.deletedProductIds;
+        state.isLoadingDeleteItemsWishlist = false;
+        state.errorDeleteItemsWishlist = null;
+
+        // Filter wishlist products only if there are product IDs to delete
+        if (
+          state.wishlist &&
+          state.wishlist.products &&
+          state.deletedProductIds.length > 0
+        ) {
+          state.wishlist.products = state.wishlist.products.filter(
+            product => !state.deletedProductIds.includes(product.productId._id)
+          );
+        }
+      })
+      .addCase(deleteItemsFromWishlist.rejected, (state, action) => {
+        state.errorDeleteItemsWishlist = action.payload;
+        state.isLoadingDeleteItemsWishlist = false;
       });
   },
 });

@@ -9,10 +9,10 @@ export default function WishlistPagination({
   currentPage,
   setCurrentPage,
 }) {
-  console.log(
-    "🚀 ~ file: WishlistPagination.js:10 ~ WishlistPagination ~ currentPage:",
-    currentPage
-  );
+  // console.log(
+  //   "🚀 ~ file: WishlistPagination.js:10 ~ WishlistPagination ~ currentPage:",
+  //   currentPage
+  // );
   const dispatch = useDispatch();
 
   const onPageChange = newPage => {

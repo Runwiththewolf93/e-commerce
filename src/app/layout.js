@@ -1,5 +1,6 @@
 import "./globals.css";
-import "../../utils/scheduler";
+import "../../utils/schedulerDiscount";
+import "../../utils/schedulerShipping";
 import { Inter } from "next/font/google";
 import ReduxProvider from "../redux/ReduxProvider";
 import { NextAuthProvider } from "./providers";

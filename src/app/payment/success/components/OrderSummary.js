@@ -40,7 +40,7 @@ const OrderSummary = ({ cartId, jwt }) => {
     userOrderCount: order?.userOrderCount,
   };
 
-  if (isLoadingGetOrder) {
+  if (isLoadingGetOrder || Object.keys(order).length === 0) {
     return <OrderSummarySkeleton />;
   }
 

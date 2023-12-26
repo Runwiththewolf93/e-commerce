@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HiHeart } from "react-icons/hi";
 import { deleteFromWishlist } from "../../../redux/slices/wishlistSlice";
