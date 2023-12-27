@@ -1,30 +1,31 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { getUserCart } from "../../redux/slices/cartSlice";
 import CartItems from "../cart/components/CartItems";
 import CartCoupon from "../cart/components/CartCoupon";
 import CartOrder from "../cart/components/CartOrder";
 import { useSession } from "next-auth/react";
-import { Spinner } from "flowbite-react";
+import useFetchState from "../hooks/useFetchState";
 
-// CART COMPONENT
+/**
+ * Renders the Cart component.
+ *
+ * @return {ReactElement} The rendered Cart component.
+ */
 export default function Cart() {
-  const dispatch = useDispatch();
   const { isLoadingGetCart, cart, errorGetCart } = useSelector(
     state => state.cart
   );
 
   console.log("🚀 ~ file: page.js:15 ~ Cart ~ cart:", cart);
   const { data: session } = useSession();
+  const jwt = session?.customJwt;
 
-  useEffect(() => {
-    if (session?.customJwt && (!cart || Object.keys(cart).length === 0)) {
-      dispatch(getUserCart(session?.customJwt));
-    }
-  }, [dispatch, session?.customJwt, cart]);
+  const isCartEmpty =
+    cart && Object.keys(cart).length === 0 && !cart.items?.length;
+  const { hasFetched } = useFetchState(getUserCart, { jwt }, isCartEmpty);
 
   return (
     <section className="py-24 bg-gray-100 font-poppins dark:bg-gray-700">
@@ -38,6 +39,7 @@ export default function Cart() {
             jwt={session?.customJwt}
             isLoadingGetCart={isLoadingGetCart}
             errorGetCart={errorGetCart}
+            hasFetched={hasFetched}
           />
           <div className="flex flex-wrap justify-between">
             <CartCoupon cart={cart} jwt={session?.customJwt} />

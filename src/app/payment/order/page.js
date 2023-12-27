@@ -21,6 +21,7 @@ import ConfirmationCart from "./components/ConfirmationCart";
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 );
+
 export default function PreviewPage() {
   const dispatch = useDispatch();
   const { data: session } = useSession();
@@ -108,7 +109,7 @@ export default function PreviewPage() {
       <ConfirmationCart isLoadingGetCart={isLoadingGetCart} cart={cart} />
       {displayedError && (
         <Alert
-          className="w-2/3 mx-auto mb-3"
+          className="w-2/3 mx-auto mb-3 text-base"
           onDismiss={() => {
             setErrorMessage("");
             dispatch(clearOrderError());

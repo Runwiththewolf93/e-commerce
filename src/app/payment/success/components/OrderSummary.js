@@ -7,6 +7,10 @@ import OrderShipping from "./OrderShipping";
 import OrderCustomer from "./OrderCustomer";
 import OrderSummarySkeleton from "./OrderSummarySkeleton";
 import { getOrder, clearOrderError } from "../../../../redux/slices/orderSlice";
+import {
+  removeCart,
+  clearErrorMessage as clearCartError,
+} from "../../../../redux/slices/cartSlice";
 import { formatDate } from "../../../../../utils/helper";
 import { Alert } from "flowbite-react";
 
@@ -15,12 +19,28 @@ const OrderSummary = ({ cartId, jwt }) => {
   const { isLoadingGetOrder, order, errorGetOrder } = useSelector(
     state => state.order
   );
+  const { isLoadingRemoveCart, errorRemoveCart } = useSelector(
+    state => state.cart
+  );
   console.log("🚀 ~ file: OrderSummary.js:13 ~ OrderSummary ~ order:", order);
 
   useEffect(() => {
-    if (cartId && (!order || Object.keys(order).length === 0) && jwt) {
-      dispatch(getOrder({ cartId, jwt }));
-    }
+    const fetchAndRemoveCart = async () => {
+      if (cartId && jwt && (!order || Object.keys(order).length === 0)) {
+        try {
+          // Await the completion of getOrder
+          await dispatch(getOrder({ cartId, jwt })).unwrap();
+
+          // If getOrder is successful, remove the cart
+          dispatch(removeCart({ cartId, jwt }));
+        } catch (error) {
+          console.error("Error fetching order:", error);
+          // Error handling logic for getOrder
+        }
+      }
+    };
+
+    fetchAndRemoveCart();
   }, [cartId, order, jwt, dispatch]);
 
   const formattedDate = order?.createdAt ? formatDate(order.createdAt) : "";
@@ -40,7 +60,11 @@ const OrderSummary = ({ cartId, jwt }) => {
     userOrderCount: order?.userOrderCount,
   };
 
-  if (isLoadingGetOrder || Object.keys(order).length === 0) {
+  if (
+    isLoadingGetOrder ||
+    Object.keys(order).length === 0 ||
+    isLoadingRemoveCart
+  ) {
     return <OrderSummarySkeleton />;
   }
 
@@ -56,13 +80,16 @@ const OrderSummary = ({ cartId, jwt }) => {
               {formattedDate}
             </p>
           </div>
-          {errorGetOrder && (
+          {(errorGetOrder || errorRemoveCart) && (
             <Alert
               color="failure"
               className="text-lg gap-0"
-              onDismiss={() => dispatch(clearOrderError())}
+              onDismiss={() => {
+                dispatch(clearOrderError());
+                dispatch(clearCartError());
+              }}
             >
-              {errorGetOrder}
+              {errorGetOrder || errorRemoveCart}
             </Alert>
           )}
         </div>

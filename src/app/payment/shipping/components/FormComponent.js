@@ -15,6 +15,15 @@ import {
   clearOrderError,
 } from "../../../../redux/slices/orderSlice";
 
+/**
+ * Renders a form component for submitting user address information.
+ *
+ * @param {Object} props - The props object containing the function parameters.
+ * @param {string} props.jwt - The JSON Web Token for authentication.
+ * @param {function} props.onAddressSubmit - The callback function to be executed when the address is submitted.
+ * @param {string} props.cartId - The ID of the cart.
+ * @return {JSX.Element} - The rendered form component.
+ */
 export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
   const dispatch = useDispatch();
   const {

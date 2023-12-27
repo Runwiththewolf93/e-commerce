@@ -33,12 +33,11 @@ export async function POST(req) {
     const session = await Stripe.checkout.sessions.retrieve(sessionId);
     console.log("🚀 ~ file: route.js:36 ~ POST ~ session:", session);
 
-    const paymentStatus = session.payment_status;
     const paymentData = {
       userId: req.user.id,
       orderId: order._id,
       stripeSessionId: sessionId,
-      paymentStatus: paymentStatus,
+      paymentStatus: session.payment_status,
       transactionId: session.payment_intent,
       amount: session.amount_total / 100,
     };
@@ -50,7 +49,7 @@ export async function POST(req) {
     // Find an existing payment and update it, or insert a new one
     const updatedOrNewPayment = await Payment.findOneAndUpdate(
       {
-        stripeSessionId: sessionId,
+        orderId: order._id,
       },
       { $set: paymentData },
       options

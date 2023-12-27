@@ -9,6 +9,11 @@ import ButtonComponent from "./components/ButtonComponent";
 import FormComponent from "./components/FormComponent";
 import CartOrder from "../../cart/components/CartOrder";
 
+/**
+ * Renders the Shipping component which displays the delivery address form and the cart order summary.
+ *
+ * @return {JSX.Element} The rendered Shipping component.
+ */
 export default function Shipping() {
   const dispatch = useDispatch();
   const { isLoadingGetCart, cart } = useSelector(state => state.cart);

@@ -3,7 +3,14 @@ import CartOrderSkeleton from "./CartOrderSkeleton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// CARTORDER COMPONENT
+/**
+ * Render the CartOrder component.
+ *
+ * @param {object} cart - The cart object.
+ * @param {boolean} isLoadingGetCart - Indicates if the cart is being loaded.
+ * @param {boolean} isAddressSubmitted - Indicates if the address is submitted.
+ * @return {JSX.Element} The rendered CartOrder component.
+ */
 export default function CartOrder({
   cart,
   isLoadingGetCart,
@@ -69,9 +76,9 @@ export default function CartOrder({
           >
             <button
               className={`block w-full py-4 font-bold text-center text-gray-100 uppercase bg-blue-500 rounded-md hover:bg-blue-600 ${
-                !isAddressSubmitted && "cursor-not-allowed"
+                isShipping && !isAddressSubmitted && "cursor-not-allowed"
               }`}
-              disabled={!isAddressSubmitted}
+              disabled={isShipping && !isAddressSubmitted}
             >
               {isShipping ? "Order Review" : "Checkout"}
             </button>

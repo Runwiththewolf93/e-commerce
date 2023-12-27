@@ -38,17 +38,26 @@ export async function POST(req) {
       throw new customAPIError.NotFoundError("Cart not found");
     }
 
-    // Construct line items from cart
-    const lineItems = cart.items.map(item => ({
-      price_data: {
-        currency: "eur",
-        product_data: {
-          name: item.product.name,
+    // Calculate discount ratio
+    const discountRatio =
+      cart.totalAmountDiscount < cart.totalAmount
+        ? (cart.totalAmount - cart.totalAmountDiscount) / cart.totalAmount
+        : 0;
+
+    // Construct line items with discounted prices
+    const lineItems = cart.items.map(item => {
+      const discountedPrice = item.product.price * (1 - discountRatio);
+      return {
+        price_data: {
+          currency: "eur",
+          product_data: {
+            name: item.product.name,
+          },
+          unit_amount: Math.round(discountedPrice * 100),
         },
-        unit_amount: item.product.price * 100,
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      };
+    });
 
     // Create Checkout Session with Stripe
     const session = await stripeInstance.checkout.sessions.create({

@@ -13,6 +13,11 @@ import {
   orderStatus,
 } from "../../../redux/slices/orderSlice";
 
+/**
+ * Renders the Cancel component.
+ *
+ * @return {JSX.Element} The rendered Cancel component.
+ */
 export default function Cancel() {
   const dispatch = useDispatch();
   const { data: session } = useSession();
@@ -26,6 +31,14 @@ export default function Cancel() {
     messageOrderStatus,
     errorOrderStatus,
   } = useSelector(state => state.order);
+  console.log(
+    "🚀 ~ file: page.js:29 ~ Cancel ~ messagePaymentConfirmation:",
+    messagePaymentConfirmation
+  );
+  console.log(
+    "🚀 ~ file: page.js:29 ~ Cancel ~ messageOrderStatus:",
+    messageOrderStatus
+  );
   const { cart } = useSelector(state => state.cart);
   const cartId = cart?._id;
   console.log("🚀 ~ file: page.js:27 ~ Success ~ cart:", cart);
@@ -57,10 +70,10 @@ export default function Cancel() {
     executeDispatches();
 
     // Cleanup functions
-    return () => {
-      dispatch(clearOrderMessage());
-      dispatch(clearOrderError());
-    };
+    // return () => {
+    //   dispatch(clearOrderMessage());
+    //   dispatch(clearOrderError());
+    // };
   }, [
     sessionId,
     cartId,

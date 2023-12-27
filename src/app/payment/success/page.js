@@ -60,10 +60,10 @@ export default function Success() {
     executeDispatches();
 
     // Cleanup functions
-    return () => {
-      dispatch(clearOrderMessage());
-      dispatch(clearOrderError());
-    };
+    // return () => {
+    //   dispatch(clearOrderMessage());
+    //   dispatch(clearOrderError());
+    // };
   }, [
     sessionId,
     cartId,

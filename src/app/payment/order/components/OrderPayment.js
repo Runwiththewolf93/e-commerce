@@ -1,5 +1,16 @@
 import { FaCheck } from "react-icons/fa";
 
+/**
+ * Renders the OrderPayment component.
+ *
+ * @param {Object} props - The props object containing the following:
+ *   - {function} handleSubmit: The submit handler function.
+ *   - {boolean} isLoadingOrderCart: A flag indicating if the order cart is loading.
+ *   - {string} messageOrderCart: The message for the order cart.
+ *   - {boolean} isLoadingPaymentCheckout: A flag indicating if the payment checkout is loading.
+ *   - {string} sessionId: The session ID.
+ * @return {JSX.Element} The rendered OrderPayment component.
+ */
 export default function OrderPayment({
   handleSubmit,
   isLoadingOrderCart,

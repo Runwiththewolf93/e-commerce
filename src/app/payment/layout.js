@@ -5,6 +5,12 @@ import Footer from "../../components/Footer";
 import PaymentRedirect from "./components/PaymentRedirect";
 import { useSession } from "next-auth/react";
 
+/**
+ * Renders the payment layout component.
+ *
+ * @param {object} children - The child components to be rendered.
+ * @return {JSX.Element} The rendered payment layout component.
+ */
 function PaymentLayout({ children }) {
   const { status } = useSession();
 

@@ -3,6 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { applyCoupon, excludeCoupon } from "../../../redux/slices/cartSlice";
 import { Alert } from "flowbite-react";
 
+/**
+ * Renders a component for applying and excluding coupons in the cart.
+ *
+ * @param {Object} cart - The cart object.
+ * @param {string} jwt - The JSON Web Token.
+ * @return {JSX.Element} The rendered component.
+ */
 export default function CartCoupon({ cart, jwt }) {
   const dispatch = useDispatch();
   const {

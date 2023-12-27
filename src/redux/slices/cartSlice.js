@@ -123,6 +123,21 @@ export const deleteCoupon = createAsyncThunk(
   }
 );
 
+export const removeCart = createAsyncThunk(
+  "cart/removeCart",
+  async ({ cartId, jwt }, { rejectWithValue }) => {
+    try {
+      const { data } = await customAxios(jwt).delete("/api/cart/removeCart", {
+        data: { cartId },
+      });
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -153,8 +168,12 @@ export const cartSlice = createSlice({
     errorAddCoupon: null,
     // deleteCoupon
     isLoadingDeleteCoupon: false,
-    couponDeleteMessage: '',
+    couponDeleteMessage: "",
     errorDeleteCoupon: null,
+    // removeCart
+    isLoadingRemoveCart: false,
+    messageRemoveCart: "",
+    errorRemoveCart: null,
   },
   reducers: {
     openCartOverlay: state => {
@@ -170,6 +189,7 @@ export const cartSlice = createSlice({
       state.errorAddCart = null;
       state.errorGetCart = null;
       state.errorDeleteCart = null;
+      state.errorRemoveCart = null;
     },
     clearCouponError: state => {
       state.errorApplyCoupon = null;
@@ -261,7 +281,7 @@ export const cartSlice = createSlice({
       })
       .addCase(addCoupon.fulfilled, (state, action) => {
         state.coupon = action.payload.coupon;
-        state.couponMessage = action.payload.message;
+        state.couponAddMessage = action.payload.message;
         state.isLoadingAddCoupon = false;
         state.errorAddCoupon = null;
       })
@@ -275,13 +295,27 @@ export const cartSlice = createSlice({
         state.errorDeleteCoupon = null;
       })
       .addCase(deleteCoupon.fulfilled, (state, action) => {
-        state.couponMessage = action.payload.message;
+        state.couponDeleteMessage = action.payload.message;
         state.isLoadingDeleteCoupon = false;
         state.errorDeleteCoupon = null;
       })
       .addCase(deleteCoupon.rejected, (state, action) => {
         state.isLoadingDeleteCoupon = false;
         state.errorDeleteCoupon = action.payload;
+      })
+      // removeCart reducer
+      .addCase(removeCart.pending, state => {
+        state.isLoadingRemoveCart = true;
+        state.errorRemoveCart = null;
+      })
+      .addCase(removeCart.fulfilled, (state, action) => {
+        state.messageRemoveCart = action.payload.message;
+        state.isLoadingRemoveCart = false;
+        state.errorRemoveCart = null;
+      })
+      .addCase(removeCart.rejected, (state, action) => {
+        state.isLoadingRemoveCart = false;
+        state.errorRemoveCart = action.payload;
       });
   },
 });

@@ -1,3 +1,9 @@
+/**
+ * Renders the confirmation totals component.
+ *
+ * @param {Object} cart - The cart object containing totalAmountDiscount and shippingCost.
+ * @return {JSX.Element} The rendered confirmation totals component.
+ */
 export default function ConfirmationTotals({ cart }) {
   return (
     <div className="w-full lg:w-4/12">

@@ -2,6 +2,15 @@ import { FaTruck } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { FiPackage } from "react-icons/fi";
 
+/**
+ * Render a button component with different styles based on the selected button.
+ *
+ * @param {Object} props - The props object containing the following properties:
+ *   - totalWeight: The total weight.
+ *   - selectedButton: The ID of the selected button.
+ *   - handleButtonClick: The function to handle button click events.
+ * @return {JSX.Element} The rendered button component.
+ */
 export default function ButtonComponent({
   totalWeight,
   selectedButton,

@@ -4,6 +4,14 @@ import ConfirmationTotals from "./ConfirmationTotals";
 import ConfirmationItemsSkeleton from "./ConfirmationItemsSkeleton";
 import ConfirmationTotalsSkeleton from "./ConfirmationTotalsSkeleton";
 
+/**
+ * Renders the ConfirmationCart component.
+ *
+ * @param {object} props - The component properties.
+ * @param {array} props.cart - The cart items.
+ * @param {boolean} props.isLoadingGetCart - Flag indicating whether the cart is being loaded.
+ * @return {JSX.Element} - The rendered ConfirmationCart component.
+ */
 export default function ConfirmationCart({ cart, isLoadingGetCart }) {
   return (
     <section className="flex items-center bg-gray-50 font-poppins dark:bg-gray-700 ">

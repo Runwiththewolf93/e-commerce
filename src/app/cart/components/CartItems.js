@@ -2,19 +2,28 @@
 "use client";
 
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { Alert } from "flowbite-react";
 import CartSkeletonItem from "./CartSkeletonItem";
 import CartQuantity from "./CartQuantity";
 import { useDispatch } from "react-redux";
 import { deleteFromCart } from "../../../redux/slices/cartSlice";
 
-// CARTITEMS COMPONENT
+/**
+ * Renders the list of cart items.
+ *
+ * @param {object} cart - The cart object.
+ * @param {string} jwt - The JWT token.
+ * @param {boolean} isLoadingGetCart - Indicates if the cart is currently being loaded.
+ * @param {string} errorGetCart - The error message if there was an error loading the cart.
+ * @param {boolean} hasFetched - Indicates if the cart has been fetched.
+ * @return {JSX.Element} The JSX element representing the list of cart items.
+ */
 export default function CartItems({
   cart,
   jwt,
   isLoadingGetCart,
   errorGetCart,
+  hasFetched,
 }) {
   const dispatch = useDispatch();
 
@@ -61,6 +70,8 @@ export default function CartItems({
       <div className="py-4 mb-8 border-t border-b border-gray-200 dark:border-gray-700">
         {isLoadingGetCart ? (
           <CartSkeletonItem />
+        ) : hasFetched && !cart?.items?.length ? (
+          <Alert color="info">Your cart is empty.</Alert>
         ) : errorGetCart ? (
           <Alert color="failure">{errorGetCart}</Alert>
         ) : (
