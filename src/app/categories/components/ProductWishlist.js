@@ -12,7 +12,7 @@ import {
 } from "../../../redux/slices/wishlistSlice";
 import { Alert } from "flowbite-react";
 
-export default function ProductWishlist({ product, jwt }) {
+export default function ProductWishlist({ productId, jwt }) {
   // console.log(
   //   "🚀 ~ file: ProductWishlist.js:16 ~ ProductWishlist ~ product:",
   //   product
@@ -30,29 +30,29 @@ export default function ProductWishlist({ product, jwt }) {
     errorWishlistDelete,
   } = useSelector(state => state.wishlist);
   const isFirstRender = useRef(true);
-  const prevProductId = useRef(product?._id);
+  const prevProductId = useRef(productId);
 
   useEffect(() => {
     if (
       jwt &&
-      product?._id &&
-      (isFirstRender.current || prevProductId.current !== product._id)
+      productId &&
+      (isFirstRender.current || prevProductId.current !== productId)
     ) {
-      dispatch(getWishlistId({ productId: product._id, jwt }));
+      dispatch(getWishlistId({ productId, jwt }));
       isFirstRender.current = false;
-      prevProductId.current = product._id;
+      prevProductId.current = productId;
     }
-  }, [dispatch, product?._id, jwt]);
+  }, [dispatch, productId, jwt]);
 
   const handleWishlistAction = () => {
-    if (!product?._id) return;
+    if (!productId) return;
 
     const action = inWishlist
-      ? deleteFromWishlist({ productId: product._id, jwt })
-      : addToWishlist({ productId: product._id, jwt });
+      ? deleteFromWishlist({ productId, jwt })
+      : addToWishlist({ productId, jwt });
 
     dispatch(action).then(() => {
-      dispatch(getWishlistId({ productId: product._id, jwt }));
+      dispatch(getWishlistId({ productId, jwt }));
     });
   };
 

@@ -1,14 +1,33 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import GalleryFeaturedSkeleton from "../subcomponents/GalleryFeaturedSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
 import Link from "next/link";
 import StarRating from "../subcomponents/StarRating";
+import { categoryToLink } from "../../utils/helper";
+import { addToCart, openCartOverlay } from "../redux/slices/cartSlice";
+import { useSession } from "next-auth/react";
+import { useCloseCartOnRouteChange } from "../app/hooks/useCloseCartOnRouteChange";
 
+/**
+ * Renders the featured gallery.
+ *
+ * @returns {JSX.Element} The rendered component.
+ */
 export default function GalleryFeatured() {
+  const dispatch = useDispatch();
   const { featured, isLoading, error } = useSelector(state => state.products);
+  const { isLoadingAddCart } = useSelector(state => state.cart);
+  const { data: session } = useSession();
+  const jwt = session?.customJwt;
+  useCloseCartOnRouteChange();
+
+  const handleAddToCart = productId => {
+    dispatch(addToCart({ productId, quantity: 1, jwt }));
+    dispatch(openCartOverlay());
+  };
 
   if (isLoading) {
     return <GalleryFeaturedSkeleton />;
@@ -36,7 +55,11 @@ export default function GalleryFeatured() {
                   -{product.discount?.percentage}%
                 </div>
               ) : null}
-              <Link href="#">
+              <Link
+                href={`/categories/${categoryToLink(product.category)}/${
+                  product._id
+                }}`}
+              >
                 <figure className="relative h-40 w-full">
                   <div className="absolute inset-0 bg-inherit">
                     <img
@@ -48,12 +71,16 @@ export default function GalleryFeatured() {
                 </figure>
               </Link>
               <div className="px-5 pb-5">
-                <Link href="#">
+                <Link
+                  href={`/categories/${categoryToLink(product.category)}/${
+                    product._id
+                  }`}
+                >
                   <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white mt-3 truncate">
                     {product.name}
                   </h5>
-                  <p className="mt-1 line-clamp-2">{product.description}</p>
                 </Link>
+                <p className="mt-1 line-clamp-2">{product.description}</p>
                 <div className="flex items-center mt-2.5 mb-3">
                   <StarRating aggregateRating={product.aggregateRating} />
                   <span className="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">
@@ -89,13 +116,13 @@ export default function GalleryFeatured() {
                       </span>
                     )}
                   </div>
-                  <div className="flex justify-end">
-                    <Link
-                      href="#"
+                  <div className="flex justify-end mt-0.5">
+                    <button
                       className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 min-w-[100px]"
+                      onClick={() => handleAddToCart(product._id)}
                     >
-                      Add to cart
-                    </Link>
+                      {isLoadingAddCart ? "Adding..." : "Add to cart"}
+                    </button>
                   </div>
                 </div>
               </div>

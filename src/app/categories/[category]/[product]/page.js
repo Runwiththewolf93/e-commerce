@@ -126,7 +126,10 @@ export default function Product() {
                 userId={session?.user?.id}
                 jwt={session?.customJwt}
               />
-              <ProductActions product={product} jwt={session?.customJwt} />
+              <ProductActions
+                productId={product?._id}
+                jwt={session?.customJwt}
+              />
             </section>
           </div>
 

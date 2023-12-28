@@ -4,6 +4,9 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import PaymentRedirect from "./components/PaymentRedirect";
 import { useSession } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 /**
  * Renders the payment layout component.
@@ -13,6 +16,16 @@ import { useSession } from "next-auth/react";
  */
 function PaymentLayout({ children }) {
   const { status } = useSession();
+  const router = useRouter();
+  const { cart } = useSelector(state => state.cart);
+
+  const isCartEmpty = !cart.items || cart.items.length === 0;
+
+  useEffect(() => {
+    if (status === "authenticated" && isCartEmpty) {
+      router.push("/");
+    }
+  }, [status, isCartEmpty, router]);
 
   if (status === "loading") {
     return (
@@ -26,7 +39,11 @@ function PaymentLayout({ children }) {
     <>
       <Header />
       <section className="min-h-screen">
-        {status === "authenticated" ? children : <PaymentRedirect />}
+        {status === "authenticated" && !isCartEmpty ? (
+          children
+        ) : (
+          <PaymentRedirect isCartEmpty={isCartEmpty} />
+        )}
       </section>
       <Footer />
     </>

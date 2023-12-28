@@ -28,7 +28,7 @@ const ProductReviewList = React.memo(function ProductReviewList({
   });
 
   return (
-    <div className="space-y-4 col-span-2">
+    <div className="space-y-4 col-span-2 mt-10">
       <div className="flex justify-around items-center relative">
         <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl inline-block">
           Product Reviews

@@ -7,6 +7,11 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useSession } from "next-auth/react";
 
+/**
+ * Renders the profile page.
+ *
+ * @return {JSX.Element} The rendered profile page.
+ */
 export default function ProfilePage() {
   const { data: session } = useSession();
 

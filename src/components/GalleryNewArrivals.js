@@ -1,15 +1,34 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import GalleryNewArrivalsSkeleton from "../subcomponents/GalleryNewArrivalsSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
 import Link from "next/link";
+import { categoryToLink } from "../../utils/helper";
+import { addToCart, openCartOverlay } from "../redux/slices/cartSlice";
+import { useSession } from "next-auth/react";
+import { useCloseCartOnRouteChange } from "../app/hooks/useCloseCartOnRouteChange";
 
+/**
+ * Renders a component that displays new arrivals in a gallery format.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
 export default function GalleryNewArrivals() {
+  const dispatch = useDispatch();
   const { newArrivals, isLoading, error } = useSelector(
     state => state.products
   );
+  const { isLoadingAddCart } = useSelector(state => state.cart);
+  const { data: session } = useSession();
+  const jwt = session?.customJwt;
+  useCloseCartOnRouteChange();
+
+  const handleAddToCart = productId => {
+    dispatch(addToCart({ productId, quantity: 1, jwt }));
+    dispatch(openCartOverlay());
+  };
 
   if (isLoading) {
     return <GalleryNewArrivalsSkeleton />;
@@ -37,7 +56,11 @@ export default function GalleryNewArrivals() {
                   -{product.discount?.percentage}%
                 </div>
               ) : null}
-              <Link href="#">
+              <Link
+                href={`/categories/${categoryToLink(product.category)}/${
+                  product._id
+                }`}
+              >
                 <figure className="relative h-40 w-full">
                   <div className="absolute inset-0 bg-inherit">
                     <img
@@ -49,7 +72,11 @@ export default function GalleryNewArrivals() {
                 </figure>
               </Link>
               <div className="p-5">
-                <Link href="#">
+                <Link
+                  href={`/categories/${categoryToLink(product.category)}/${
+                    product._id
+                  }`}
+                >
                   <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white truncate">
                     {product.name}
                   </h5>
@@ -104,12 +131,12 @@ export default function GalleryNewArrivals() {
                     )}
                   </div>
                   <div className="flex justify-end">
-                    <Link
-                      href="#"
+                    <button
                       className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 min-w-[100px]"
+                      onClick={() => handleAddToCart(product._id)}
                     >
-                      Add to cart
-                    </Link>
+                      {isLoadingAddCart ? "Adding..." : "Add to cart"}
+                    </button>
                   </div>
                 </div>
               </div>

@@ -1,4 +1,6 @@
-export default function PaymentRedirect() {
+import Link from "next/link";
+
+export default function PaymentRedirect({ isCartEmpty }) {
   return (
     <section className="flex items-start h-screen bg-gray-100 font-poppins dark:bg-gray-900 ">
       <div className="justify-center flex-1 max-w-4xl px-4 py-4 mx-auto lg:py-10 ">
@@ -19,22 +21,37 @@ export default function PaymentRedirect() {
                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
               </svg>
             </div>
-            <div>
-              <p className="mb-1 text-lg font-bold dark:text-gray-300">
-                You are not logged in!
-              </p>
-              <p className="text-base dark:text-gray-400">
-                Please{" "}
-                <a href="/register" className="underline font-bold">
-                  sign up
-                </a>{" "}
-                or{" "}
-                <a href="/login" className="underline font-bold">
-                  log in
-                </a>{" "}
-                to view your order.
-              </p>
-            </div>
+            {isCartEmpty ? (
+              <div>
+                <p className="mb-1 text-lg font-bold dark:text-gray-300">
+                  Your cart is empty!
+                </p>
+                <p className="text-base dark:text-gray-400">
+                  Browse our products{" "}
+                  <Link href="/" className="underline font-bold">
+                    here
+                  </Link>
+                  .
+                </p>
+              </div>
+            ) : (
+              <div>
+                <p className="mb-1 text-lg font-bold dark:text-gray-300">
+                  You are not logged in!
+                </p>
+                <p className="text-base dark:text-gray-400">
+                  Please{" "}
+                  <Link href="/register" className="underline font-bold">
+                    sign up
+                  </Link>{" "}
+                  or{" "}
+                  <Link href="/login" className="underline font-bold">
+                    log in
+                  </Link>{" "}
+                  to view your order.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

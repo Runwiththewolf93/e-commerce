@@ -4,22 +4,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, openCartOverlay } from "../../../redux/slices/cartSlice";
 import CartOverlay from "../../cart/overlay/page";
 import CartQuantity from "../../cart/shared/CartQuantity";
+import { useCloseCartOnRouteChange } from "../../hooks/useCloseCartOnRouteChange";
 
-export default function ProductCart({ product, jwt }) {
+export default function ProductCart({ productId, jwt }) {
   const dispatch = useDispatch();
   const { isCartOpen, isLoadingGetCart, quantity, isLoadingAddCart } =
     useSelector(state => state.cart);
+  console.log(
+    "🚀 ~ file: ProductCart.js:12 ~ ProductCart ~ isCartOpen:",
+    isCartOpen
+  );
+  useCloseCartOnRouteChange();
 
   const handleAddToCart = () => {
     // Dispatch action to add item to cart
-    // dispatch(
-    //   addToCart({ productId: "65256fd44e6d44d34b3767b3", quantity, jwt })
-    // );
+    dispatch(addToCart({ productId, quantity, jwt }));
     // Open the cart overlay
     dispatch(openCartOverlay());
   };
 
-  // Test this tomorrow
   // Combined loading states for disabling the button
   const isButtonDisabled = isLoadingGetCart || isLoadingAddCart;
   const buttonText = isButtonDisabled ? "Processing..." : "Add to cart";
@@ -39,6 +42,7 @@ export default function ProductCart({ product, jwt }) {
       >
         {buttonText}
       </button>
+      <button onClick={() => dispatch(openCartOverlay())}>Open overlay</button>
 
       {isCartOpen ? <CartOverlay /> : null}
     </div>

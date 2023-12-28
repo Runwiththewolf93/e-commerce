@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { HiMinusSm, HiPlusSm } from "react-icons/hi";
 import styles from "./CartQuantity.module.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,54 +38,59 @@ export default function CartQuantity({
   const quantity =
     quantityFromProp !== undefined ? quantityFromProp : quantityFromState;
 
-  const handleQuantityChange = async newQuantity => {
-    if (newQuantity > 0 && newQuantity <= product.stock) {
-      if (productFromProp) {
-        // Product from props, use addToCart or deleteFromCart
-        try {
-          const actionResult =
-            newQuantity > quantity
-              ? await dispatch(
-                  addToCart({
-                    productId: product._id,
-                    quantity: newQuantity - quantity,
-                    jwt,
-                  })
-                )
-              : await dispatch(
-                  deleteFromCart({
-                    productId: product._id,
-                    quantity: quantity - newQuantity,
-                    jwt,
-                  })
-                );
+  const handleQuantityChange = useCallback(
+    async newQuantity => {
+      if (newQuantity > 0 && newQuantity <= product.stock) {
+        if (productFromProp) {
+          // Product from props, use addToCart or deleteFromCart
+          try {
+            const actionResult =
+              newQuantity > quantity
+                ? await dispatch(
+                    addToCart({
+                      productId: product._id,
+                      quantity: newQuantity - quantity,
+                      jwt,
+                    })
+                  )
+                : await dispatch(
+                    deleteFromCart({
+                      productId: product._id,
+                      quantity: quantity - newQuantity,
+                      jwt,
+                    })
+                  );
 
-          if (actionResult?.error) {
-            console.log(
-              "🚀 ~ file: CartQuantity.js:63 ~ handleQuantityChange ~ actionResult:",
-              actionResult
-            );
-            throw new Error(actionResult?.payload || "Error in cart operation");
+            if (actionResult?.error) {
+              console.log(
+                "🚀 ~ file: CartQuantity.js:63 ~ handleQuantityChange ~ actionResult:",
+                actionResult
+              );
+              throw new Error(
+                actionResult?.payload || "Error in cart operation"
+              );
+            }
+
+            onClearError();
+          } catch (error) {
+            onError(error.message);
           }
-
-          onClearError();
-        } catch (error) {
-          onError(error.message);
+        } else {
+          // Product from state, use setQuantity
+          dispatch(setQuantity(newQuantity));
         }
-      } else {
-        // Product from state, use setQuantity
-        dispatch(setQuantity(newQuantity));
       }
-    }
-  };
+    },
+    [product, quantity, productFromProp, jwt, dispatch, onError, onClearError]
+  );
 
-  const incrementQuantity = () => {
+  const incrementQuantity = useCallback(() => {
     handleQuantityChange(quantity + 1);
-  };
+  }, [quantity, handleQuantityChange]);
 
-  const decrementQuantity = () => {
+  const decrementQuantity = useCallback(() => {
     handleQuantityChange(quantity - 1);
-  };
+  }, [quantity, handleQuantityChange]);
 
   return (
     <div className="flex justify-center">

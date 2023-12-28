@@ -23,7 +23,6 @@ export default function CartItems({
   jwt,
   isLoadingGetCart,
   errorGetCart,
-  hasFetched,
 }) {
   const dispatch = useDispatch();
 
@@ -70,8 +69,6 @@ export default function CartItems({
       <div className="py-4 mb-8 border-t border-b border-gray-200 dark:border-gray-700">
         {isLoadingGetCart ? (
           <CartSkeletonItem />
-        ) : hasFetched && !cart?.items?.length ? (
-          <Alert color="info">Your cart is empty.</Alert>
         ) : errorGetCart ? (
           <Alert color="failure">{errorGetCart}</Alert>
         ) : (

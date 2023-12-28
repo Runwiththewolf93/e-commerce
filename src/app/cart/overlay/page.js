@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeCartOverlay, getUserCart } from "../../../redux/slices/cartSlice";
 import { IoMdClose } from "react-icons/io";
@@ -11,17 +11,29 @@ import CartItems from "./components/CartItems";
 import CartTotal from "./components/CartTotal";
 import CartButtons from "./components/CartButtons";
 
+/**
+ * Renders the CartOverlay component.
+ *
+ * @return {JSX.Element} The rendered CartOverlay component.
+ */
 const CartOverlay = () => {
   const dispatch = useDispatch();
   const { isCartOpen, cart } = useSelector(state => state.cart);
-  console.log("🚀 ~ file: page.js:14 ~ CartOverlay ~ cart:", cart);
+  console.log("🚀 ~ file: page.js:22 ~ CartOverlay ~ isCartOpen:", isCartOpen);
+  // console.log("🚀 ~ file: page.js:14 ~ CartOverlay ~ cart:", cart);
   const { data: session } = useSession();
+  const closeButtonRef = useRef(null);
 
   useEffect(() => {
-    if (session?.customJwt && (!cart || Object.keys(cart).length === 0)) {
+    if (
+      isCartOpen &&
+      session?.customJwt &&
+      (!cart || Object.keys(cart).length === 0)
+    ) {
       dispatch(getUserCart(session.customJwt));
     }
-  }, [dispatch, session?.customJwt, cart]);
+    closeButtonRef.current?.focus();
+  }, [dispatch, session?.customJwt, cart, isCartOpen]);
 
   const handleClose = () => {
     dispatch(closeCartOverlay());
@@ -65,6 +77,7 @@ const CartOverlay = () => {
                         </Dialog.Title>
                         <div className="ml-3 flex h-7 items-center">
                           <button
+                            ref={closeButtonRef}
                             type="button"
                             className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
                             onClick={handleClose}

@@ -1,5 +1,6 @@
 import { LoginForm } from "./form";
 import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 export default function LoginPage() {
   return (
@@ -12,6 +13,7 @@ export default function LoginPage() {
           </div>
         </div>
       </section>
+      <Footer />
     </>
   );
 }

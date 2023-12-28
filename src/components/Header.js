@@ -7,7 +7,7 @@ import SearchForm from "../subcomponents/SearchForm";
 import { BsCart3 } from "react-icons/bs";
 import { BiUser, BiLogOut } from "react-icons/bi";
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PURGE } from "redux-persist";
 
 export default function Header() {
@@ -56,11 +56,13 @@ export default function Header() {
           </div>
           <div className="flex-1 flex justify-end">
             <ul className="flex items-center gap-6">
-              <li>
-                <Link href="/" className="text-gray-600">
-                  <BsCart3 className="h-6 w-6" />
-                </Link>
-              </li>
+              {user && (
+                <li>
+                  <Link href="/cart" className="text-gray-600">
+                    <BsCart3 className="h-6 w-6" />
+                  </Link>
+                </li>
+              )}
               {!user && (
                 <>
                   <li>

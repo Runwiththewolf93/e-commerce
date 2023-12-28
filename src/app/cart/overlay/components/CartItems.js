@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import CartSkeletonItem from "./CartSkeletonItem";
 import { Alert } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,10 +8,18 @@ import CartQuantity from "../../shared/CartQuantity";
 import { deleteFromCart } from "../../../../redux/slices/cartSlice";
 import { categoryToLink } from "../../../../../utils/helper";
 
+/**
+ * Renders a single item in the cart.
+ *
+ * @param {object} cart - The cart object containing cart items.
+ * @param {object} session - The session object containing user session data.
+ * @return {JSX.Element} The rendered cart item.
+ */
 export default function CartItem({ cart, session }) {
   const dispatch = useDispatch();
   const { isLoadingGetCart, errorGetCart } = useSelector(state => state.cart);
   const [errorMap, setErrorMap] = useState({});
+  const [loadingMap, setLoadingMap] = useState({});
 
   const handleActionError = (productId, errorMessage) => {
     setErrorMap(prevErrorMap => ({
@@ -28,6 +36,31 @@ export default function CartItem({ cart, session }) {
     });
   };
 
+  const resetLoading = productId => {
+    setLoadingMap(prev => ({ ...prev, [productId]: false }));
+  };
+
+  const handleRemoveItem = useCallback(
+    async productId => {
+      setLoadingMap(prev => ({ ...prev, [productId]: true }));
+      try {
+        // Await the completion of the deleteFromCart thunk
+        await dispatch(
+          deleteFromCart({
+            productId,
+            removeCartItem: true,
+            jwt: session?.customJwt,
+          })
+        ).unwrap();
+      } catch (error) {
+        handleActionError(productId, error.message);
+      } finally {
+        resetLoading(productId);
+      }
+    },
+    [dispatch, session?.customJwt]
+  );
+
   return (
     <ul role="list" className="-my-6 divide-y divide-gray-200">
       {isLoadingGetCart ? (
@@ -41,6 +74,7 @@ export default function CartItem({ cart, session }) {
             : item.product.price;
 
           const errorAddOrDeleteCart = errorMap[item.product._id];
+          const isLoading = loadingMap[item.product._id] || false;
 
           return (
             <div key={item._id}>
@@ -91,17 +125,10 @@ export default function CartItem({ cart, session }) {
                       <button
                         type="button"
                         className="font-medium text-indigo-600 hover:text-indigo-500"
-                        onClick={() =>
-                          dispatch(
-                            deleteFromCart({
-                              productId: item.product._id,
-                              removeCartItem: true,
-                              jwt: session?.customJwt,
-                            })
-                          )
-                        }
+                        disabled={isLoading}
+                        onClick={() => handleRemoveItem(item.product._id)}
                       >
-                        Remove
+                        {isLoading ? "Removing..." : "Remove"}
                       </button>
                     </div>
                   </div>

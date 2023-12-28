@@ -21,7 +21,7 @@ export const addToCart = createAsyncThunk(
 
 export const getUserCart = createAsyncThunk(
   "cart/getUserCart",
-  async (jwt, { rejectWithValue }) => {
+  async ({ jwt }, { rejectWithValue }) => {
     try {
       const { data } = await customAxios(jwt).get("/api/cart/getUserCart");
 
@@ -310,6 +310,7 @@ export const cartSlice = createSlice({
       })
       .addCase(removeCart.fulfilled, (state, action) => {
         state.messageRemoveCart = action.payload.message;
+        state.cart = {};
         state.isLoadingRemoveCart = false;
         state.errorRemoveCart = null;
       })

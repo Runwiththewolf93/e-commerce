@@ -1,3 +1,5 @@
+"use client";
+
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Jumbotron from "../components/Jumbotron";
@@ -9,8 +11,12 @@ import GalleryFeatured from "../components/GalleryFeatured";
 import UserTestimonial from "../components/UserTestimonial";
 import GalleryNewArrivals from "../components/GalleryNewArrivals";
 import SocialProof from "../components/SocialProof";
+import { useSelector } from "react-redux";
+import CartOverlay from "./cart/overlay/page";
 
 export default function Home() {
+  const { isCartOpen } = useSelector(state => state.cart);
+
   return (
     <div className="bg-sky-300">
       <Header />
@@ -32,6 +38,7 @@ export default function Home() {
       <div className="divider" />
       <Banner />
       <Footer />
+      {isCartOpen ? <CartOverlay /> : null}
     </div>
   );
 }

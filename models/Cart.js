@@ -68,7 +68,7 @@ cartSchema.pre("save", async function (next) {
 
   this.totalAmountDiscount = totalWithDiscount;
   this.totalAmount = totalWithoutDiscount;
-  this.totalWeight = totalWeight;
+  this.totalWeight = totalWeight.toFixed(2);
 
   // Calculate shipping cost based on total weight
   if (totalWeight <= 1) {

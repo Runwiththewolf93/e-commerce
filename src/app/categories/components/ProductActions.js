@@ -7,7 +7,7 @@ import ProductSizeWrapper from "./ProductSizeWrapper";
 import ProductWishlist from "./ProductWishlist";
 import ProductCart from "./ProductCart";
 
-export default function ProductActions({ product, jwt }) {
+export default function ProductActions({ productId, jwt }) {
   const [isLoadingSession, setIsLoadingSession] = useState(true);
 
   useEffect(() => {
@@ -44,9 +44,9 @@ export default function ProductActions({ product, jwt }) {
   }
 
   return (
-    <div className="flex flex-col mt-12">
-      <ProductCart product={product} jwt={jwt} />
-      <ProductWishlist product={product} jwt={jwt} />
+    <div className="flex flex-col mt-5">
+      <ProductCart productId={productId} jwt={jwt} />
+      <ProductWishlist productId={productId} jwt={jwt} />
     </div>
   );
 }

@@ -6,6 +6,12 @@ import { getOrders } from "../../../redux/slices/orderSlice";
 import OrderOverviewSkeleton from "./OrderOverviewSkeleton";
 import { Alert } from "flowbite-react";
 
+/**
+ * Renders the order overview page.
+ *
+ * @param {Object} session - The session object.
+ * @return {JSX.Element} The JSX element representing the order overview page.
+ */
 export default function OrderOverview({ session }) {
   const jwt = session?.customJwt;
   const dispatch = useDispatch();
