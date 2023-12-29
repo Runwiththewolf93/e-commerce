@@ -3,12 +3,10 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Alert } from "flowbite-react";
-import {
-  FilterDropdown,
-  SortDropdown,
-  ReviewNavigation,
-  AddVote,
-} from "./ProductComponents";
+import { ProductFilterDropdown } from "../components/subcomponents/ProductFilterDropdown";
+import { ProductSortDropdown } from "../components/subcomponents/ProductSortDropdown";
+import { ProductReviewNavigation } from "../components/subcomponents/ProductReviewNavigation";
+import { ProductAddVote } from "../components/subcomponents/ProductAddVote";
 
 const ProductReviewList = React.memo(function ProductReviewList({
   productId,
@@ -34,13 +32,13 @@ const ProductReviewList = React.memo(function ProductReviewList({
           Product Reviews
         </h1>
         <div className="flex-grow"></div>
-        <FilterDropdown
+        <ProductFilterDropdown
           productId={productId}
           filterSortCriteria={filterSortCriteria}
           setFilterSortCriteria={setFilterSortCriteria}
         />
         <div className="flex-grow"></div>
-        <SortDropdown
+        <ProductSortDropdown
           productId={productId}
           filterSortCriteria={filterSortCriteria}
           setFilterSortCriteria={setFilterSortCriteria}
@@ -68,7 +66,7 @@ const ProductReviewList = React.memo(function ProductReviewList({
             </div>
             <p className="mt-2 text-gray-700">{review.review}</p>
             <div className="mt-4 flex items-center justify-between">
-              <AddVote review={review} />
+              <ProductAddVote review={review} />
               <span className="text-gray-500 text-sm">
                 {new Date(review.createdAt).toLocaleDateString()}
               </span>
@@ -77,7 +75,7 @@ const ProductReviewList = React.memo(function ProductReviewList({
         ))
       )}
       {reviews.length === 0 ? null : (
-        <ReviewNavigation
+        <ProductReviewNavigation
           productId={productId}
           pagination={pagination}
           filterSortCriteria={filterSortCriteria}

@@ -1,19 +1,18 @@
 "use client";
 
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, openCartOverlay } from "../../../redux/slices/cartSlice";
-import CartOverlay from "../../cart/overlay/page";
-import CartQuantity from "../../cart/shared/CartQuantity";
-import { useCloseCartOnRouteChange } from "../../hooks/useCloseCartOnRouteChange";
+import {
+  addToCart,
+  openCartOverlay,
+} from "../../../../../redux/slices/cartSlice";
+import CartOverlay from "../../../../cart/overlay/page";
+import CartQuantity from "../../../../cart/shared/CartQuantity";
+import { useCloseCartOnRouteChange } from "../../../../hooks/useCloseCartOnRouteChange";
 
 export default function ProductCart({ productId, jwt }) {
   const dispatch = useDispatch();
   const { isCartOpen, isLoadingGetCart, quantity, isLoadingAddCart } =
     useSelector(state => state.cart);
-  console.log(
-    "🚀 ~ file: ProductCart.js:12 ~ ProductCart ~ isCartOpen:",
-    isCartOpen
-  );
   useCloseCartOnRouteChange();
 
   const handleAddToCart = () => {
@@ -42,7 +41,7 @@ export default function ProductCart({ productId, jwt }) {
       >
         {buttonText}
       </button>
-      <button onClick={() => dispatch(openCartOverlay())}>Open overlay</button>
+      {/* <button onClick={() => dispatch(openCartOverlay())}>Open overlay</button> */}
 
       {isCartOpen ? <CartOverlay /> : null}
     </div>

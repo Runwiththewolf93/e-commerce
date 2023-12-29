@@ -9,14 +9,10 @@ import {
   getWishlistId,
   clearSuccessMessages,
   clearErrorMessages,
-} from "../../../redux/slices/wishlistSlice";
+} from "../../../../../redux/slices/wishlistSlice";
 import { Alert } from "flowbite-react";
 
 export default function ProductWishlist({ productId, jwt }) {
-  // console.log(
-  //   "🚀 ~ file: ProductWishlist.js:16 ~ ProductWishlist ~ product:",
-  //   product
-  // );
   const dispatch = useDispatch();
   const {
     isLoadingWishlist,
@@ -73,7 +69,7 @@ export default function ProductWishlist({ productId, jwt }) {
         )}
         {inWishlist ? "Remove from wishlist" : "Add to wishlist"}
       </button>
-      <button
+      {/* <button
         className="mt-5"
         onClick={() =>
           dispatch(
@@ -82,7 +78,7 @@ export default function ProductWishlist({ productId, jwt }) {
         }
       >
         Add wish - test
-      </button>
+      </button> */}
       {messageWishlist || messageWishlistDelete ? (
         <Alert
           color="success"

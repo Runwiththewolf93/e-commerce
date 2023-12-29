@@ -7,30 +7,34 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../../redux/slices/productSlice";
 import { fetchReviews } from "../../../../redux/slices/reviewSlice";
 import { useSession } from "next-auth/react";
-import { Alert, Spinner } from "flowbite-react";
-import { HiInformationCircle } from "react-icons/hi";
-import ProductBreadcrumb from "../../components/ProductBreadcrumb";
-import ProductImages from "../../components/ProductImages";
-import ProductCreateReview from "../../components/ProductCreateReview";
-import ProductReviewList from "../../components/ProductReviewList";
-import ProductAggregateRating from "../../components/ProductAggregateRating";
-import ProductActions from "../../components/ProductActions";
-import ProductDescription from "../../components/ProductDescription";
+import ProductBreadcrumb from "./components/ProductBreadcrumb";
+import ProductImages from "./components/ProductImages";
+import ProductCreateReview from "./components/ProductCreateReview";
+import ProductReviewList from "./components/ProductReviewList";
+import ProductAggregateRating from "./components/ProductAggregateRating";
+import ProductActions from "./components/ProductActions";
+import ProductDescription from "./components/ProductDescription";
+import ProductPrice from "./components/ProductPrice";
+import ProductReviewListSkeleton from "./components/subcomponents/ProductReviewListSkeleton";
+import ProductError from "./components/ProductError";
+import ProductSpinner from "./components/ProductSpinner";
 
+/**
+ * Renders the Product component.
+ *
+ * @returns {JSX.Element} The rendered Product component.
+ */
 export default function Product() {
   const dispatch = useDispatch();
-  const pathname = usePathname();
   const { data: session } = useSession();
-  // console.log("🚀 ~ file: page.js:21 ~ Product ~ session:", session);
 
+  const pathname = usePathname();
   const pathSegments = pathname.split("/");
   const id = pathSegments[pathSegments.length - 1];
-  // console.log("🚀 ~ file: page.js:26 ~ Product ~ id:", id);
 
   const { isLoadingProduct, product, errorProduct } = useSelector(
     state => state.products
   );
-  // console.log("🚀 ~ file: page.js:30 ~ Product ~ product:", product);
 
   useEffect(() => {
     if (Object.keys(product).length === 0 || product._id !== id) {
@@ -58,25 +62,15 @@ export default function Product() {
   } else {
     productWithDiscount.discount = { percentage: 20 };
   }
-  // console.log(
-  //   "🚀 ~ file: page.js:30 ~ Product ~ productWithDiscount:",
-  //   productWithDiscount
-  // );
   // testing purposes
 
   if (isLoadingProduct) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-      </div>
-    );
+    return <ProductSpinner />;
   }
 
   if (errorProduct) {
     return (
-      <Alert color="failure" icon={HiInformationCircle}>
-        {errorProduct}
-      </Alert>
+      <ProductError errorMessage={errorProduct} productId={product?._id} />
     );
   }
 
@@ -88,7 +82,7 @@ export default function Product() {
     <div className="bg-white">
       <div className="pt-6">
         <ProductBreadcrumb product={product} />
-        {product && <ProductImages productImages={product.images} />}
+        <ProductImages productImages={product.images} />
 
         <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16">
           <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
@@ -98,26 +92,7 @@ export default function Product() {
           </div>
 
           <div className="mt-4 lg:row-span-3 lg:mt-0">
-            <h2 className="sr-only">Product information</h2>
-            {!productWithDiscount?.discount ? (
-              <p className="text-3xl tracking-tight text-gray-900">
-                €{productWithDiscount?.price}
-              </p>
-            ) : (
-              <div className="flex items-center">
-                <del className="text-3xl tracking-tight text-red-600 mr-3">
-                  €{productWithDiscount?.price}
-                </del>
-                <p className="text-3xl tracking-tight text-green-600">
-                  €
-                  {Math.round(
-                    productWithDiscount?.price *
-                      (1 - productWithDiscount?.discount?.percentage / 100)
-                  )}
-                </p>
-              </div>
-            )}
-
+            <ProductPrice productWithDiscount={productWithDiscount} />
             <ProductAggregateRating productId={product?._id} />
 
             <section>
@@ -142,9 +117,7 @@ export default function Product() {
               reviews={reviews}
             />
           ) : (
-            <div className="flex justify-center">
-              <Spinner size="xl" />
-            </div>
+            <ProductReviewListSkeleton />
           )}
         </div>
       </div>
@@ -152,4 +125,4 @@ export default function Product() {
   );
 }
 
-// http://localhost:3000/categories/electronics/65256be84e6d44d34b376798
+// http://localhost:3000/categories/clothing/65256fd44e6d44d34b3767b3

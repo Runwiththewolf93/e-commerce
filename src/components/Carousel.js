@@ -6,32 +6,31 @@ import Link from "next/link";
 
 export default function DefaultCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [nextSlide, setNextSlide] = useState(1);
   const [opacity, setOpacity] = useState(1);
 
   const carouselData = [
     {
       image:
         "https://raw.githubusercontent.com/Runwiththewolf93/e-commerce/master/public/dall-e/product1.png",
-      link: "/clothing",
+      link: "/categories/clothing",
       text: "Step up your style with our latest sneakers",
     },
     {
       image:
         "https://raw.githubusercontent.com/Runwiththewolf93/e-commerce/master/public/dall-e/product2.png",
-      link: "/cars-motorcycles",
+      link: "/categories/cars-motorcycles",
       text: "Drive your dreams with our latest cars and motorcycles",
     },
     {
       image:
         "https://raw.githubusercontent.com/Runwiththewolf93/e-commerce/master/public/dall-e/product3.png",
-      link: "/home-garden",
+      link: "/categories/home-garden",
       text: "Make your house a home with our stylish and affordable home and garden products",
     },
     {
       image:
         "https://raw.githubusercontent.com/Runwiththewolf93/e-commerce/master/public/dall-e/product4.png",
-      link: "/toys",
+      link: "categories/toys",
       text: "Let your kids' imaginations run wild with our fun and educational toys",
     },
   ];

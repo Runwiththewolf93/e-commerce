@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import StarRating from "../../../subcomponents/StarRating";
-import { fetchAggregateRating } from "../../../redux/slices/reviewSlice";
-import { TooltipStar } from "./ProductComponents";
+import StarRating from "../../../../../subcomponents/StarRating";
+import { fetchAggregateRating } from "../../../../../redux/slices/reviewSlice";
+import ProductTooltipStar from "../components/subcomponents/ProductTooltipStar";
 
 export default function ProductAggregateRating({ productId }) {
   const dispatch = useDispatch();
@@ -33,9 +33,9 @@ export default function ProductAggregateRating({ productId }) {
       <div className="flex items-center">
         <div className="flex items-center">
           {tooltipContent ? (
-            <TooltipStar content={tooltipContent}>
+            <ProductTooltipStar content={tooltipContent}>
               <StarRating aggregateRating={rating} />
-            </TooltipStar>
+            </ProductTooltipStar>
           ) : (
             <StarRating aggregateRating={rating} />
           )}

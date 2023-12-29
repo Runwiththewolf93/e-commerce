@@ -3,12 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createReview,
   resetCreateReview,
-} from "../../../redux/slices/reviewSlice";
+} from "../../../../../redux/slices/reviewSlice";
 import { Alert, Spinner } from "flowbite-react";
 import Link from "next/link";
 import ProductSizeWrapper from "./ProductSizeWrapper";
+import ProductCreateReviewSkeleton from "./subcomponents/ProductCreateReviewSkeleton";
 
-const CreateReview = ({ productId, userId, jwt }) => {
+const ProductCreateReview = ({ productId, userId, jwt }) => {
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(5);
   const [isLoadingSession, setIsLoadingSession] = useState(true);
@@ -31,11 +32,7 @@ const CreateReview = ({ productId, userId, jwt }) => {
   };
 
   if (isLoadingSession) {
-    return (
-      <ProductSizeWrapper minHeight="350px" minWidth="350px">
-        <Spinner size="xl" />
-      </ProductSizeWrapper>
-    );
+    return <ProductCreateReviewSkeleton />;
   }
 
   if (!jwt) {
@@ -121,4 +118,4 @@ const CreateReview = ({ productId, userId, jwt }) => {
   );
 };
 
-export default CreateReview;
+export default ProductCreateReview;

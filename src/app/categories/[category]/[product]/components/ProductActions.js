@@ -6,6 +6,7 @@ import Link from "next/link";
 import ProductSizeWrapper from "./ProductSizeWrapper";
 import ProductWishlist from "./ProductWishlist";
 import ProductCart from "./ProductCart";
+import ProductActionsSkeleton from "./subcomponents/ProductActionsSkeleton";
 
 export default function ProductActions({ productId, jwt }) {
   const [isLoadingSession, setIsLoadingSession] = useState(true);
@@ -17,11 +18,7 @@ export default function ProductActions({ productId, jwt }) {
   }, [jwt]);
 
   if (isLoadingSession) {
-    return (
-      <ProductSizeWrapper minHeight="200px" minWidth="350px">
-        <Spinner size="xl" />
-      </ProductSizeWrapper>
-    );
+    return <ProductActionsSkeleton />;
   }
 
   if (!jwt) {
@@ -43,6 +40,7 @@ export default function ProductActions({ productId, jwt }) {
     );
   }
 
+  // continue checking how the other error states work!
   return (
     <div className="flex flex-col mt-5">
       <ProductCart productId={productId} jwt={jwt} />
