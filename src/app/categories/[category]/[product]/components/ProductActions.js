@@ -8,14 +8,14 @@ import ProductWishlist from "./ProductWishlist";
 import ProductCart from "./ProductCart";
 import ProductActionsSkeleton from "./subcomponents/ProductActionsSkeleton";
 
-export default function ProductActions({ productId, jwt }) {
+export default function ProductActions({ productId, jwt, isAuthenticated }) {
   const [isLoadingSession, setIsLoadingSession] = useState(true);
 
   useEffect(() => {
-    if (jwt !== undefined) {
+    if (jwt !== undefined || !isAuthenticated) {
       setIsLoadingSession(false);
     }
-  }, [jwt]);
+  }, [jwt, isAuthenticated]);
 
   if (isLoadingSession) {
     return <ProductActionsSkeleton />;

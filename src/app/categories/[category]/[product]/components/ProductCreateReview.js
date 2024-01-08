@@ -4,24 +4,34 @@ import {
   createReview,
   resetCreateReview,
 } from "../../../../../redux/slices/reviewSlice";
-import { Alert, Spinner } from "flowbite-react";
+import { Alert } from "flowbite-react";
 import Link from "next/link";
 import ProductSizeWrapper from "./ProductSizeWrapper";
 import ProductCreateReviewSkeleton from "./subcomponents/ProductCreateReviewSkeleton";
 
-const ProductCreateReview = ({ productId, userId, jwt }) => {
+/**
+ * Creates a review for a product.
+ *
+ * @param {string} productId - The ID of the product.
+ * @param {string} userId - The ID of the user creating the review.
+ * @param {string} jwt - The JSON Web Token for authentication.
+ * @param {boolean} isAuthenticated - Indicates if the user is authenticated.
+ * @return {void} No return value.
+ */
+const ProductCreateReview = ({ productId, userId, jwt, isAuthenticated }) => {
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(5);
   const [isLoadingSession, setIsLoadingSession] = useState(true);
 
   const dispatch = useDispatch();
-  const { isLoading, message, error } = useSelector(state => state.reviews);
+  const { isLoadingCreateReview, messageCreateReview, errorCreateReview } =
+    useSelector(state => state.reviews);
 
   useEffect(() => {
-    if (jwt !== undefined) {
+    if (jwt !== undefined || !isAuthenticated) {
       setIsLoadingSession(false);
     }
-  }, [jwt]);
+  }, [jwt, isAuthenticated]);
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -56,14 +66,14 @@ const ProductCreateReview = ({ productId, userId, jwt }) => {
   return (
     <div className="bg-white p-4 rounded shadow">
       <h2 className="text-2xl font-semibold mb-4">Write a Review</h2>
-      {message && (
+      {messageCreateReview && (
         <Alert color="success" onDismiss={() => dispatch(resetCreateReview())}>
-          {message}
+          {messageCreateReview}
         </Alert>
       )}
-      {error && (
+      {errorCreateReview && (
         <Alert color="failure" onDismiss={() => dispatch(resetCreateReview())}>
-          {error}
+          {errorCreateReview}
         </Alert>
       )}
       <form onSubmit={handleSubmit}>
@@ -109,7 +119,7 @@ const ProductCreateReview = ({ productId, userId, jwt }) => {
         <button
           type="submit"
           className="bg-blue-500 text-white p-2 rounded"
-          disabled={isLoading}
+          disabled={isLoadingCreateReview}
         >
           Submit Review
         </button>

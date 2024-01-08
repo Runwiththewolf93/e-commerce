@@ -26,7 +26,10 @@ import ProductSpinner from "./components/ProductSpinner";
  */
 export default function Product() {
   const dispatch = useDispatch();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated";
+  const jwt = session?.customJwt;
+  const userId = session?.user?.id;
 
   const pathname = usePathname();
   const pathSegments = pathname.split("/");
@@ -45,12 +48,18 @@ export default function Product() {
   const { reviews, isLoadingFetch } = useSelector(state => state.reviews);
 
   useEffect(() => {
-    if (product && product._id && session?.user?.id && !reviews.length) {
-      dispatch(
-        fetchReviews({ productId: product._id, userId: session.user.id })
-      );
+    // Check if product is loaded
+    if (product && product._id) {
+      // If user is authenticated, fetch reviews only when userId is available
+      if (isAuthenticated && userId) {
+        dispatch(fetchReviews({ productId: product._id, userId }));
+      }
+      // If user is not authenticated, fetch reviews without userId
+      else if (!isAuthenticated) {
+        dispatch(fetchReviews({ productId: product._id }));
+      }
     }
-  }, [dispatch, product, session?.user?.id, reviews.length]);
+  }, [dispatch, product, isAuthenticated, userId]);
 
   // testing purposes
   const productWithDiscount = { ...product };
@@ -74,10 +83,6 @@ export default function Product() {
     );
   }
 
-  const isLoadingProductReviewList =
-    product && product._id && session?.user?.id;
-  const isEverythingLoaded = isLoadingProductReviewList && !isLoadingFetch;
-
   return (
     <div className="bg-white">
       <div className="pt-6">
@@ -98,22 +103,24 @@ export default function Product() {
             <section>
               <ProductCreateReview
                 productId={product?._id}
-                userId={session?.user?.id}
-                jwt={session?.customJwt}
+                userId={userId}
+                jwt={jwt}
+                isAuthenticated={isAuthenticated}
               />
               <ProductActions
                 productId={product?._id}
-                jwt={session?.customJwt}
+                jwt={jwt}
+                isAuthenticated={isAuthenticated}
               />
             </section>
           </div>
 
           <ProductDescription productDescription={product?.description} />
 
-          {isEverythingLoaded ? (
+          {!isLoadingFetch ? (
             <ProductReviewList
               productId={product._id}
-              userId={session.user.id}
+              userId={userId}
               reviews={reviews}
             />
           ) : (

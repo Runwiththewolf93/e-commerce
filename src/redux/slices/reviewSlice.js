@@ -107,9 +107,9 @@ export const reviewSlice = createSlice({
   name: "reviews",
   initialState: {
     // createReview
-    isLoading: false,
-    message: "",
-    error: null,
+    isLoadingCreateReview: false,
+    messageCreateReview: "",
+    errorCreateReview: null,
     // fetchReview
     isLoadingFetch: false,
     reviews: [],
@@ -128,25 +128,26 @@ export const reviewSlice = createSlice({
   },
   reducers: {
     resetCreateReview: state => {
-      state.isLoading = false;
-      state.message = "";
-      state.error = null;
+      state.isLoadingCreateReview = false;
+      state.messageCreateReview = "";
+      state.errorCreateReview = null;
     },
   },
   extraReducers: builder => {
     builder
       // createReview reducer
       .addCase(createReview.pending, state => {
-        state.isLoading = true;
+        state.isLoadingCreateReview = true;
+        state.errorCreateReview = null;
       })
       .addCase(createReview.fulfilled, (state, action) => {
         state.message = action.payload;
-        state.isLoading = false;
-        state.error = null;
+        state.isLoadingCreateReview = false;
+        state.errorCreateReview = null;
       })
       .addCase(createReview.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
+        state.isLoadingCreateReview = false;
+        state.errorCreateReview = action.payload;
       })
       // fetchReview reducer
       .addCase(fetchReviews.pending, state => {
