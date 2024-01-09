@@ -27,7 +27,6 @@ export const ProductReviewNavigation = React.memo(
 
     // Update currentPage whenever pagination.page changes
     useEffect(() => {
-      // console.log("how often does this render?");
       setCurrentPage(Number(pagination.page));
     }, [pagination.page]);
 

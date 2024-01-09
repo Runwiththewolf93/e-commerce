@@ -19,7 +19,7 @@ export const createReview = createAsyncThunk(
         rating,
       });
 
-      return data.message;
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -111,11 +111,11 @@ export const reviewSlice = createSlice({
     messageCreateReview: "",
     errorCreateReview: null,
     // fetchReview
-    isLoadingFetch: false,
+    isLoadingFetchReviews: false,
     reviews: [],
     pagination: {},
     reviewsMessage: "",
-    errorFetch: null,
+    errorFetchReviews: null,
     // createVote
     isLoadingVote: false,
     prevReviewState: null,
@@ -141,7 +141,20 @@ export const reviewSlice = createSlice({
         state.errorCreateReview = null;
       })
       .addCase(createReview.fulfilled, (state, action) => {
-        state.message = action.payload;
+        const newReview = action.payload.review;
+        const existingReviewIndex = state.reviews.findIndex(
+          review => review.userId === newReview.userId
+        );
+
+        if (existingReviewIndex !== -1) {
+          // Replace the existing review
+          state.reviews[existingReviewIndex] = newReview;
+        } else {
+          // Add new review
+          state.reviews.push(newReview);
+        }
+
+        state.messageCreateReview = action.payload.message;
         state.isLoadingCreateReview = false;
         state.errorCreateReview = null;
       })
@@ -151,21 +164,21 @@ export const reviewSlice = createSlice({
       })
       // fetchReview reducer
       .addCase(fetchReviews.pending, state => {
-        state.isLoadingFetch = true;
+        state.isLoadingFetchReviews = true;
         state.reviews = [];
-        state.errorFetch = null;
+        state.errorFetchReviews = null;
         state.reviewsMessage = "";
       })
       .addCase(fetchReviews.fulfilled, (state, action) => {
         state.reviews = action.payload.reviews;
         state.pagination = action.payload.pagination;
         state.reviewsMessage = action.payload.reviewsMessage;
-        state.isLoadingFetch = false;
-        state.errorFetch = null;
+        state.isLoadingFetchReviews = false;
+        state.errorFetchReviews = null;
       })
       .addCase(fetchReviews.rejected, (state, action) => {
-        state.isLoadingFetch = false;
-        state.errorFetch = action.payload;
+        state.isLoadingFetchReviews = false;
+        state.errorFetchReviews = action.payload;
       })
       // fetchAggregateRating reducer
       .addCase(fetchAggregateRating.pending, state => {
@@ -237,5 +250,3 @@ export const reviewSlice = createSlice({
 export const { resetCreateReview } = reviewSlice.actions;
 
 export default reviewSlice.reducer;
-
-// http://localhost:3000/categories/electronics/65256be84e6d44d34b376798

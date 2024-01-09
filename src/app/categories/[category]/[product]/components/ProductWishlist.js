@@ -12,6 +12,14 @@ import {
 } from "../../../../../redux/slices/wishlistSlice";
 import { Alert } from "flowbite-react";
 
+/**
+ * Renders the product wishlist component.
+ *
+ * @param {Object} ProductWishlist - An object containing the product ID and JWT.
+ * @param {string} ProductWishlist.productId - The ID of the product.
+ * @param {string} ProductWishlist.jwt - The JWT token for authentication.
+ * @return {JSX.Element} The rendered product wishlist component.
+ */
 export default function ProductWishlist({ productId, jwt }) {
   const dispatch = useDispatch();
   const {

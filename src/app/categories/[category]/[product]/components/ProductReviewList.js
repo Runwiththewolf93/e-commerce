@@ -1,19 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Alert } from "flowbite-react";
 import { ProductFilterDropdown } from "../components/subcomponents/ProductFilterDropdown";
 import { ProductSortDropdown } from "../components/subcomponents/ProductSortDropdown";
 import { ProductReviewNavigation } from "../components/subcomponents/ProductReviewNavigation";
 import { ProductAddVote } from "../components/subcomponents/ProductAddVote";
+import { fetchReviews } from "../../../../../redux/slices/reviewSlice";
 
 const ProductReviewList = React.memo(function ProductReviewList({
   productId,
   userId,
   reviews,
 }) {
-  const { pagination, reviewsMessage, errorFetch } = useSelector(
+  const dispatch = useDispatch();
+  const { pagination, reviewsMessage, errorFetchReviews } = useSelector(
     state => state.reviews
   );
 
@@ -24,6 +26,10 @@ const ProductReviewList = React.memo(function ProductReviewList({
       updatedAt: "desc",
     },
   });
+
+  const refetchReviews = () => {
+    dispatch(fetchReviews({ productId, userId }));
+  };
 
   return (
     <div className="space-y-4 col-span-2 mt-10">
@@ -45,9 +51,19 @@ const ProductReviewList = React.memo(function ProductReviewList({
         />
         <div className="flex-grow"></div>
       </div>
-      {errorFetch ? (
+      {errorFetchReviews ? (
         <Alert color="failure" className="text-base">
-          {errorFetch}
+          {errorFetchReviews}{" "}
+          <div>
+            Click{" "}
+            <span
+              className="text-blue-600 cursor-pointer hover:underline"
+              onClick={refetchReviews}
+            >
+              here
+            </span>{" "}
+            to refetch
+          </div>
         </Alert>
       ) : reviews.length === 0 && reviewsMessage ? (
         <Alert color="info" className="text-base">

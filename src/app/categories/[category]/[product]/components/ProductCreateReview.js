@@ -67,12 +67,20 @@ const ProductCreateReview = ({ productId, userId, jwt, isAuthenticated }) => {
     <div className="bg-white p-4 rounded shadow">
       <h2 className="text-2xl font-semibold mb-4">Write a Review</h2>
       {messageCreateReview && (
-        <Alert color="success" onDismiss={() => dispatch(resetCreateReview())}>
+        <Alert
+          color="success"
+          onDismiss={() => dispatch(resetCreateReview())}
+          className="mb-3"
+        >
           {messageCreateReview}
         </Alert>
       )}
       {errorCreateReview && (
-        <Alert color="failure" onDismiss={() => dispatch(resetCreateReview())}>
+        <Alert
+          color="failure"
+          onDismiss={() => dispatch(resetCreateReview())}
+          className="mb-3"
+        >
           {errorCreateReview}
         </Alert>
       )}

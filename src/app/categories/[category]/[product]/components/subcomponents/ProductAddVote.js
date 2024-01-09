@@ -78,7 +78,6 @@ export const ProductAddVote = React.memo(function ProductAddVote({ review }) {
   );
 
   useEffect(() => {
-    // console.log("The main culprit, how often do you log?");
     setLocalUpvotes(review?.upvotesCount || 0);
     setLocalDownvotes(review?.downvotesCount || 0);
     setLocalUserVoteType(review?.userVoteType || null);
@@ -118,7 +117,7 @@ export const ProductAddVote = React.memo(function ProductAddVote({ review }) {
         <span>{localDownvotes}</span>
       </button>
       {errorVote && (
-        <Alert color="failure" className="ml-5">
+        <Alert color="failure" className="ml-5 p-2">
           {errorVote}
         </Alert>
       )}

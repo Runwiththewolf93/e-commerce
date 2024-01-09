@@ -3,13 +3,18 @@
 
 import { Fragment, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { closeCartOverlay, getUserCart } from "../../../redux/slices/cartSlice";
+import {
+  closeCartOverlay,
+  getUserCart,
+  clearErrorMessage,
+} from "../../../redux/slices/cartSlice";
 import { IoMdClose } from "react-icons/io";
 import { Dialog, Transition } from "@headlessui/react";
 import { useSession } from "next-auth/react";
 import CartItems from "./components/CartItems";
 import CartTotal from "./components/CartTotal";
 import CartButtons from "./components/CartButtons";
+import { Alert } from "flowbite-react";
 
 /**
  * Renders the CartOverlay component.
@@ -18,8 +23,8 @@ import CartButtons from "./components/CartButtons";
  */
 const CartOverlay = () => {
   const dispatch = useDispatch();
-  const { isCartOpen, cart } = useSelector(state => state.cart);
-  console.log("🚀 ~ file: page.js:22 ~ CartOverlay ~ isCartOpen:", isCartOpen);
+  const { isCartOpen, cart, errorAddCart } = useSelector(state => state.cart);
+  // console.log("🚀 ~ file: page.js:22 ~ CartOverlay ~ isCartOpen:", isCartOpen);
   // console.log("🚀 ~ file: page.js:14 ~ CartOverlay ~ cart:", cart);
   const { data: session } = useSession();
   const closeButtonRef = useRef(null);
@@ -30,13 +35,14 @@ const CartOverlay = () => {
       session?.customJwt &&
       (!cart || Object.keys(cart).length === 0)
     ) {
-      dispatch(getUserCart(session.customJwt));
+      dispatch(getUserCart({ jwt: session.customJwt }));
     }
     closeButtonRef.current?.focus();
   }, [dispatch, session?.customJwt, cart, isCartOpen]);
 
   const handleClose = () => {
     dispatch(closeCartOverlay());
+    dispatch(clearErrorMessage());
   };
 
   if (!isCartOpen) return null;
@@ -71,6 +77,17 @@ const CartOverlay = () => {
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
                   <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
                     <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                      {errorAddCart && (
+                        <Alert
+                          color="failure"
+                          onDismiss={() => dispatch(clearErrorMessage())}
+                          className="mb-3"
+                          aria-live="assertive"
+                        >
+                          {errorAddCart}{" "}
+                          <div>Please exit the modal and try again.</div>
+                        </Alert>
+                      )}
                       <div className="flex items-start justify-between">
                         <Dialog.Title className="text-lg font-medium text-gray-900">
                           Shopping cart

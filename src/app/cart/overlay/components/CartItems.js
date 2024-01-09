@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 import CartSkeletonItem from "./CartSkeletonItem";
 import { Alert } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +16,7 @@ import { categoryToLink } from "../../../../../utils/helper";
  * @return {JSX.Element} The rendered cart item.
  */
 export default function CartItem({ cart, session }) {
+  console.log("🚀 ~ CartItem ~ cart:", cart);
   const dispatch = useDispatch();
   const { isLoadingGetCart, errorGetCart } = useSelector(state => state.cart);
   const [errorMap, setErrorMap] = useState({});
@@ -43,6 +44,12 @@ export default function CartItem({ cart, session }) {
   const handleRemoveItem = useCallback(
     async productId => {
       setLoadingMap(prev => ({ ...prev, [productId]: true }));
+
+      // Simulate an error for testing purposes
+      // const mockError = "This is a simulated error message.";
+      // handleActionError(productId, mockError);
+      // resetLoading(productId);
+
       try {
         // Await the completion of the deleteFromCart thunk
         await dispatch(
@@ -141,3 +148,5 @@ export default function CartItem({ cart, session }) {
     </ul>
   );
 }
+
+// continue with testing the app tomorrow!

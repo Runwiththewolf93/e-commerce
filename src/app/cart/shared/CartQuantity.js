@@ -62,10 +62,10 @@ export default function CartQuantity({
                   );
 
             if (actionResult?.error) {
-              console.log(
-                "🚀 ~ file: CartQuantity.js:63 ~ handleQuantityChange ~ actionResult:",
-                actionResult
-              );
+              // console.log(
+              //   "🚀 ~ file: CartQuantity.js:63 ~ handleQuantityChange ~ actionResult:",
+              //   actionResult
+              // );
               throw new Error(
                 actionResult?.payload || "Error in cart operation"
               );

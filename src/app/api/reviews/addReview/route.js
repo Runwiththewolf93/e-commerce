@@ -38,32 +38,34 @@ export async function POST(req) {
       throw new customAPIError.NotFoundError("User or Product not found");
     }
 
-    let existingReview = await Review.findOne({ userId, productId });
     let isUpdated = false;
+    let updatedReview;
 
+    const existingReview = await Review.findOne({ userId, productId });
     if (existingReview) {
       existingReview.review = review;
       existingReview.rating = rating;
-      existingReview.updateAt = new Date();
       await existingReview.save();
+      updatedReview = existingReview;
       isUpdated = true;
     } else {
-      const newReview = new Review({
+      updatedReview = new Review({
         userId: new mongoose.Types.ObjectId(userId),
         productId: new mongoose.Types.ObjectId(productId),
         review,
         rating,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       });
-      await newReview.save();
+      await updatedReview.save();
     }
 
     const message = isUpdated
       ? "Review updated successfully"
       : "Review created successfully";
 
-    return NextResponse.json({ status: "success", message }, { status: 200 });
+    return NextResponse.json(
+      { status: "success", message, review: updatedReview },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       {

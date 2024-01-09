@@ -8,6 +8,15 @@ import ProductWishlist from "./ProductWishlist";
 import ProductCart from "./ProductCart";
 import ProductActionsSkeleton from "./subcomponents/ProductActionsSkeleton";
 
+/**
+ * Generates the product actions for the given product.
+ *
+ * @param {object} param - The parameter object.
+ * @param {string} param.productId - The ID of the product.
+ * @param {string} param.jwt - The JWT token for authentication.
+ * @param {boolean} param.isAuthenticated - Indicates if the user is authenticated.
+ * @return {JSX.Element} The JSX element representing the product actions.
+ */
 export default function ProductActions({ productId, jwt, isAuthenticated }) {
   const [isLoadingSession, setIsLoadingSession] = useState(true);
 
@@ -40,7 +49,6 @@ export default function ProductActions({ productId, jwt, isAuthenticated }) {
     );
   }
 
-  // continue checking how the other error states work!
   return (
     <div className="flex flex-col mt-5">
       <ProductCart productId={productId} jwt={jwt} />

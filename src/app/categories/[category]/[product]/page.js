@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../../../redux/slices/productSlice";
@@ -30,36 +30,43 @@ export default function Product() {
   const isAuthenticated = status === "authenticated";
   const jwt = session?.customJwt;
   const userId = session?.user?.id;
-
   const pathname = usePathname();
   const pathSegments = pathname.split("/");
   const id = pathSegments[pathSegments.length - 1];
+  const [preventRefetch, setPreventRefetch] = useState(false);
 
   const { isLoadingProduct, product, errorProduct } = useSelector(
     state => state.products
   );
 
   useEffect(() => {
-    if (Object.keys(product).length === 0 || product._id !== id) {
+    if (
+      Object.keys(product).length === 0 ||
+      product._id !== id ||
+      !preventRefetch
+    ) {
       dispatch(fetchProduct(id));
     }
-  }, [dispatch, product, id]);
+  }, [dispatch, id, product, preventRefetch]);
 
-  const { reviews, isLoadingFetch } = useSelector(state => state.reviews);
+  const { reviews, isLoadingFetchReviews } = useSelector(
+    state => state.reviews
+  );
 
   useEffect(() => {
     // Check if product is loaded
     if (product && product._id) {
       // If user is authenticated, fetch reviews only when userId is available
-      if (isAuthenticated && userId) {
+      if (isAuthenticated && userId && !preventRefetch) {
         dispatch(fetchReviews({ productId: product._id, userId }));
+        setPreventRefetch(true);
       }
       // If user is not authenticated, fetch reviews without userId
       else if (!isAuthenticated) {
         dispatch(fetchReviews({ productId: product._id }));
       }
     }
-  }, [dispatch, product, isAuthenticated, userId]);
+  }, [dispatch, isAuthenticated, userId, product, preventRefetch]);
 
   // testing purposes
   const productWithDiscount = { ...product };
@@ -117,7 +124,7 @@ export default function Product() {
 
           <ProductDescription productDescription={product?.description} />
 
-          {!isLoadingFetch ? (
+          {!isLoadingFetchReviews && preventRefetch ? (
             <ProductReviewList
               productId={product._id}
               userId={userId}
