@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   closeCartOverlay,
@@ -28,16 +28,22 @@ const CartOverlay = () => {
   // console.log("🚀 ~ file: page.js:14 ~ CartOverlay ~ cart:", cart);
   const { data: session } = useSession();
   const closeButtonRef = useRef(null);
+  const [isFirstOpen, setIsFirstOpen] = useState(true);
 
   useEffect(() => {
-    if (
-      isCartOpen &&
-      session?.customJwt &&
-      (!cart || Object.keys(cart).length === 0)
-    ) {
-      dispatch(getUserCart({ jwt: session.customJwt }));
+    if (isCartOpen) {
+      if (session?.customJwt && (!cart || Object.keys(cart).length === 0)) {
+        dispatch(getUserCart({ jwt: session.customJwt }));
+      }
+      closeButtonRef.current?.focus();
+
+      if (isFirstOpen) {
+        setIsFirstOpen(false);
+      }
+    } else {
+      setIsFirstOpen(true);
     }
-    closeButtonRef.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, session?.customJwt, cart, isCartOpen]);
 
   const handleClose = () => {
@@ -77,7 +83,7 @@ const CartOverlay = () => {
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
                   <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
                     <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-                      {errorAddCart && (
+                      {isFirstOpen && errorAddCart && (
                         <Alert
                           color="failure"
                           onDismiss={() => dispatch(clearErrorMessage())}

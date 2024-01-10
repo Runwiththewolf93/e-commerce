@@ -1,3 +1,9 @@
+/**
+ * Renders the total amount and subtotal of the cart with or without a discount.
+ *
+ * @param {Object} cart - The cart object containing the total amount and the total amount with discount.
+ * @return {JSX.Element} - The JSX element displaying the total amount and subtotal of the cart.
+ */
 export default function CartTotal({ cart }) {
   return (
     <div className="flex flex-col">

@@ -1,5 +1,11 @@
 import Link from "next/link";
 
+/**
+ * Renders the CartButtons component.
+ *
+ * @param {function} handleClose - The function to handle the closing of the component.
+ * @return {JSX.Element} The rendered CartButtons component.
+ */
 export default function CartButtons({ handleClose }) {
   return (
     <>

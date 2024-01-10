@@ -10,6 +10,16 @@ import {
   deleteFromCart,
 } from "../../../redux/slices/cartSlice";
 
+/**
+ * Renders a component that displays the quantity of a product in a cart.
+ *
+ * @param {Object} productFromProp - The product object passed as a prop.
+ * @param {number} quantityFromProp - The quantity of the product passed as a prop.
+ * @param {string} jwt - The JSON Web Token.
+ * @param {Function} onError - The callback function to handle errors.
+ * @param {Function} onClearError - The callback function to clear error messages.
+ * @return {JSX.Element} The rendered component.
+ */
 export default function CartQuantity({
   productFromProp,
   quantityFromProp,
@@ -28,6 +38,7 @@ export default function CartQuantity({
     isLoadingAddCart,
     isLoadingDeleteCart,
   } = useSelector(state => state.cart);
+
   // console.log(
   //   "🚀 ~ file: CartQuantity.js:13 ~ CartQuantity ~ quantity:",
   //   quantity
@@ -71,6 +82,7 @@ export default function CartQuantity({
               );
             }
 
+            // Clearing the error on success
             onClearError();
           } catch (error) {
             onError(error.message);

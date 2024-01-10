@@ -16,7 +16,6 @@ import { categoryToLink } from "../../../../../utils/helper";
  * @return {JSX.Element} The rendered cart item.
  */
 export default function CartItem({ cart, session }) {
-  console.log("🚀 ~ CartItem ~ cart:", cart);
   const dispatch = useDispatch();
   const { isLoadingGetCart, errorGetCart } = useSelector(state => state.cart);
   const [errorMap, setErrorMap] = useState({});
@@ -59,8 +58,11 @@ export default function CartItem({ cart, session }) {
             jwt: session?.customJwt,
           })
         ).unwrap();
+
+        // Clear error on successful dispatch
+        clearError(productId);
       } catch (error) {
-        handleActionError(productId, error.message);
+        handleActionError(productId, error);
       } finally {
         resetLoading(productId);
       }
