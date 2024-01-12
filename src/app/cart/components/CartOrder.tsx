@@ -2,6 +2,13 @@
 import CartOrderSkeleton from "./CartOrderSkeleton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CartType } from "../../../redux/types/cartSliceTypes";
+
+interface CartOrderProps {
+  cart: CartType;
+  isLoadingGetCart: boolean;
+  isAddressSubmitted?: boolean;
+}
 
 /**
  * Render the CartOrder component.
@@ -15,7 +22,7 @@ export default function CartOrder({
   cart,
   isLoadingGetCart,
   isAddressSubmitted,
-}) {
+}: CartOrderProps) {
   const pathname = usePathname();
   const isShipping = pathname === "/payment/shipping";
 

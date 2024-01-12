@@ -2,11 +2,26 @@
 import { useState, useCallback } from "react";
 import CartSkeletonItem from "./CartSkeletonItem";
 import { Alert } from "flowbite-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../../hooks/reactReduxHooks";
 import Link from "next/link";
 import CartQuantity from "../../shared/CartQuantity";
 import { deleteFromCart } from "../../../../redux/slices/cartSlice";
 import { categoryToLink } from "../../../../../utils/helper";
+import { CartType } from "../../../../redux/types/cartSliceTypes";
+import { CustomSession } from "../../../types/authentication/authenticationTypes";
+
+interface CartItemProps {
+  cart: CartType;
+  session: CustomSession;
+}
+
+interface ErrorMap {
+  [productId: string]: string;
+}
+
+interface LoadingMap {
+  [productId: string]: boolean;
+}
 
 /**
  * Renders a single item in the cart.
@@ -15,20 +30,22 @@ import { categoryToLink } from "../../../../../utils/helper";
  * @param {object} session - The session object containing user session data.
  * @return {JSX.Element} The rendered cart item.
  */
-export default function CartItem({ cart, session }) {
-  const dispatch = useDispatch();
-  const { isLoadingGetCart, errorGetCart } = useSelector(state => state.cart);
-  const [errorMap, setErrorMap] = useState({});
-  const [loadingMap, setLoadingMap] = useState({});
+export default function CartItem({ cart, session }: CartItemProps) {
+  const dispatch = useAppDispatch();
+  const { isLoadingGetCart, errorGetCart } = useAppSelector(
+    state => state.cart
+  );
+  const [errorMap, setErrorMap] = useState<ErrorMap>({});
+  const [loadingMap, setLoadingMap] = useState<LoadingMap>({});
 
-  const handleActionError = (productId, errorMessage) => {
+  const handleActionError = (productId: string, errorMessage: string) => {
     setErrorMap(prevErrorMap => ({
       ...prevErrorMap,
       [productId]: errorMessage,
     }));
   };
 
-  const clearError = productId => {
+  const clearError = (productId: string) => {
     setErrorMap(prevErrorMap => {
       const newErrorMap = { ...prevErrorMap };
       delete newErrorMap[productId];
@@ -36,12 +53,12 @@ export default function CartItem({ cart, session }) {
     });
   };
 
-  const resetLoading = productId => {
+  const resetLoading = (productId: string) => {
     setLoadingMap(prev => ({ ...prev, [productId]: false }));
   };
 
   const handleRemoveItem = useCallback(
-    async productId => {
+    async (productId: string) => {
       setLoadingMap(prev => ({ ...prev, [productId]: true }));
 
       // Simulate an error for testing purposes
@@ -85,6 +102,8 @@ export default function CartItem({ cart, session }) {
           const errorAddOrDeleteCart = errorMap[item.product._id];
           const isLoading = loadingMap[item.product._id] || false;
 
+          console.log("item.product", item.product);
+
           return (
             <div key={item._id}>
               {errorAddOrDeleteCart && (
@@ -125,7 +144,7 @@ export default function CartItem({ cart, session }) {
                       productFromProp={item.product}
                       quantityFromProp={item.quantity}
                       jwt={session?.customJwt}
-                      onError={error =>
+                      onError={(error: string) =>
                         handleActionError(item.product._id, error)
                       }
                       onClearError={() => clearError(item.product._id)}
@@ -150,5 +169,3 @@ export default function CartItem({ cart, session }) {
     </ul>
   );
 }
-
-// continue with testing the app tomorrow!

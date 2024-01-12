@@ -1,8 +1,19 @@
 import { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../hooks/reactReduxHooks";
+import { AsyncThunk } from "@reduxjs/toolkit";
 
-const useFetchState = (fetchAction, fetchParams, isDataEmpty) => {
-  const dispatch = useDispatch();
+interface FetchParams {
+  jwt?: string;
+}
+
+type FetchAction<T = any, P = FetchParams, R = any> = AsyncThunk<T, P, R>;
+
+const useFetchState = (
+  fetchAction: FetchAction,
+  fetchParams: FetchParams,
+  isDataEmpty: boolean
+) => {
+  const dispatch = useAppDispatch();
   const [hasFetched, setHasFetched] = useState(false);
   const initialFetchDone = useRef(false);
 

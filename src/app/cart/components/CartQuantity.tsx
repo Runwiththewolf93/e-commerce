@@ -1,9 +1,32 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
 import { addToCart, deleteFromCart } from "../../../redux/slices/cartSlice";
+import { CartItem } from "../../../redux/types/cartSliceTypes";
+import { isRejectedWithValue } from "@reduxjs/toolkit";
 
-export default function CartQuantity({ cartItem, jwt, onError, onClearError }) {
-  const dispatch = useDispatch();
-  const { isLoadingAddCart, isLoadingDeleteCart } = useSelector(
+interface CartQuantityProps {
+  cartItem: CartItem;
+  jwt: string;
+  onError: (message: string) => void;
+  onClearError: () => void;
+}
+
+/**
+ * Renders the cart quantity component.
+ *
+ * @param {CartQuantityProps} cartItem - The cart item object.
+ * @param {string} jwt - The JWT token.
+ * @param {function} onError - The error handler function.
+ * @param {function} onClearError - The clear error handler function.
+ * @return {JSX.Element} The rendered cart quantity component.
+ */
+export default function CartQuantity({
+  cartItem,
+  jwt,
+  onError,
+  onClearError,
+}: CartQuantityProps) {
+  const dispatch = useAppDispatch();
+  const { isLoadingAddCart, isLoadingDeleteCart } = useAppSelector(
     state => state.cart
   );
   // console.log(
@@ -11,7 +34,7 @@ export default function CartQuantity({ cartItem, jwt, onError, onClearError }) {
   //   cartItem
   // );
 
-  const handleQuantityChange = async newQuantity => {
+  const handleQuantityChange = async (newQuantity: number) => {
     if (newQuantity > 0 && newQuantity <= cartItem.product.stock) {
       // Product from props, use addToCart or deleteFromCart
       try {
@@ -32,8 +55,8 @@ export default function CartQuantity({ cartItem, jwt, onError, onClearError }) {
                 })
               );
 
-        if (actionResult?.error) {
-          throw new Error(actionResult?.payload || "Error in cart operation");
+        if (isRejectedWithValue(actionResult)) {
+          throw new Error(actionResult.payload as string);
         }
 
         onClearError();

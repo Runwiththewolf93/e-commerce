@@ -1,7 +1,13 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, ChangeEvent, FormEvent } from "react";
+import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
 import { applyCoupon, excludeCoupon } from "../../../redux/slices/cartSlice";
 import { Alert } from "flowbite-react";
+import { CartType } from "../../../redux/types/cartSliceTypes";
+
+interface CartCouponProps {
+  cart: CartType;
+  jwt: string;
+}
 
 /**
  * Renders a component for applying and excluding coupons in the cart.
@@ -10,32 +16,34 @@ import { Alert } from "flowbite-react";
  * @param {string} jwt - The JSON Web Token.
  * @return {JSX.Element} The rendered component.
  */
-export default function CartCoupon({ cart, jwt }) {
-  const dispatch = useDispatch();
+export default function CartCoupon({ cart, jwt }: CartCouponProps) {
+  const dispatch = useAppDispatch();
   const {
     isLoadingApplyCoupon,
     errorApplyCoupon,
     isLoadingExcludeCoupon,
     errorExcludeCoupon,
-  } = useSelector(state => state.cart);
+  } = useAppSelector(state => state.cart);
   const [couponCode, setCouponCode] = useState("");
 
-  const handleCouponCodeChange = e => {
-    setCouponCode(e.target.value);
+  const handleCouponCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCouponCode(event.target.value);
   };
 
-  const handleApplyCoupon = e => {
-    e.preventDefault();
+  const handleApplyCoupon = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (couponCode && cart?._id && jwt) {
       dispatch(applyCoupon({ code: couponCode, cartId: cart._id, jwt }));
     }
+    setCouponCode("");
   };
 
-  const handleRemoveCoupon = e => {
-    e.preventDefault();
+  const handleRemoveCoupon = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (cart?._id && jwt) {
       dispatch(excludeCoupon({ cartId: cart._id, jwt }));
     }
+    setCouponCode("");
   };
 
   return (

@@ -1,11 +1,23 @@
 "use client";
 
+import React, { ReactNode } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import CartRedirect from "./components/CartRedirect";
 import { useSession } from "next-auth/react";
 
-function CartLayout({ children }) {
+interface CartLayoutProps {
+  children: ReactNode;
+}
+
+/**
+ * Renders the layout for the cart page.
+ *
+ * @param {object} props - The cart layout properties.
+ * @param {ReactNode} props.children - The children components to render.
+ * @return {ReactNode} The rendered cart layout.
+ */
+const CartLayout: React.FC<CartLayoutProps> = ({ children }) => {
   const { status } = useSession();
 
   if (status === "loading") {
@@ -25,6 +37,6 @@ function CartLayout({ children }) {
       <Footer />
     </>
   );
-}
+};
 
 export default CartLayout;

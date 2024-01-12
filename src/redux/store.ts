@@ -44,3 +44,7 @@ export const store = configureStore({
       },
     }),
 });
+
+// types required by reactReduxHooks
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

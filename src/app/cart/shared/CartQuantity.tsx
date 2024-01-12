@@ -3,12 +3,22 @@
 import { useCallback } from "react";
 import { HiMinusSm, HiPlusSm } from "react-icons/hi";
 import styles from "./CartQuantity.module.css";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
 import {
   setQuantity,
   addToCart,
   deleteFromCart,
 } from "../../../redux/slices/cartSlice";
+import { ProductType } from "../../../redux/types/cartSliceTypes";
+import { isRejectedWithValue } from "@reduxjs/toolkit";
+
+interface CartQuantityProps {
+  productFromProp?: ProductType;
+  quantityFromProp?: number;
+  jwt: string;
+  onError?: (message: string) => void;
+  onClearError?: () => void;
+}
 
 /**
  * Renders a component that displays the quantity of a product in a cart.
@@ -26,9 +36,9 @@ export default function CartQuantity({
   jwt,
   onError,
   onClearError,
-}) {
-  const dispatch = useDispatch();
-  const { product: productFromState } = useSelector(state => state.products);
+}: CartQuantityProps) {
+  const dispatch = useAppDispatch();
+  const { product: productFromState } = useAppSelector(state => state.products);
   // console.log(
   //   "🚀 ~ file: CartQuantity.js:12 ~ CartQuantity ~ product:",
   //   product
@@ -37,7 +47,7 @@ export default function CartQuantity({
     quantity: quantityFromState,
     isLoadingAddCart,
     isLoadingDeleteCart,
-  } = useSelector(state => state.cart);
+  } = useAppSelector(state => state.cart);
 
   // console.log(
   //   "🚀 ~ file: CartQuantity.js:13 ~ CartQuantity ~ quantity:",
@@ -50,7 +60,7 @@ export default function CartQuantity({
     quantityFromProp !== undefined ? quantityFromProp : quantityFromState;
 
   const handleQuantityChange = useCallback(
-    async newQuantity => {
+    async (newQuantity: number) => {
       if (newQuantity > 0 && newQuantity <= product.stock) {
         if (productFromProp) {
           // Product from props, use addToCart or deleteFromCart
@@ -72,14 +82,8 @@ export default function CartQuantity({
                     })
                   );
 
-            if (actionResult?.error) {
-              // console.log(
-              //   "🚀 ~ file: CartQuantity.js:63 ~ handleQuantityChange ~ actionResult:",
-              //   actionResult
-              // );
-              throw new Error(
-                actionResult?.payload || "Error in cart operation"
-              );
+            if (isRejectedWithValue(actionResult)) {
+              throw new Error(actionResult.payload as string);
             }
 
             // Clearing the error on success

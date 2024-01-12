@@ -2,6 +2,12 @@ import { FaTruck } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { FiPackage } from "react-icons/fi";
 
+interface ButtonComponentProps {
+  totalWeight: number;
+  selectedButton: number;
+  handleButtonClick: (buttonId: number) => void;
+}
+
 /**
  * Render a button component with different styles based on the selected button.
  *
@@ -15,8 +21,8 @@ export default function ButtonComponent({
   totalWeight,
   selectedButton,
   handleButtonClick,
-}) {
-  const getButtonClass = buttonId =>
+}: ButtonComponentProps) {
+  const getButtonClass = (buttonId: number) =>
     selectedButton === buttonId
       ? "inline-flex items-center justify-start px-6 py-5 me-2 overflow-hidden text-sm font-medium rounded-lg group focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 w-full border border-blue-500 text-blue-500"
       : "inline-flex items-center justify-start px-6 py-5 me-2 overflow-hidden text-sm font-medium rounded-lg group focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 w-full border border-gray-500 text-gray-500";

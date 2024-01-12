@@ -2,15 +2,38 @@
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customAxios from "../../lib/api";
+import {
+  AddToCartArgs,
+  AddToCartResponse,
+  GetUserCartArgs,
+  GetUserCartResponse,
+  DeleteFromCartArgs,
+  DeleteFromCartResponse,
+  ApplyCouponArgs,
+  ApplyCouponResponse,
+  ExcludeCouponArgs,
+  ExcludeCouponResponse,
+  AddCouponArgs,
+  AddCouponResponse,
+  DeleteCouponArgs,
+  DeleteCouponResponse,
+  RemoveCartArgs,
+  RemoveCartResponse,
+  CartType,
+  CouponType,
+} from "../types/cartSliceTypes";
 
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ productId, quantity, jwt }, { rejectWithValue }) => {
+  async ({ productId, quantity, jwt }: AddToCartArgs, { rejectWithValue }) => {
     try {
-      const { data } = await customAxios(jwt).post("/api/cart/addToCart", {
-        productId,
-        quantity,
-      });
+      const { data } = await customAxios(jwt).post<AddToCartResponse>(
+        "/api/cart/addToCart",
+        {
+          productId,
+          quantity,
+        }
+      );
 
       return data;
     } catch (error) {
@@ -21,9 +44,11 @@ export const addToCart = createAsyncThunk(
 
 export const getUserCart = createAsyncThunk(
   "cart/getUserCart",
-  async ({ jwt }, { rejectWithValue }) => {
+  async ({ jwt }: GetUserCartArgs, { rejectWithValue }) => {
     try {
-      const { data } = await customAxios(jwt).get("/api/cart/getUserCart");
+      const { data } = await customAxios(jwt).get<GetUserCartResponse>(
+        "/api/cart/getUserCart"
+      );
 
       return data;
     } catch (error) {
@@ -34,9 +59,12 @@ export const getUserCart = createAsyncThunk(
 
 export const deleteFromCart = createAsyncThunk(
   "cart/deleteFromCart",
-  async ({ productId, quantity, jwt, removeCartItem }, { rejectWithValue }) => {
+  async (
+    { productId, quantity, jwt, removeCartItem }: DeleteFromCartArgs,
+    { rejectWithValue }
+  ) => {
     try {
-      const { data } = await customAxios(jwt).delete(
+      const { data } = await customAxios(jwt).delete<DeleteFromCartResponse>(
         "/api/cart/deleteFromCart",
         { data: { productId, quantity, removeCartItem } }
       );
@@ -50,11 +78,11 @@ export const deleteFromCart = createAsyncThunk(
 
 export const applyCoupon = createAsyncThunk(
   "cart/applyCoupon",
-  async ({ code, cartId, jwt }, { rejectWithValue }) => {
+  async ({ code, cartId, jwt }: ApplyCouponArgs, { rejectWithValue }) => {
     try {
       clearCouponError();
 
-      const { data } = await customAxios(jwt).post(
+      const { data } = await customAxios(jwt).post<ApplyCouponResponse>(
         "/api/cart/coupon/applyCoupon",
         {
           code,
@@ -72,11 +100,11 @@ export const applyCoupon = createAsyncThunk(
 
 export const excludeCoupon = createAsyncThunk(
   "cart/excludeCoupon",
-  async ({ cartId, jwt }, { rejectWithValue }) => {
+  async ({ cartId, jwt }: ExcludeCouponArgs, { rejectWithValue }) => {
     try {
       clearCouponError();
 
-      const { data } = await customAxios(jwt).delete(
+      const { data } = await customAxios(jwt).delete<ExcludeCouponResponse>(
         "/api/cart/coupon/excludeCoupon",
         { data: { cartId, jwt } }
       );
@@ -91,14 +119,18 @@ export const excludeCoupon = createAsyncThunk(
 export const addCoupon = createAsyncThunk(
   "cart/addCoupon",
   async (
-    { code, discountPercentage, expirationDate, jwt },
+    { code, discountPercentage, expirationDate, jwt }: AddCouponArgs,
     { rejectWithValue }
   ) => {
     try {
-      const { data } = await customAxios(jwt).post(
+      const { data } = await customAxios(jwt).post<AddCouponResponse>(
         "api/cart/coupon/addCoupon",
         { code, discountPercentage, expirationDate }
       );
+
+      if (data.status === "error") {
+        throw new Error(data.message);
+      }
 
       return data;
     } catch (error) {
@@ -109,9 +141,9 @@ export const addCoupon = createAsyncThunk(
 
 export const deleteCoupon = createAsyncThunk(
   "cart/deleteCoupon",
-  async ({ code, jwt }, { rejectWithValue }) => {
+  async ({ code, jwt }: DeleteCouponArgs, { rejectWithValue }) => {
     try {
-      const { data } = await customAxios(jwt).delete(
+      const { data } = await customAxios(jwt).delete<DeleteCouponResponse>(
         "api/cart/coupon/deleteCoupon",
         { data: { code } }
       );
@@ -125,11 +157,14 @@ export const deleteCoupon = createAsyncThunk(
 
 export const removeCart = createAsyncThunk(
   "cart/removeCart",
-  async ({ cartId, jwt }, { rejectWithValue }) => {
+  async ({ cartId, jwt }: RemoveCartArgs, { rejectWithValue }) => {
     try {
-      const { data } = await customAxios(jwt).delete("/api/cart/removeCart", {
-        data: { cartId },
-      });
+      const { data } = await customAxios(jwt).delete<RemoveCartResponse>(
+        "/api/cart/removeCart",
+        {
+          data: { cartId },
+        }
+      );
 
       return data;
     } catch (error) {
@@ -137,6 +172,29 @@ export const removeCart = createAsyncThunk(
     }
   }
 );
+
+const defaultCart: CartType = {
+  _id: "",
+  user: "",
+  items: [],
+  totalAmountDiscount: 0,
+  totalAmount: 0,
+  shippingCost: 0,
+  totalWeight: 0,
+  createdAt: "",
+  updatedAt: "",
+  __v: 0,
+};
+
+const defaultCoupon: CouponType = {
+  _id: "",
+  code: "",
+  discountPercentage: 0,
+  expirationDate: "",
+  usedBy: [],
+  __v: 0,
+  updatedAt: "",
+};
 
 export const cartSlice = createSlice({
   name: "cart",
@@ -148,7 +206,7 @@ export const cartSlice = createSlice({
     isCartOpen: false,
     // getUserCart
     isLoadingGetCart: false,
-    cart: {},
+    cart: defaultCart,
     errorGetCart: null,
     // deleteFromCart
     isLoadingDeleteCart: false,
@@ -163,7 +221,7 @@ export const cartSlice = createSlice({
     errorExcludeCoupon: null,
     // addCoupon
     isLoadingAddCoupon: false,
-    coupon: {},
+    coupon: defaultCoupon,
     couponAddMessage: "",
     errorAddCoupon: null,
     // deleteCoupon
@@ -310,7 +368,7 @@ export const cartSlice = createSlice({
       })
       .addCase(removeCart.fulfilled, (state, action) => {
         state.messageRemoveCart = action.payload.message;
-        state.cart = {};
+        state.cart = defaultCart;
         state.isLoadingRemoveCart = false;
         state.errorRemoveCart = null;
       })

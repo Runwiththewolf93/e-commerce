@@ -1,6 +1,10 @@
 import { Alert } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 
+interface AlertComponentProps {
+  totalWeight: number;
+}
+
 /**
  * Renders an AlertComponent based on the totalWeight.
  *
@@ -8,7 +12,7 @@ import { HiInformationCircle } from "react-icons/hi";
  * @param {number} props.totalWeight - The total weight of the packages.
  * @return {JSX.Element} The rendered AlertComponent.
  */
-export default function AlertComponent({ totalWeight }) {
+export default function AlertComponent({ totalWeight }: AlertComponentProps) {
   return (
     <div className="mt-5">
       {totalWeight >= 1 && (

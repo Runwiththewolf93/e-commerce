@@ -2,7 +2,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
 import {
   closeCartOverlay,
   getUserCart,
@@ -10,7 +10,7 @@ import {
 } from "../../../redux/slices/cartSlice";
 import { IoMdClose } from "react-icons/io";
 import { Dialog, Transition } from "@headlessui/react";
-import { useSession } from "next-auth/react";
+import { useCustomSession } from "../../hooks/useCustomSession";
 import CartItems from "./components/CartItems";
 import CartTotal from "./components/CartTotal";
 import CartButtons from "./components/CartButtons";
@@ -22,11 +22,13 @@ import { Alert } from "flowbite-react";
  * @return {JSX.Element} The rendered CartOverlay component.
  */
 const CartOverlay = () => {
-  const dispatch = useDispatch();
-  const { isCartOpen, cart, errorAddCart } = useSelector(state => state.cart);
+  const dispatch = useAppDispatch();
+  const { isCartOpen, cart, errorAddCart } = useAppSelector(
+    state => state.cart
+  );
   // console.log("🚀 ~ file: page.js:22 ~ CartOverlay ~ isCartOpen:", isCartOpen);
   // console.log("🚀 ~ file: page.js:14 ~ CartOverlay ~ cart:", cart);
-  const { data: session } = useSession();
+  const { data: session } = useCustomSession();
   const closeButtonRef = useRef(null);
   const [isFirstOpen, setIsFirstOpen] = useState(true);
 
@@ -54,8 +56,8 @@ const CartOverlay = () => {
   if (!isCartOpen) return null;
 
   return (
-    <Transition.Root show={isCartOpen} as={Fragment} className="z-50">
-      <Dialog as="div" className="relative z-10" onClose={handleClose}>
+    <Transition.Root show={isCartOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={handleClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-in-out duration-500"

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../../hooks/reactReduxHooks";
 import FormSkeleton from "./FormSkeleton";
 import { Alert } from "flowbite-react";
 import InputField from "./InputField";
@@ -8,7 +8,7 @@ import {
   userAddress,
   clearUserMessage,
   clearUserError,
-} from "../../../../redux/slices/userSlice";
+} from "../../../../redux/slices/userSlice.ts";
 import {
   orderAddress,
   clearOrderMessage,
@@ -25,7 +25,7 @@ import {
  * @return {JSX.Element} - The rendered form component.
  */
 export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const {
     isLoadingGetUser,
     user,
@@ -33,9 +33,9 @@ export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
     isLoadingUserAddress,
     messageUserAddress,
     errorUserAddress,
-  } = useSelector(state => state.user);
+  } = useAppSelector(state => state.user);
   const { isLoadingOrderAddress, messageOrderAddress, errorOrderAddress } =
-    useSelector(state => state.order);
+    useAppSelector(state => state.order);
 
   const [formData, setFormData] = useState({
     name: "",

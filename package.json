@@ -43,8 +43,11 @@
     "tailwindcss": "3.4.1"
   },
   "devDependencies": {
+    "@types/node": "^20.10.8",
+    "@types/react": "^18.2.47",
     "daisyui": "^4.5.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "typescript": "^5.3.3"
   },
   "files.watcherExclude": {
     "**/.git/objects/**": true,

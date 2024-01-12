@@ -1,12 +1,18 @@
 import Link from "next/link";
 
+type CartButtonProps = {
+  handleClose: () => void;
+};
+
 /**
  * Renders the CartButtons component.
  *
- * @param {function} handleClose - The function to handle the closing of the component.
+ * @param {CartButtonsProps} props - The properties for the component.
  * @return {JSX.Element} The rendered CartButtons component.
  */
-export default function CartButtons({ handleClose }) {
+export default function CartButtons({
+  handleClose,
+}: CartButtonProps): JSX.Element {
   return (
     <>
       <p className="mt-0.5 text-sm text-gray-500">

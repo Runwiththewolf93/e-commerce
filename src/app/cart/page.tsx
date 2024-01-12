@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../hooks/reactReduxHooks";
 import { getUserCart } from "../../redux/slices/cartSlice";
 import CartItems from "../cart/components/CartItems";
 import CartCoupon from "../cart/components/CartCoupon";
@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import useFetchState from "../hooks/useFetchState";
 import { Alert } from "flowbite-react";
 import Link from "next/link";
+import { CustomSession } from "../types/authentication/authenticationTypes";
 
 /**
  * Renders the Cart component.
@@ -17,15 +18,17 @@ import Link from "next/link";
  * @return {ReactElement} The rendered Cart component.
  */
 export default function Cart() {
-  const { isLoadingGetCart, cart, errorGetCart } = useSelector(
+  const { isLoadingGetCart, cart, errorGetCart } = useAppSelector(
     state => state.cart
   );
 
   console.log("🚀 ~ file: page.js:15 ~ Cart ~ cart:", cart);
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: CustomSession };
   const jwt = session?.customJwt;
 
-  const isCartEmpty = !cart || Object.keys(cart).length === 0;
+  const isCartPopulated = "items" in cart;
+  const isCartEmpty = isCartPopulated && cart.items.length === 0;
+
   const { hasFetched } = useFetchState(getUserCart, { jwt }, isCartEmpty);
 
   return (
@@ -35,7 +38,7 @@ export default function Cart() {
           <h2 className="mb-8 text-4xl font-bold dark:text-gray-400">
             Your Cart
           </h2>
-          {hasFetched && !cart?.items?.length ? (
+          {hasFetched && isCartEmpty ? (
             <Alert color="info" className="text-xl">
               Your cart is empty. Go{" "}
               <Link

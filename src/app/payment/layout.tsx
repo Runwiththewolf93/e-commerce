@@ -3,10 +3,14 @@
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import PaymentRedirect from "./components/PaymentRedirect";
-import { useSession } from "next-auth/react";
-import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useCustomSession } from "../hooks/useCustomSession";
+import { useAppSelector } from "../hooks/reactReduxHooks";
+import { useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+
+interface PaymentLayoutProps {
+  children: ReactNode;
+}
 
 /**
  * Renders the payment layout component.
@@ -14,10 +18,10 @@ import { useRouter } from "next/navigation";
  * @param {object} children - The child components to be rendered.
  * @return {JSX.Element} The rendered payment layout component.
  */
-function PaymentLayout({ children }) {
-  const { status } = useSession();
+function PaymentLayout({ children }: PaymentLayoutProps) {
+  const { status } = useCustomSession();
   const router = useRouter();
-  const { cart } = useSelector(state => state.cart);
+  const { cart } = useAppSelector(state => state.cart);
 
   const isCartEmpty = !cart.items || cart.items.length === 0;
 

@@ -1,4 +1,3 @@
-// SkeletonCartItem.js
 const SkeletonCartItem = () => {
   return (
     <>

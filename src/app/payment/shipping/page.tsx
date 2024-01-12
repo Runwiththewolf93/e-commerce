@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
+import { useCustomSession } from "../../hooks/useCustomSession";
 import { getUserCart } from "../../../redux/slices/cartSlice";
-import { useSession } from "next-auth/react";
 import AlertComponent from "./components/AlertComponent";
 import ButtonComponent from "./components/ButtonComponent";
 import FormComponent from "./components/FormComponent";
@@ -15,16 +15,16 @@ import CartOrder from "../../cart/components/CartOrder";
  * @return {JSX.Element} The rendered Shipping component.
  */
 export default function Shipping() {
-  const dispatch = useDispatch();
-  const { isLoadingGetCart, cart } = useSelector(state => state.cart);
-  const { data: session } = useSession();
+  const dispatch = useAppDispatch();
+  const { isLoadingGetCart, cart } = useAppSelector(state => state.cart);
+  const { data: session } = useCustomSession();
   const [selectedButton, setSelectedButton] = useState(null);
   const [isAddressSubmitted, setIsAddressSubmitted] = useState(false);
   console.log("🚀 ~ file: page.js:14 ~ Shipping ~ cart:", cart);
 
   useEffect(() => {
     if ((!cart || Object.keys(cart).length === 0) && session?.customJwt) {
-      dispatch(getUserCart(session?.customJwt));
+      dispatch(getUserCart({ jwt: session?.customJwt }));
     }
   }, [cart, dispatch, session?.customJwt]);
 
@@ -40,7 +40,7 @@ export default function Shipping() {
   };
   const shippingDates = calculateShippingDates();
 
-  const handleButtonClick = buttonId => {
+  const handleButtonClick = (buttonId: number) => {
     setSelectedButton(buttonId);
   };
 
