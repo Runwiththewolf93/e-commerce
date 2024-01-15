@@ -150,3 +150,5 @@ export interface RemoveCartResponse {
   status: "success" | "error";
   message: string;
 }
+
+export type ErrorCartState = string | null;

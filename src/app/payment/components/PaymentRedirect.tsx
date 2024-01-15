@@ -5,6 +5,10 @@ interface PaymentRedirectProps {
 }
 
 export default function PaymentRedirect({ isCartEmpty }: PaymentRedirectProps) {
+  console.log(
+    "🚀 ~ file: PaymentRedirect.tsx:8 ~ PaymentRedirect ~ isCartEmpty:",
+    isCartEmpty
+  );
   return (
     <section className="flex items-start h-screen bg-gray-100 font-poppins dark:bg-gray-900 ">
       <div className="justify-center flex-1 max-w-4xl px-4 py-4 mx-auto lg:py-10 ">

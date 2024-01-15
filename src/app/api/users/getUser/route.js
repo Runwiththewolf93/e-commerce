@@ -16,12 +16,12 @@ export async function GET(req) {
     await connect();
 
     // Find user by ID
-    const user = await User.findOne({ _id: req.user.id });
+    const user = await User.findOne({ _id: req.user.id }).select("-password");
     if (!user) {
       throw new CustomAPIError.NotFoundError("User not found");
     }
 
-    return NextResponse.json({ user });
+    return NextResponse.json({ status: "success", user });
   } catch (error) {
     return NextResponse.json(
       {

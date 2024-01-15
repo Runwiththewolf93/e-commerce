@@ -21,6 +21,7 @@ import {
   RemoveCartResponse,
   CartType,
   CouponType,
+  ErrorCartState,
 } from "../types/cartSliceTypes";
 
 export const addToCart = createAsyncThunk(
@@ -201,37 +202,37 @@ export const cartSlice = createSlice({
   initialState: {
     // addToCart
     isLoadingAddCart: false,
-    errorAddCart: null,
+    errorAddCart: null as ErrorCartState,
     // cartOverlay
     isCartOpen: false,
     // getUserCart
     isLoadingGetCart: false,
     cart: defaultCart,
-    errorGetCart: null,
+    errorGetCart: null as ErrorCartState,
     // deleteFromCart
     isLoadingDeleteCart: false,
-    errorDeleteCart: null,
+    errorDeleteCart: null as ErrorCartState,
     // quantity
     quantity: 1,
     // applyCoupon
     isLoadingApplyCoupon: false,
-    errorApplyCoupon: null,
+    errorApplyCoupon: null as ErrorCartState,
     // excludeCoupon
     isLoadingExcludeCoupon: false,
-    errorExcludeCoupon: null,
+    errorExcludeCoupon: null as ErrorCartState,
     // addCoupon
     isLoadingAddCoupon: false,
     coupon: defaultCoupon,
     couponAddMessage: "",
-    errorAddCoupon: null,
+    errorAddCoupon: null as ErrorCartState,
     // deleteCoupon
     isLoadingDeleteCoupon: false,
     couponDeleteMessage: "",
-    errorDeleteCoupon: null,
+    errorDeleteCoupon: null as ErrorCartState,
     // removeCart
     isLoadingRemoveCart: false,
     messageRemoveCart: "",
-    errorRemoveCart: null,
+    errorRemoveCart: null as ErrorCartState,
   },
   reducers: {
     openCartOverlay: state => {
@@ -274,7 +275,7 @@ export const cartSlice = createSlice({
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.isLoadingAddCart = false;
-        state.errorAddCart = action.payload;
+        state.errorAddCart = action.payload as string;
       })
       // getUserCart reducer
       .addCase(getUserCart.pending, state => {
@@ -288,7 +289,7 @@ export const cartSlice = createSlice({
       })
       .addCase(getUserCart.rejected, (state, action) => {
         state.isLoadingGetCart = false;
-        state.errorGetCart = action.payload;
+        state.errorGetCart = action.payload as string;
       })
       // deleteFromCart reducer
       .addCase(deleteFromCart.pending, state => {
@@ -302,7 +303,7 @@ export const cartSlice = createSlice({
       })
       .addCase(deleteFromCart.rejected, (state, action) => {
         state.isLoadingDeleteCart = false;
-        state.errorDeleteCart = action.payload;
+        state.errorDeleteCart = action.payload as string;
       })
       // applyCoupon reducer
       .addCase(applyCoupon.pending, state => {
@@ -316,7 +317,7 @@ export const cartSlice = createSlice({
       })
       .addCase(applyCoupon.rejected, (state, action) => {
         state.isLoadingApplyCoupon = false;
-        state.errorApplyCoupon = action.payload;
+        state.errorApplyCoupon = action.payload as string;
       })
       // excludeCoupon reducer
       .addCase(excludeCoupon.pending, state => {
@@ -330,7 +331,7 @@ export const cartSlice = createSlice({
       })
       .addCase(excludeCoupon.rejected, (state, action) => {
         state.isLoadingExcludeCoupon = false;
-        state.errorExcludeCoupon = action.payload;
+        state.errorExcludeCoupon = action.payload as string;
       })
       // addCoupon reducer
       .addCase(addCoupon.pending, state => {
@@ -345,7 +346,7 @@ export const cartSlice = createSlice({
       })
       .addCase(addCoupon.rejected, (state, action) => {
         state.isLoadingAddCoupon = false;
-        state.errorAddCoupon = action.payload;
+        state.errorAddCoupon = action.payload as string;
       })
       // deleteCoupon reducer
       .addCase(deleteCoupon.pending, state => {
@@ -359,7 +360,7 @@ export const cartSlice = createSlice({
       })
       .addCase(deleteCoupon.rejected, (state, action) => {
         state.isLoadingDeleteCoupon = false;
-        state.errorDeleteCoupon = action.payload;
+        state.errorDeleteCoupon = action.payload as string;
       })
       // removeCart reducer
       .addCase(removeCart.pending, state => {
@@ -374,7 +375,7 @@ export const cartSlice = createSlice({
       })
       .addCase(removeCart.rejected, (state, action) => {
         state.isLoadingRemoveCart = false;
-        state.errorRemoveCart = action.payload;
+        state.errorRemoveCart = action.payload as string;
       });
   },
 });

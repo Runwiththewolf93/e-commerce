@@ -77,7 +77,10 @@ export async function PATCH(req) {
 
     await user.save();
 
-    return NextResponse.json({ message: "User address successfully updated!" });
+    return NextResponse.json({
+      status: "success",
+      message: "User address successfully updated!",
+    });
   } catch (error) {
     return NextResponse.json(
       {

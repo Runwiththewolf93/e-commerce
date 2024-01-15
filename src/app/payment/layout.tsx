@@ -23,7 +23,7 @@ function PaymentLayout({ children }: PaymentLayoutProps) {
   const router = useRouter();
   const { cart } = useAppSelector(state => state.cart);
 
-  const isCartEmpty = !cart.items || cart.items.length === 0;
+  const isCartEmpty = !cart.items && cart.items.length === 0;
 
   useEffect(() => {
     if (status === "authenticated" && isCartEmpty) {

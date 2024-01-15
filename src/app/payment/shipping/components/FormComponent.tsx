@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks/reactReduxHooks";
 import FormSkeleton from "./FormSkeleton";
 import { Alert } from "flowbite-react";
@@ -8,12 +8,18 @@ import {
   userAddress,
   clearUserMessage,
   clearUserError,
-} from "../../../../redux/slices/userSlice.ts";
+} from "../../../../redux/slices/userSlice";
 import {
   orderAddress,
   clearOrderMessage,
   clearOrderError,
 } from "../../../../redux/slices/orderSlice";
+
+interface FormComponentProps {
+  jwt: string;
+  onAddressSubmit: () => void;
+  cartId: string;
+}
 
 /**
  * Renders a form component for submitting user address information.
@@ -24,7 +30,11 @@ import {
  * @param {string} props.cartId - The ID of the cart.
  * @return {JSX.Element} - The rendered form component.
  */
-export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
+export default function FormComponent({
+  jwt,
+  onAddressSubmit,
+  cartId,
+}: FormComponentProps) {
   const dispatch = useAppDispatch();
   const {
     isLoadingGetUser,
@@ -34,6 +44,7 @@ export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
     messageUserAddress,
     errorUserAddress,
   } = useAppSelector(state => state.user);
+  console.log("🚀 ~ file: FormComponent.tsx:47 ~ user:", user);
   const { isLoadingOrderAddress, messageOrderAddress, errorOrderAddress } =
     useAppSelector(state => state.order);
 
@@ -41,16 +52,13 @@ export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
     name: "",
     surname: "",
     street: "",
-    streetNumber: "",
+    streetNumber: 0,
     city: "",
     municipality: "",
     zip: "",
     phoneNumber: "",
   });
-  console.log(
-    "🚀 ~ file: FormComponent.js:18 ~ FormComponent ~ formData:",
-    formData
-  );
+  console.log("🚀 ~ file: FormComponent.tsx:61 ~ formData:", formData);
 
   useEffect(() => {
     // Check if user data is not present and jwt token is available
@@ -66,15 +74,15 @@ export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
     }
   }, [user, onAddressSubmit]);
 
-  const onChangeHandler = e => {
+  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prevFormData => ({
       ...prevFormData,
-      [name]: value,
+      [name]: name === "streetNumber" ? parseInt(value) || 0 : value,
     }));
   };
 
-  const onSubmitHandler = async e => {
+  const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Dispatch the update address action for user and order
@@ -93,7 +101,7 @@ export default function FormComponent({ jwt, onAddressSubmit, cartId }) {
         name: "",
         surname: "",
         street: "",
-        streetNumber: "",
+        streetNumber: 0,
         city: "",
         municipality: "",
         zip: "",

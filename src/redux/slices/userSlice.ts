@@ -2,12 +2,23 @@
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customAxios from "../../lib/api";
+import {
+  UserType,
+  GetUserArgs,
+  GetUserResponse,
+  RegisterUserType,
+  ErrorUserState,
+  UserAddressArgs,
+  UserAddressResponse,
+} from "../types/userSliceTypes";
 
 export const getUser = createAsyncThunk(
   "user/getUser",
-  async ({ jwt }, { rejectWithValue }) => {
+  async ({ jwt }: GetUserArgs, { rejectWithValue }) => {
     try {
-      const { data } = await customAxios(jwt).get("/api/users/getUser");
+      const { data } = await customAxios(jwt).get<GetUserResponse>(
+        "/api/users/getUser"
+      );
 
       return data;
     } catch (error) {
@@ -16,11 +27,13 @@ export const getUser = createAsyncThunk(
   }
 );
 
+// SEE ABOUT THE REDIRECT
+
 export const userAddress = createAsyncThunk(
   "user/userAddress",
-  async ({ jwt, address }, { rejectWithValue }) => {
+  async ({ jwt, address }: UserAddressArgs, { rejectWithValue }) => {
     try {
-      const { data } = await customAxios(jwt).patch(
+      const { data } = await customAxios(jwt).patch<UserAddressResponse>(
         "/api/users/address",
         address
       );
@@ -79,29 +92,45 @@ export const checkAdmin = createAsyncThunk(
   }
 );
 
+const defaultUser: UserType = {
+  _id: "",
+  username: "",
+  email: "",
+  roles: [],
+  createdAt: "",
+  __v: 0,
+  updatedAt: "",
+};
+
+const registerUserDefault: RegisterUserType = {
+  name: "",
+  email: "",
+  password: "",
+};
+
 export const userSlice = createSlice({
   name: "user",
   initialState: {
     // getUser
     isLoadingGetUser: false,
-    user: {},
-    errorGetUser: null,
+    user: defaultUser,
+    errorGetUser: null as ErrorUserState,
     // userAddress
     isLoadingUserAddress: false,
     messageUserAddress: "",
-    errorUserAddress: null,
+    errorUserAddress: null as ErrorUserState,
     // resetUserPassword
     isLoadingResetUserPassword: false,
     messageResetUserPassword: "",
-    errorResetUserPassword: null,
+    errorResetUserPassword: null as ErrorUserState,
     // registerUser
     isLoadingRegisterUser: false,
-    user: {},
-    errorRegisterUser: null,
+    registerUserDetails: registerUserDefault,
+    errorRegisterUser: null as ErrorUserState,
     // checkAdmin
     isLoadingCheckAdmin: false,
     isAdmin: null,
-    errorCheckAdmin: null,
+    errorCheckAdmin: null as ErrorUserState,
   },
   reducers: {
     clearUserMessage: state => {
@@ -125,11 +154,11 @@ export const userSlice = createSlice({
       })
       .addCase(getUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
-        state.isLoadingGetUser = false;
         state.errorGetUser = null;
+        state.isLoadingGetUser = false;
       })
       .addCase(getUser.rejected, (state, action) => {
-        state.errorGetUser = action.payload;
+        state.errorGetUser = action.payload as string;
         state.isLoadingGetUser = false;
       })
       // userAddress reducer
@@ -143,7 +172,7 @@ export const userSlice = createSlice({
         state.errorUserAddress = null;
       })
       .addCase(userAddress.rejected, (state, action) => {
-        state.errorUserAddress = action.payload;
+        state.errorUserAddress = action.payload as string;
         state.isLoadingUserAddress = false;
       })
       // resetUserPassword reducer
@@ -157,7 +186,7 @@ export const userSlice = createSlice({
         state.errorResetUserPassword = null;
       })
       .addCase(resetUserPassword.rejected, (state, action) => {
-        state.errorResetUserPassword = action.payload;
+        state.errorResetUserPassword = action.payload as string;
         state.isLoadingResetUserPassword = false;
       })
       // registerUser reducer
@@ -166,12 +195,12 @@ export const userSlice = createSlice({
         state.errorRegisterUser = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.user = action.payload.user;
+        state.registerUserDetails = action.payload.user;
         state.isLoadingRegisterUser = false;
         state.errorRegisterUser = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
-        state.errorRegisterUser = action.payload;
+        state.errorRegisterUser = action.payload as string;
         state.isLoadingRegisterUser = false;
       })
       // checkAdmin reducer
@@ -185,7 +214,7 @@ export const userSlice = createSlice({
         state.errorCheckAdmin = null;
       })
       .addCase(checkAdmin.rejected, (state, action) => {
-        state.errorCheckAdmin = action.payload;
+        state.errorCheckAdmin = action.payload as string;
         state.isLoadingCheckAdmin = false;
       });
   },
