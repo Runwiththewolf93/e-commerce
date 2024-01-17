@@ -92,6 +92,7 @@ export async function PATCH(req) {
     await order.save();
 
     return NextResponse.json({
+      status: "success",
       message: "Order successfully updated with cart details!",
     });
   } catch (error) {

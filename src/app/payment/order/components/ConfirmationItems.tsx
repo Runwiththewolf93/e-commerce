@@ -1,5 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-export default function ConfirmationItems({ cart }) {
+import { CartType } from "../../../../redux/types/cartSliceTypes";
+
+interface ConfirmationItemsProps {
+  cart: CartType;
+}
+
+export default function ConfirmationItems({ cart }: ConfirmationItemsProps) {
   return (
     <div className="w-full lg:w-8/12">
       <div className="px-10">

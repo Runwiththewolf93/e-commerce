@@ -10,6 +10,12 @@ import {
   ErrorUserState,
   UserAddressArgs,
   UserAddressResponse,
+  ResetUserPasswordArgs,
+  ResetUserPasswordResponse,
+  RegisterUserArgs,
+  RegisterUserResponse,
+  CheckAdminArgs,
+  CheckAdminResponse,
 } from "../types/userSliceTypes";
 
 export const getUser = createAsyncThunk(
@@ -26,8 +32,6 @@ export const getUser = createAsyncThunk(
     }
   }
 );
-
-// SEE ABOUT THE REDIRECT
 
 export const userAddress = createAsyncThunk(
   "user/userAddress",
@@ -47,13 +51,19 @@ export const userAddress = createAsyncThunk(
 
 export const resetUserPassword = createAsyncThunk(
   "user/resetUserPassword",
-  async ({ jwt, email, currentPassword, newPassword }, { rejectWithValue }) => {
+  async (
+    { jwt, email, currentPassword, newPassword }: ResetUserPasswordArgs,
+    { rejectWithValue }
+  ) => {
     try {
-      const { data } = await customAxios(jwt).post("/api/users/reset", {
-        email,
-        currentPassword,
-        newPassword,
-      });
+      const { data } = await customAxios(jwt).post<ResetUserPasswordResponse>(
+        "/api/users/reset",
+        {
+          email,
+          currentPassword,
+          newPassword,
+        }
+      );
 
       return data;
     } catch (error) {
@@ -64,13 +74,16 @@ export const resetUserPassword = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
   "user/registerUser",
-  async ({ name, email, password }, { rejectWithValue }) => {
+  async ({ name, email, password }: RegisterUserArgs, { rejectWithValue }) => {
     try {
-      const { data } = await customAxios().post("/api/users/register", {
-        name,
-        email,
-        password,
-      });
+      const { data } = await customAxios().post<RegisterUserResponse>(
+        "/api/users/register",
+        {
+          name,
+          email,
+          password,
+        }
+      );
 
       return data;
     } catch (error) {
@@ -81,9 +94,11 @@ export const registerUser = createAsyncThunk(
 
 export const checkAdmin = createAsyncThunk(
   "user/checkAdmin",
-  async ({ jwt }, { rejectWithValue }) => {
+  async ({ jwt }: CheckAdminArgs, { rejectWithValue }) => {
     try {
-      const { data } = await customAxios(jwt).get("/api/users/checkAdmin");
+      const { data } = await customAxios(jwt).get<CheckAdminResponse>(
+        "/api/users/checkAdmin"
+      );
 
       return data;
     } catch (error) {

@@ -1,5 +1,13 @@
 import { FaCheck } from "react-icons/fa";
 
+interface OrderPaymentProps {
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isLoadingOrderCart: boolean;
+  messageOrderCart: string;
+  isLoadingPaymentCheckout: boolean;
+  sessionId: string;
+}
+
 /**
  * Renders the OrderPayment component.
  *
@@ -17,7 +25,7 @@ export default function OrderPayment({
   messageOrderCart,
   isLoadingPaymentCheckout,
   sessionId,
-}) {
+}: OrderPaymentProps) {
   return (
     <div className="w-full flex justify-center items-center mb-14">
       <form onSubmit={handleSubmit} className="w-1/2">

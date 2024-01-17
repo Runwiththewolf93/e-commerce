@@ -67,7 +67,7 @@ export async function POST(req) {
       cancel_url: "http://localhost:3000/payment/cancel",
     });
 
-    return NextResponse.json({ sessionId: session.id });
+    return NextResponse.json({ status: "success", sessionId: session.id });
   } catch (error) {
     return NextResponse.json(
       {

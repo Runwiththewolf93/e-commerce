@@ -13,11 +13,11 @@ import {
   orderAddress,
   clearOrderMessage,
   clearOrderError,
+  setIsAddressSubmitted,
 } from "../../../../redux/slices/orderSlice";
 
 interface FormComponentProps {
   jwt: string;
-  onAddressSubmit: () => void;
   cartId: string;
 }
 
@@ -26,15 +26,10 @@ interface FormComponentProps {
  *
  * @param {Object} props - The props object containing the function parameters.
  * @param {string} props.jwt - The JSON Web Token for authentication.
- * @param {function} props.onAddressSubmit - The callback function to be executed when the address is submitted.
  * @param {string} props.cartId - The ID of the cart.
  * @return {JSX.Element} - The rendered form component.
  */
-export default function FormComponent({
-  jwt,
-  onAddressSubmit,
-  cartId,
-}: FormComponentProps) {
+export default function FormComponent({ jwt, cartId }: FormComponentProps) {
   const dispatch = useAppDispatch();
   const {
     isLoadingGetUser,
@@ -44,7 +39,6 @@ export default function FormComponent({
     messageUserAddress,
     errorUserAddress,
   } = useAppSelector(state => state.user);
-  console.log("🚀 ~ file: FormComponent.tsx:47 ~ user:", user);
   const { isLoadingOrderAddress, messageOrderAddress, errorOrderAddress } =
     useAppSelector(state => state.order);
 
@@ -58,7 +52,6 @@ export default function FormComponent({
     zip: "",
     phoneNumber: "",
   });
-  console.log("🚀 ~ file: FormComponent.tsx:61 ~ formData:", formData);
 
   useEffect(() => {
     // Check if user data is not present and jwt token is available
@@ -70,9 +63,8 @@ export default function FormComponent({
   useEffect(() => {
     if (user?.address && Object.keys(user.address).length > 0) {
       setFormData(user.address);
-      onAddressSubmit();
     }
-  }, [user, onAddressSubmit]);
+  }, [user]);
 
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -96,7 +88,7 @@ export default function FormComponent({
       userAddress.fulfilled.match(results[0]) &&
       orderAddress.fulfilled.match(results[1])
     ) {
-      onAddressSubmit();
+      dispatch(setIsAddressSubmitted());
       setFormData({
         name: "",
         surname: "",

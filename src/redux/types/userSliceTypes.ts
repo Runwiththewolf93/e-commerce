@@ -42,11 +42,50 @@ export interface UserAddressResponse {
   message: string;
 }
 
+// resetUserPassword types
+export interface ResetUserPasswordArgs {
+  jwt: string;
+  email: string;
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ResetUserPasswordResponse {
+  status: string;
+  message: string;
+}
+
 // registerUser types
 export interface RegisterUserType {
   name: string;
   email: string;
+  password?: string;
+}
+
+export interface RegisterUserArgs {
+  name: string;
+  email: string;
   password: string;
+}
+
+export interface RegisterUserResponse {
+  user: {
+    name: string;
+    email: string;
+  };
+  status: string;
+  message?: string;
+}
+
+// checkAdmin types
+export interface CheckAdminArgs {
+  jwt: string;
+}
+
+export interface CheckAdminResponse {
+  status: string;
+  isAdmin?: boolean;
+  message?: string;
 }
 
 export type ErrorUserState = string | null;

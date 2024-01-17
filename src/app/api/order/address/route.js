@@ -90,6 +90,7 @@ export async function PATCH(req) {
     await order.save();
 
     return NextResponse.json({
+      status: "success",
       message: "Order address successfully updated!",
     });
   } catch (error) {
@@ -102,5 +103,3 @@ export async function PATCH(req) {
     );
   }
 }
-
-// TEST THE ROUTE OUT TOMORROW

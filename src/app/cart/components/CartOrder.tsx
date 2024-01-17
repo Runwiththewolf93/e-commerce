@@ -3,11 +3,11 @@ import CartOrderSkeleton from "./CartOrderSkeleton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CartType } from "../../../redux/types/cartSliceTypes";
+import { useAppSelector } from "@/app/hooks/reactReduxHooks";
 
 interface CartOrderProps {
   cart: CartType;
   isLoadingGetCart: boolean;
-  isAddressSubmitted?: boolean;
 }
 
 /**
@@ -15,16 +15,12 @@ interface CartOrderProps {
  *
  * @param {object} cart - The cart object.
  * @param {boolean} isLoadingGetCart - Indicates if the cart is being loaded.
- * @param {boolean} isAddressSubmitted - Indicates if the address is submitted.
  * @return {JSX.Element} The rendered CartOrder component.
  */
-export default function CartOrder({
-  cart,
-  isLoadingGetCart,
-  isAddressSubmitted,
-}: CartOrderProps) {
+export default function CartOrder({ cart, isLoadingGetCart }: CartOrderProps) {
   const pathname = usePathname();
   const isShipping = pathname === "/payment/shipping";
+  const { isAddressSubmitted } = useAppSelector(state => state.order);
 
   return isLoadingGetCart ? (
     <CartOrderSkeleton />
@@ -76,7 +72,7 @@ export default function CartOrder({
             className="object-cover h-16 w-26"
           />
         </div>
-        <div className="flex items-center justify-between ">
+        <div className="flex items-center justify-between">
           <Link
             href={isShipping ? "/payment/order" : "/payment/shipping"}
             className="w-full"
@@ -86,6 +82,11 @@ export default function CartOrder({
                 isShipping && !isAddressSubmitted && "cursor-not-allowed"
               }`}
               disabled={isShipping && !isAddressSubmitted}
+              title={
+                isShipping && !isAddressSubmitted
+                  ? "Please submit your address to proceed."
+                  : ""
+              }
             >
               {isShipping ? "Order Review" : "Checkout"}
             </button>

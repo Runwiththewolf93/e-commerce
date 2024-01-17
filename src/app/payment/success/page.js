@@ -12,8 +12,9 @@ import {
   clearOrderError,
   clearSessionId,
   orderStatus,
+  setIsPaymentProcessed,
 } from "../../../redux/slices/orderSlice";
-import { getUserCart } from "../../../redux/slices/cartSlice";
+import { useRouter } from "next/navigation";
 
 export default function Success() {
   const dispatch = useDispatch();
@@ -27,12 +28,26 @@ export default function Success() {
     isLoadingOrderStatus,
     messageOrderStatus,
     errorOrderStatus,
+    isPaymentProcessed,
   } = useSelector(state => state.order);
   const { cart } = useSelector(state => state.cart);
+  const router = useRouter();
   const cartId = cart?._id;
   console.log("🚀 ~ file: page.js:27 ~ Success ~ cart:", cart);
   console.log("🚀 ~ file: page.js:17 ~ Success ~ sessionId:", sessionId);
-  const orderRef = useRef(false);
+  const isInitialMount = useRef(false);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (!isPaymentProcessed) {
+        router.push("/payment/order");
+      } else {
+        // Reset isPaymentProcessed to false for future payment attempts
+        dispatch(setIsPaymentProcessed(false));
+      }
+    }
+  }, [isPaymentProcessed, router, dispatch]);
 
   useEffect(() => {
     const executeDispatches = async () => {

@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
-import { useSession } from "next-auth/react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCustomSession } from "../../hooks/useCustomSession";
+import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
 import {
   getUserCart,
   clearErrorMessage,
@@ -13,19 +13,26 @@ import {
   clearOrderMessage,
   clearOrderError,
   paymentCheckout,
+  setIsPaymentProcessed,
 } from "../../../redux/slices/orderSlice";
 import OrderPayment from "./components/OrderPayment";
 import { Alert } from "flowbite-react";
 import ConfirmationCart from "./components/ConfirmationCart";
+import { PaymentCheckoutResponse } from "@/redux/types/orderSliceTypes";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 );
 
+/**
+ * Renders the preview page.
+ *
+ * @return {void} This function does not return a value.
+ */
 export default function PreviewPage() {
-  const dispatch = useDispatch();
-  const { data: session } = useSession();
-  const { isLoadingGetCart, cart, errorGetCart } = useSelector(
+  const dispatch = useAppDispatch();
+  const { data: session } = useCustomSession();
+  const { isLoadingGetCart, cart, errorGetCart } = useAppSelector(
     state => state.cart
   );
   const {
@@ -35,13 +42,13 @@ export default function PreviewPage() {
     isLoadingPaymentCheckout,
     sessionId,
     errorPaymentCheckout,
-  } = useSelector(state => state.order);
+  } = useAppSelector(state => state.order);
   const [errorMessage, setErrorMessage] = useState("");
   console.log("🚀 ~ file: page.js:16 ~ PreviewPage ~ cart:", cart);
 
   useEffect(() => {
     if ((!cart || Object.keys(cart).length === 0) && session?.customJwt) {
-      dispatch(getUserCart(session?.customJwt));
+      dispatch(getUserCart({ jwt: session?.customJwt }));
     }
 
     return () => {
@@ -50,15 +57,27 @@ export default function PreviewPage() {
     };
   }, [cart, dispatch, session?.customJwt]);
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    function isErrorResponse(
+      action: any
+    ): action is { error: { message: string } } {
+      return action.error !== undefined;
+    }
+
+    function isSuccessResponse(
+      action: any
+    ): action is { payload: PaymentCheckoutResponse } {
+      return action.payload && "sessionId" in action.payload;
+    }
 
     try {
       // Update the order
       const orderUpdateResponse = await dispatch(
         orderCart({ cartObject: cart, jwt: session?.customJwt })
       );
-      if (orderUpdateResponse.error) {
+      if (isErrorResponse(orderUpdateResponse)) {
         setErrorMessage(
           orderUpdateResponse.error.message || "Error updating order"
         );
@@ -69,25 +88,28 @@ export default function PreviewPage() {
       const checkoutResponse = await dispatch(
         paymentCheckout({ cartId: cart?._id, jwt: session?.customJwt })
       );
-      if (checkoutResponse.error) {
+      if (isErrorResponse(checkoutResponse)) {
         setErrorMessage(
           checkoutResponse.error.message || "Error requesting session ID"
         );
         return;
       }
-
-      console.log("Checkout Response Payload:", checkoutResponse.payload);
-      console.log("Session ID:", checkoutResponse.payload.sessionId);
+      if (!isSuccessResponse(checkoutResponse)) {
+        // Handle case where checkoutResponse is not a success response
+        setErrorMessage("Failed to process payment checkout.");
+        return;
+      }
 
       // Continue with Stripe payment if order update is successful
       const stripe = await stripePromise;
-      const result = await stripe.redirectToCheckout({
-        sessionId: checkoutResponse.payload.sessionId,
-      });
+      const sessionId = checkoutResponse.payload.sessionId;
+      const result = await stripe.redirectToCheckout({ sessionId });
 
       if (result.error) {
         setErrorMessage(result.error.message);
       }
+
+      dispatch(setIsPaymentProcessed(true));
     } catch (error) {
       setErrorMessage(error.message);
     }

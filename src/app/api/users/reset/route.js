@@ -68,7 +68,10 @@ export async function POST(req) {
     user.password = hashedNewPassword;
     await user.save();
 
-    return NextResponse.json({ message: "Password successfully updated!" });
+    return NextResponse.json({
+      status: "success",
+      message: "Password successfully updated!",
+    });
   } catch (error) {
     return NextResponse.json(
       {

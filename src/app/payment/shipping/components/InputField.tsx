@@ -1,4 +1,20 @@
-const InputField = ({ name, type, value, onChange, placeholder, label }) => (
+interface InputFieldProps {
+  name: string;
+  type: string;
+  value: string | number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  label: string;
+}
+
+const InputField: React.FC<InputFieldProps> = ({
+  name,
+  type,
+  value,
+  onChange,
+  placeholder,
+  label,
+}) => (
   <div className="relative z-0 w-full mb-5 group">
     <input
       type={type}

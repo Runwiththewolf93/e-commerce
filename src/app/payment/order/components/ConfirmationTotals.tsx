@@ -1,10 +1,16 @@
+import { CartType } from "@/redux/types/cartSliceTypes";
+
+interface ConfirmationTotalsProps {
+  cart: CartType;
+}
+
 /**
  * Renders the confirmation totals component.
  *
  * @param {Object} cart - The cart object containing totalAmountDiscount and shippingCost.
  * @return {JSX.Element} The rendered confirmation totals component.
  */
-export default function ConfirmationTotals({ cart }) {
+export default function ConfirmationTotals({ cart }: ConfirmationTotalsProps) {
   return (
     <div className="w-full lg:w-4/12">
       <div className="px-6 mb-14">

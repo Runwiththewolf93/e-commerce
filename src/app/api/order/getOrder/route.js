@@ -41,6 +41,7 @@ export async function GET(req) {
 
     // Append the order count to the response
     const response = {
+      status: "success",
       order: {
         ...order.toObject(),
         userOrderCount: orderCount,

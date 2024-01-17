@@ -16,9 +16,15 @@ export async function GET(req) {
     }
 
     if (user.roles && user.roles.includes("admin")) {
-      return NextResponse.json({ isAdmin: true }, { status: 200 });
+      return NextResponse.json(
+        { status: "success", isAdmin: true },
+        { status: 200 }
+      );
     } else {
-      return NextResponse.json({ isAdmin: false }, { status: 200 });
+      return NextResponse.json(
+        { status: "success", isAdmin: false },
+        { status: 200 }
+      );
     }
   } catch (error) {
     return NextResponse.json(

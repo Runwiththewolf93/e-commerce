@@ -1,17 +1,19 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
 import Link from "next/link";
 import { Alert } from "flowbite-react";
-import { useSession } from "next-auth/react";
+import { useCustomSession } from "../../hooks/useCustomSession";
 import {
   paymentConfirmation,
   clearOrderMessage,
   clearOrderError,
   clearSessionId,
   orderStatus,
+  setIsPaymentProcessed,
 } from "../../../redux/slices/orderSlice";
+import { useRouter } from "next/navigation";
 
 /**
  * Renders the Cancel component.
@@ -19,8 +21,8 @@ import {
  * @return {JSX.Element} The rendered Cancel component.
  */
 export default function Cancel() {
-  const dispatch = useDispatch();
-  const { data: session } = useSession();
+  const dispatch = useAppDispatch();
+  const { data: session } = useCustomSession();
   const jwt = session?.customJwt;
   const {
     sessionId,
@@ -30,7 +32,9 @@ export default function Cancel() {
     isLoadingOrderStatus,
     messageOrderStatus,
     errorOrderStatus,
-  } = useSelector(state => state.order);
+    isPaymentProcessed,
+  } = useAppSelector(state => state.order);
+  const router = useRouter();
   console.log(
     "🚀 ~ file: page.js:29 ~ Cancel ~ messagePaymentConfirmation:",
     messagePaymentConfirmation
@@ -39,10 +43,22 @@ export default function Cancel() {
     "🚀 ~ file: page.js:29 ~ Cancel ~ messageOrderStatus:",
     messageOrderStatus
   );
-  const { cart } = useSelector(state => state.cart);
+  const { cart } = useAppSelector(state => state.cart);
   const cartId = cart?._id;
   console.log("🚀 ~ file: page.js:27 ~ Success ~ cart:", cart);
-  const orderRef = useRef(false);
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (!isPaymentProcessed) {
+        router.push("/payment/order");
+      } else {
+        // Reset isPaymentProcessed to false for future payment attempts
+        dispatch(setIsPaymentProcessed(false));
+      }
+    }
+  }, [isPaymentProcessed, router, dispatch]);
 
   useEffect(() => {
     const executeDispatches = async () => {
@@ -86,6 +102,8 @@ export default function Cancel() {
   const isLoading = isLoadingPaymentConfirmation || isLoadingOrderStatus;
   const isSuccess = messagePaymentConfirmation && messageOrderStatus;
   const isError = errorPaymentConfirmation || errorOrderStatus;
+
+  // IMPLEMENT REDIRECTING... WHEN ISPAYMENTPROCESSED IS FALSE - SO USERS DON'T SEE THE COMPONENT AT ALL.
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-red-100">

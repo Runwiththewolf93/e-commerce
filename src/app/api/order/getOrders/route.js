@@ -21,7 +21,7 @@ export async function GET(req) {
       return NextResponse.json({ orders: [] });
     }
 
-    return NextResponse.json({ orders });
+    return NextResponse.json({ status: "success", orders });
   } catch (error) {
     return NextResponse.json(
       {

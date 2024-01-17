@@ -18,8 +18,7 @@ export default function Shipping() {
   const dispatch = useAppDispatch();
   const { isLoadingGetCart, cart } = useAppSelector(state => state.cart);
   const { data: session } = useCustomSession();
-  const [selectedButton, setSelectedButton] = useState(null);
-  const [isAddressSubmitted, setIsAddressSubmitted] = useState(false);
+  const [selectedButton, setSelectedButton] = useState<number | null>(null);
   console.log("🚀 ~ file: page.js:14 ~ Shipping ~ cart:", cart);
 
   useEffect(() => {
@@ -42,10 +41,6 @@ export default function Shipping() {
 
   const handleButtonClick = (buttonId: number) => {
     setSelectedButton(buttonId);
-  };
-
-  const handleAddressSubmission = () => {
-    setIsAddressSubmitted(true);
   };
 
   return (
@@ -74,19 +69,11 @@ export default function Shipping() {
               handleButtonClick={handleButtonClick}
             />
             {selectedButton === 1 && (
-              <FormComponent
-                jwt={session?.customJwt}
-                onAddressSubmit={handleAddressSubmission}
-                cartId={cart?._id}
-              />
+              <FormComponent jwt={session?.customJwt} cartId={cart?._id} />
             )}
           </div>
           <div className="flex justify-center mt-6 flex-1">
-            <CartOrder
-              cart={cart}
-              isLoadingGetCart={isLoadingGetCart}
-              isAddressSubmitted={isAddressSubmitted}
-            />
+            <CartOrder cart={cart} isLoadingGetCart={isLoadingGetCart} />
           </div>
         </div>
       </div>

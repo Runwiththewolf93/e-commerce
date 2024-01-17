@@ -7,6 +7,7 @@ import { useCustomSession } from "../hooks/useCustomSession";
 import { useAppSelector } from "../hooks/reactReduxHooks";
 import { useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface PaymentLayoutProps {
   children: ReactNode;
@@ -21,7 +22,9 @@ interface PaymentLayoutProps {
 function PaymentLayout({ children }: PaymentLayoutProps) {
   const { status } = useCustomSession();
   const router = useRouter();
+  const pathname = usePathname();
   const { cart } = useAppSelector(state => state.cart);
+  const { isAddressSubmitted } = useAppSelector(state => state.order);
 
   const isCartEmpty = !cart.items && cart.items.length === 0;
 
@@ -30,6 +33,21 @@ function PaymentLayout({ children }: PaymentLayoutProps) {
       router.push("/");
     }
   }, [status, isCartEmpty, router]);
+
+  useEffect(() => {
+    // Restricted paths
+    const restrictedPaths = [
+      "/payment/order",
+      "/payment/success",
+      "/payment/cancel",
+    ];
+    const currentPath = pathname;
+
+    if (restrictedPaths.includes(currentPath) && !isAddressSubmitted) {
+      router.push("/payment/shipping");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, router]);
 
   if (status === "loading") {
     return (
