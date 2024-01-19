@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import GalleryBestSellersSkeleton from "../subcomponents/GalleryBestSellersSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
@@ -26,9 +26,9 @@ export default function GalleryBestSellers() {
   const { bestSellers, isLoading, error, currentGallery } = useSelector(
     state => state.products
   );
-  const { isLoadingAddCart } = useSelector(state => state.cart);
   const { data: session } = useSession();
   const jwt = session?.customJwt;
+  const [addingProductId, setAddingProductId] = useState(null);
   useCloseCartOnRouteChange();
   // console.log(
   //   "🚀 ~ file: GalleryBestSellers.js:18 ~ GalleryBestSellers ~ bestSellers:",
@@ -51,8 +51,10 @@ export default function GalleryBestSellers() {
     }
   }, [dispatch, currentGallery]);
 
-  const handleAddToCart = productId => {
-    dispatch(addToCart({ productId, quantity: 1, jwt }));
+  const handleAddToCart = async productId => {
+    setAddingProductId(productId);
+    await dispatch(addToCart({ productId, quantity: 1, jwt })).unwrap();
+    setAddingProductId(null);
     dispatch(openCartOverlay());
   };
 
@@ -137,7 +139,9 @@ export default function GalleryBestSellers() {
                     className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 min-w-[100px] w-full"
                     onClick={() => handleAddToCart(product._id)}
                   >
-                    {isLoadingAddCart ? "Adding..." : "Add to cart"}
+                    {addingProductId === product._id
+                      ? "Adding..."
+                      : "Add to cart"}
                   </button>
                 </div>
               </div>

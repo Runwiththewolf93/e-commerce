@@ -1,4 +1,15 @@
-export default function OrderSummary({ orderTotal }) {
+interface OrderOutlineProps {
+  totalAmount: number;
+  totalAmountDiscount: number;
+  shippingCost: number;
+  appliedCoupon: string | null;
+}
+
+interface OrderTotalProps {
+  orderTotal: OrderOutlineProps;
+}
+
+export default function OrderSummary({ orderTotal }: OrderTotalProps) {
   const { totalAmount, totalAmountDiscount, shippingCost, appliedCoupon } =
     orderTotal;
 

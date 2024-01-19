@@ -1,10 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
 import { getOrders } from "../../../redux/slices/orderSlice";
 import OrderOverviewSkeleton from "./OrderOverviewSkeleton";
 import { Alert } from "flowbite-react";
+import { CustomSession } from "@/app/types/authentication/authenticationTypes";
+
+interface OrderOverviewProps {
+  session: CustomSession;
+}
 
 /**
  * Renders the order overview page.
@@ -12,10 +17,10 @@ import { Alert } from "flowbite-react";
  * @param {Object} session - The session object.
  * @return {JSX.Element} The JSX element representing the order overview page.
  */
-export default function OrderOverview({ session }) {
+export default function OrderOverview({ session }: OrderOverviewProps) {
   const jwt = session?.customJwt;
-  const dispatch = useDispatch();
-  const { isLoadingGetOrders, orders, errorGetOrders } = useSelector(
+  const dispatch = useAppDispatch();
+  const { isLoadingGetOrders, orders, errorGetOrders } = useAppSelector(
     state => state.order
   );
   console.log(
@@ -23,24 +28,10 @@ export default function OrderOverview({ session }) {
     orders
   );
 
-  const [duplicatedOrders, setDuplicatedOrders] = useState([]);
-
   useEffect(() => {
     if (jwt) {
-      const getDuplicates = async () => {
-        await dispatch(getOrders(jwt)).then(() => {
-          if (orders.length === 1) {
-            const duplicatedOrders = Array.from({ length: 6 }, (_, i) => ({
-              ...orders[0],
-              _id: `${orders[0]._id}_${i}`,
-            }));
-            setDuplicatedOrders(duplicatedOrders);
-          }
-        });
-      };
-      getDuplicates();
+      dispatch(getOrders(jwt));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jwt, dispatch]);
 
   // State for pagination
@@ -50,30 +41,27 @@ export default function OrderOverview({ session }) {
   // Get current orders
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = duplicatedOrders.slice(
-    indexOfFirstOrder,
-    indexOfLastOrder
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  console.log(
+    "🚀 ~ file: OrderOverview.js:57 ~ OrderOverview ~ currentOrders:",
+    currentOrders
   );
 
   // Change page
-  const paginate = pageNumber => setCurrentPage(pageNumber);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   // Calculate page numbers
   const pageNumbers = [];
-  for (
-    let i = 1;
-    i <= Math.ceil(duplicatedOrders.length / ordersPerPage);
-    i++
-  ) {
+  for (let i = 1; i <= Math.ceil(orders.length / ordersPerPage); i++) {
     pageNumbers.push(i);
   }
 
   // Render pagination
   const renderPagination = () => (
     <nav>
-      <ul className="flex justify-center space-x-5 mt-5">
+      <ul className="flex justify-center overflow-x-auto space-x-5 mt-5">
         {pageNumbers.map(number => (
-          <li key={number} className="list-none">
+          <li key={number} className="list-none flex-none">
             <button
               onClick={() => paginate(number)}
               className={`py-2 px-4 rounded ${
@@ -90,7 +78,7 @@ export default function OrderOverview({ session }) {
     </nav>
   );
 
-  const getReadableDeliveryTime = deliveryTime => {
+  const getReadableDeliveryTime = (deliveryTime: number) => {
     const currentTime = new Date().getTime();
     const timeDiff = deliveryTime - currentTime;
     const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));

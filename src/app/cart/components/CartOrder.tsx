@@ -21,6 +21,10 @@ export default function CartOrder({ cart, isLoadingGetCart }: CartOrderProps) {
   const pathname = usePathname();
   const isShipping = pathname === "/payment/shipping";
   const { isAddressSubmitted } = useAppSelector(state => state.order);
+  console.log(
+    "🚀 ~ file: CartOrder.tsx:24 ~ CartOrder ~ isAddressSubmitted:",
+    isAddressSubmitted
+  );
 
   return isLoadingGetCart ? (
     <CartOrderSkeleton />

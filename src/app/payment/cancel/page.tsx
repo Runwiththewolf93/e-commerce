@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reactReduxHooks";
 import Link from "next/link";
 import { Alert } from "flowbite-react";
@@ -13,7 +13,9 @@ import {
   orderStatus,
   setIsPaymentProcessed,
 } from "../../../redux/slices/orderSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import RedirectingIndicator from "./components/RedirectingIndicator";
+import { PaymentStates } from "../../../redux/types/orderSliceTypes";
 
 /**
  * Renders the Cancel component.
@@ -22,6 +24,9 @@ import { useRouter } from "next/navigation";
  */
 export default function Cancel() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
+  console.log("🚀 ~ file: page.tsx:29 ~ Cancel ~ pathname:", pathname);
   const { data: session } = useCustomSession();
   const jwt = session?.customJwt;
   const {
@@ -32,33 +37,31 @@ export default function Cancel() {
     isLoadingOrderStatus,
     messageOrderStatus,
     errorOrderStatus,
-    isPaymentProcessed,
+    paymentState,
   } = useAppSelector(state => state.order);
-  const router = useRouter();
-  console.log(
-    "🚀 ~ file: page.js:29 ~ Cancel ~ messagePaymentConfirmation:",
-    messagePaymentConfirmation
-  );
-  console.log(
-    "🚀 ~ file: page.js:29 ~ Cancel ~ messageOrderStatus:",
-    messageOrderStatus
-  );
   const { cart } = useAppSelector(state => state.cart);
+  console.log("🚀 ~ file: page.tsx:38 ~ Cancel ~ paymentState:", paymentState);
   const cartId = cart?._id;
   console.log("🚀 ~ file: page.js:27 ~ Success ~ cart:", cart);
-  const isInitialMount = useRef(true);
+  const currentPath = "/payment/cancel";
 
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      if (!isPaymentProcessed) {
-        router.push("/payment/order");
-      } else {
-        // Reset isPaymentProcessed to false for future payment attempts
-        dispatch(setIsPaymentProcessed(false));
-      }
+    // At least I tried to reset the state here, but it didn't work
+    if (pathname !== currentPath) {
+      dispatch(setIsPaymentProcessed(PaymentStates.NONE));
     }
-  }, [isPaymentProcessed, router, dispatch]);
+  }, [dispatch, pathname]);
+
+  useEffect(() => {
+    if (
+      paymentState === PaymentStates.SUCCESSFUL ||
+      paymentState === PaymentStates.NONE
+    ) {
+      router.push("/payment/order");
+    } else {
+      dispatch(setIsPaymentProcessed(PaymentStates.CANCELLED));
+    }
+  }, [dispatch, paymentState, router]);
 
   useEffect(() => {
     const executeDispatches = async () => {
@@ -84,26 +87,18 @@ export default function Cancel() {
     };
 
     executeDispatches();
-
-    // Cleanup functions
-    // return () => {
-    //   dispatch(clearOrderMessage());
-    //   dispatch(clearOrderError());
-    // };
-  }, [
-    sessionId,
-    cartId,
-    jwt,
-    dispatch,
-    errorPaymentConfirmation,
-    errorOrderStatus,
-  ]);
+  }, [sessionId, cartId, jwt, dispatch]);
 
   const isLoading = isLoadingPaymentConfirmation || isLoadingOrderStatus;
   const isSuccess = messagePaymentConfirmation && messageOrderStatus;
   const isError = errorPaymentConfirmation || errorOrderStatus;
 
-  // IMPLEMENT REDIRECTING... WHEN ISPAYMENTPROCESSED IS FALSE - SO USERS DON'T SEE THE COMPONENT AT ALL.
+  if (
+    paymentState === PaymentStates.SUCCESSFUL ||
+    paymentState === PaymentStates.NONE
+  ) {
+    return <RedirectingIndicator />;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-red-100">
@@ -133,6 +128,7 @@ export default function Cancel() {
           <button
             className="hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-lg font-medium leading-4 text-white min-w-96"
             disabled={isLoading}
+            onClick={() => dispatch(setIsPaymentProcessed(PaymentStates.NONE))}
           >
             Try Payment Again
           </button>
@@ -149,6 +145,7 @@ export default function Cancel() {
           <button
             className="hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-lg font-medium leading-4 text-white min-w-96"
             disabled={isLoading}
+            onClick={() => dispatch(setIsPaymentProcessed(PaymentStates.NONE))}
           >
             Continue Shopping
           </button>

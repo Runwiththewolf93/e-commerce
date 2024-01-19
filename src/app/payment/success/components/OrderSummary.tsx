@@ -1,12 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../../hooks/reactReduxHooks";
 import OrderCart from "./OrderCart";
 import OrderOutline from "./OrderOutline";
 import OrderShipping from "./OrderShipping";
 import OrderCustomer from "./OrderCustomer";
 import OrderSummarySkeleton from "./OrderSummarySkeleton";
-import { getOrder, clearOrderError } from "../../../../redux/slices/orderSlice";
+import {
+  getOrder,
+  clearOrderError,
+  setIsAddressSubmitted,
+} from "../../../../redux/slices/orderSlice";
 import {
   removeCart,
   clearErrorMessage as clearCartError,
@@ -14,24 +18,40 @@ import {
 import { formatDate } from "../../../../../utils/helper";
 import { Alert } from "flowbite-react";
 
-const OrderSummary = ({ cartId, jwt }) => {
-  const dispatch = useDispatch();
-  const { isLoadingGetOrder, order, errorGetOrder } = useSelector(
+interface OrderSummaryProps {
+  cartId: string;
+  jwt: string;
+}
+
+/**
+ * Render the order summary component.
+ *
+ * @param {string} cartId - The ID of the cart.
+ * @param {string} jwt - The JSON Web Token.
+ * @returns {JSX.Element} The JSX element representing the order summary.
+ */
+const OrderSummary = ({ cartId, jwt }: OrderSummaryProps) => {
+  const dispatch = useAppDispatch();
+  const { isLoadingGetOrder, order, errorGetOrder } = useAppSelector(
     state => state.order
   );
-  const { isLoadingRemoveCart, errorRemoveCart } = useSelector(
+  const { isLoadingRemoveCart, errorRemoveCart } = useAppSelector(
     state => state.cart
   );
   console.log("🚀 ~ file: OrderSummary.js:13 ~ OrderSummary ~ order:", order);
 
   useEffect(() => {
     const fetchAndRemoveCart = async () => {
-      if (cartId && jwt && (!order || Object.keys(order).length === 0)) {
+      if (cartId && jwt) {
+        console.log("FETCHANDREMOVECART");
         try {
-          // Await the completion of getOrder
+          // Fetch order details
           await dispatch(getOrder({ cartId, jwt })).unwrap();
 
-          // If getOrder is successful, remove the cart
+          // Reset isAddressSubmitted state for new orders
+          dispatch(setIsAddressSubmitted(false));
+
+          // Remove the cart after successfully fetching the order
           dispatch(removeCart({ cartId, jwt }));
         } catch (error) {
           console.error("Error fetching order:", error);
@@ -41,7 +61,7 @@ const OrderSummary = ({ cartId, jwt }) => {
     };
 
     fetchAndRemoveCart();
-  }, [cartId, order, jwt, dispatch]);
+  }, [cartId, jwt, dispatch, order?.cartId]);
 
   const formattedDate = order?.createdAt ? formatDate(order.createdAt) : "";
   const orderOutline = {
@@ -56,7 +76,10 @@ const OrderSummary = ({ cartId, jwt }) => {
   };
   const orderCustomer = {
     shippingAddress: order?.shippingAddress,
-    userInfo: order?.userId,
+    userInfo:
+      typeof order?.userId === "string"
+        ? { _id: order.userId, email: "" }
+        : order?.userId,
     userOrderCount: order?.userOrderCount,
   };
 

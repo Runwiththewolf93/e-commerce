@@ -34,7 +34,7 @@ const CartOverlay = () => {
 
   useEffect(() => {
     if (isCartOpen) {
-      if (session?.customJwt && (!cart || Object.keys(cart).length === 0)) {
+      if (session?.customJwt && (!cart || cart?.items?.length === 0)) {
         dispatch(getUserCart({ jwt: session.customJwt }));
       }
       closeButtonRef.current?.focus();

@@ -20,6 +20,8 @@ import {
   GetOrdersResponse,
   OrderType,
   OrderStatusType,
+  PaymentStateType,
+  PaymentStates,
 } from "../types/orderSliceTypes";
 
 export const orderAddress = createAsyncThunk(
@@ -215,8 +217,8 @@ export const orderSlice = createSlice({
     errorGetOrders: null as ErrorOrderState,
     // isAddressSubmitted
     isAddressSubmitted: false,
-    // isPaymentProcessed
-    isPaymentProcessed: false,
+    // paymentState
+    paymentState: PaymentStates.NONE as PaymentStateType,
   },
   reducers: {
     clearOrderMessage: state => {
@@ -237,11 +239,14 @@ export const orderSlice = createSlice({
     clearSessionId: state => {
       state.sessionId = "";
     },
-    setIsAddressSubmitted: state => {
-      state.isAddressSubmitted = true;
+    setIsAddressSubmitted: (state, action: PayloadAction<boolean>) => {
+      state.isAddressSubmitted = action.payload;
     },
-    setIsPaymentProcessed: (state, action: PayloadAction<boolean>) => {
-      state.isPaymentProcessed = action.payload;
+    setIsPaymentProcessed: (state, action: PayloadAction<PaymentStateType>) => {
+      state.paymentState = action.payload;
+    },
+    resetOrderState: state => {
+      state.order = defaultOrder;
     },
   },
   extraReducers: builder => {
@@ -260,12 +265,13 @@ export const orderSlice = createSlice({
         state.errorOrderAddress = action.payload as string;
         state.isLoadingOrderAddress = false;
       })
-      // orderAddress reducer
+      // orderCart reducer
       .addCase(orderCart.pending, state => {
         state.isLoadingOrderCart = true;
         state.errorOrderCart = null;
       })
       .addCase(orderCart.fulfilled, (state, action) => {
+        state.order = action.payload.order;
         state.messageOrderCart = action.payload.message;
         state.isLoadingOrderCart = false;
         state.errorOrderCart = null;
@@ -353,6 +359,7 @@ export const {
   clearSessionId,
   setIsAddressSubmitted,
   setIsPaymentProcessed,
+  resetOrderState,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

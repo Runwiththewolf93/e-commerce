@@ -1,8 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
-export default function OrderCart({ orderItems }) {
-  const calculateDiscountedPrice = (price, discount) => {
+import {
+  OrderItemType,
+  DiscountType,
+} from "../../../../redux/types/orderSliceTypes";
+
+interface OrderCartProps {
+  orderItems: OrderItemType[];
+}
+
+export default function OrderCart({ orderItems }: OrderCartProps) {
+  const calculateDiscountedPrice = (price: number, discount: DiscountType) => {
     if (!discount || discount.percentage === 0) return price;
-    return (price - (price * discount.percentage) / 100).toFixed(2);
+    return price - (price * discount.percentage) / 100;
   };
 
   return (
@@ -32,7 +41,8 @@ export default function OrderCart({ orderItems }) {
             </div>
             <div className="grid grid-cols-3 gap-4 place-items-center w-full">
               <p className="text-base xl:text-lg leading-6">
-                €{calculateDiscountedPrice(item.price, item.discount)}
+                €
+                {calculateDiscountedPrice(item.price, item.discount).toFixed(2)}
                 {item.discount && item.discount.percentage > 0 && (
                   <span className="text-red-300 line-through ml-2">
                     €{item.price.toFixed(2)}

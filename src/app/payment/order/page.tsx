@@ -18,7 +18,10 @@ import {
 import OrderPayment from "./components/OrderPayment";
 import { Alert } from "flowbite-react";
 import ConfirmationCart from "./components/ConfirmationCart";
-import { PaymentCheckoutResponse } from "@/redux/types/orderSliceTypes";
+import {
+  PaymentCheckoutResponse,
+  PaymentStates,
+} from "@/redux/types/orderSliceTypes";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -32,6 +35,7 @@ const stripePromise = loadStripe(
 export default function PreviewPage() {
   const dispatch = useAppDispatch();
   const { data: session } = useCustomSession();
+  const jwt = session?.customJwt;
   const { isLoadingGetCart, cart, errorGetCart } = useAppSelector(
     state => state.cart
   );
@@ -42,20 +46,25 @@ export default function PreviewPage() {
     isLoadingPaymentCheckout,
     sessionId,
     errorPaymentCheckout,
+    paymentState,
   } = useAppSelector(state => state.order);
+  console.log(
+    "🚀 ~ file: page.tsx:51 ~ PreviewPage ~ paymentState:",
+    paymentState
+  );
   const [errorMessage, setErrorMessage] = useState("");
   console.log("🚀 ~ file: page.js:16 ~ PreviewPage ~ cart:", cart);
 
   useEffect(() => {
-    if ((!cart || Object.keys(cart).length === 0) && session?.customJwt) {
-      dispatch(getUserCart({ jwt: session?.customJwt }));
+    if ((!cart || cart?.items?.length === 0) && jwt) {
+      dispatch(getUserCart({ jwt }));
     }
 
     return () => {
       dispatch(clearOrderMessage());
       dispatch(clearOrderError());
     };
-  }, [cart, dispatch, session?.customJwt]);
+  }, [cart, dispatch, jwt]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,8 +83,9 @@ export default function PreviewPage() {
 
     try {
       // Update the order
+      console.log("🚀 ~ file: page.tsx:80 ~ handleSubmit ~ jwt:", jwt);
       const orderUpdateResponse = await dispatch(
-        orderCart({ cartObject: cart, jwt: session?.customJwt })
+        orderCart({ cartObject: cart, jwt })
       );
       if (isErrorResponse(orderUpdateResponse)) {
         setErrorMessage(
@@ -86,7 +96,7 @@ export default function PreviewPage() {
 
       // Request session ID from Stripe Checkout
       const checkoutResponse = await dispatch(
-        paymentCheckout({ cartId: cart?._id, jwt: session?.customJwt })
+        paymentCheckout({ cartId: cart?._id, jwt })
       );
       if (isErrorResponse(checkoutResponse)) {
         setErrorMessage(
@@ -100,6 +110,8 @@ export default function PreviewPage() {
         return;
       }
 
+      dispatch(setIsPaymentProcessed(PaymentStates.INITIATED));
+
       // Continue with Stripe payment if order update is successful
       const stripe = await stripePromise;
       const sessionId = checkoutResponse.payload.sessionId;
@@ -108,8 +120,6 @@ export default function PreviewPage() {
       if (result.error) {
         setErrorMessage(result.error.message);
       }
-
-      dispatch(setIsPaymentProcessed(true));
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -119,6 +129,11 @@ export default function PreviewPage() {
 
   return (
     <>
+      {/* <button
+        onClick={() => dispatch(setIsPaymentProcessed(PaymentStates.NONE))}
+      >
+        payment
+      </button> */}
       {errorGetCart && (
         <Alert
           color="failure"

@@ -1,5 +1,22 @@
 /* eslint-disable @next/next/no-img-element */
-export default function OrderCustomer({ orderCustomer }) {
+import { AddressType } from "@/redux/types/userSliceTypes";
+
+interface UserInfoType {
+  _id: string;
+  email: string;
+}
+
+interface OrderCustomerProps {
+  shippingAddress: AddressType;
+  userInfo: UserInfoType;
+  userOrderCount: number;
+}
+
+interface OrderCustomerObject {
+  orderCustomer: OrderCustomerProps;
+}
+
+export default function OrderCustomer({ orderCustomer }: OrderCustomerObject) {
   console.log(
     "🚀 ~ file: OrderCustomer.js:3 ~ OrderCustomer ~ orderCustomer:",
     orderCustomer
@@ -20,7 +37,7 @@ export default function OrderCustomer({ orderCustomer }) {
                 {shippingAddress.name} {shippingAddress.surname}
               </p>
               <p className="text-sm leading-5 text-gray-600">
-                {userOrderCount} Previous{" "}
+                {userOrderCount - 1} Previous{" "}
                 {userOrderCount === 1 ? "Order" : "Orders"}
               </p>
             </div>

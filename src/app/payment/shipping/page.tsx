@@ -22,7 +22,7 @@ export default function Shipping() {
   console.log("🚀 ~ file: page.js:14 ~ Shipping ~ cart:", cart);
 
   useEffect(() => {
-    if ((!cart || Object.keys(cart).length === 0) && session?.customJwt) {
+    if ((!cart || cart?.items?.length === 0) && session?.customJwt) {
       dispatch(getUserCart({ jwt: session?.customJwt }));
     }
   }, [cart, dispatch, session?.customJwt]);

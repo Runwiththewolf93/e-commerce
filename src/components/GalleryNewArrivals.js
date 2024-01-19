@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import GalleryNewArrivalsSkeleton from "../subcomponents/GalleryNewArrivalsSkeleton";
 import GalleryError from "../subcomponents/GalleryError";
@@ -23,10 +24,13 @@ export default function GalleryNewArrivals() {
   const { isLoadingAddCart } = useSelector(state => state.cart);
   const { data: session } = useSession();
   const jwt = session?.customJwt;
+  const [addingProductId, setAddingProductId] = useState(null);
   useCloseCartOnRouteChange();
 
-  const handleAddToCart = productId => {
-    dispatch(addToCart({ productId, quantity: 1, jwt }));
+  const handleAddToCart = async productId => {
+    setAddingProductId(productId);
+    await dispatch(addToCart({ productId, quantity: 1, jwt })).unwrap();
+    setAddingProductId(null);
     dispatch(openCartOverlay());
   };
 
@@ -135,7 +139,9 @@ export default function GalleryNewArrivals() {
                       className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 min-w-[100px]"
                       onClick={() => handleAddToCart(product._id)}
                     >
-                      {isLoadingAddCart ? "Adding..." : "Add to cart"}
+                      {addingProductId === product._id
+                        ? "Adding..."
+                        : "Add to cart"}
                     </button>
                   </div>
                 </div>

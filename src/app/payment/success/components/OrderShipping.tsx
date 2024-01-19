@@ -1,20 +1,29 @@
 /* eslint-disable @next/next/no-img-element */
-export default function OrderShipping({ orderShipping }) {
-  // console.log(
-  //   "🚀 ~ file: OrderShipping.js:3 ~ OrderShipping ~ orderShipping:",
-  //   orderShipping
-  // );
 
-  const calculateRemainingDays = deliveryTime => {
+interface OrderShippingProps {
+  shippingCost: number;
+  deliveryTime: number;
+}
+
+interface OrderShippingObject {
+  orderShipping: OrderShippingProps;
+}
+
+export default function OrderShipping({ orderShipping }: OrderShippingObject) {
+  const calculateRemainingDays = (deliveryTime: number) => {
     const currentTime = Date.now();
     const timeDiff = deliveryTime - currentTime;
     return Math.max(0, Math.floor(timeDiff / (1000 * 60 * 60 * 24)));
   };
 
   const remainingDays = calculateRemainingDays(orderShipping.deliveryTime);
+  console.log(
+    "🚀 ~ file: OrderShipping.tsx:20 ~ OrderShipping ~ remainingDays:",
+    remainingDays
+  );
   const shippingCost = orderShipping.shippingCost.toFixed(2);
   return (
-    <div className="flex flex-col justify-center px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 space-y-6   ">
+    <div className="flex flex-col justify-center px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 space-y-6">
       <h3 className="text-xl font-semibold leading-5 text-gray-800">
         Shipping
       </h3>

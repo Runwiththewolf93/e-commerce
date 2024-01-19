@@ -8,6 +8,7 @@ import { useAppSelector } from "../hooks/reactReduxHooks";
 import { useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import RedirectingIndicator from "./cancel/components/RedirectingIndicator";
 
 interface PaymentLayoutProps {
   children: ReactNode;
@@ -24,9 +25,20 @@ function PaymentLayout({ children }: PaymentLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { cart } = useAppSelector(state => state.cart);
-  const { isAddressSubmitted } = useAppSelector(state => state.order);
+  const { isAddressSubmitted, paymentState } = useAppSelector(
+    state => state.order
+  );
 
-  const isCartEmpty = !cart.items && cart.items.length === 0;
+  const isCartEmpty = !cart.items && cart?.items?.length === 0;
+  console.log(
+    "🚀 ~ file: layout.tsx:31 ~ PaymentLayout ~ isCartEmpty:",
+    isCartEmpty
+  );
+  const restrictedPaths = [
+    "/payment/order",
+    "/payment/success",
+    "/payment/cancel",
+  ];
 
   useEffect(() => {
     if (status === "authenticated" && isCartEmpty) {
@@ -36,15 +48,14 @@ function PaymentLayout({ children }: PaymentLayoutProps) {
 
   useEffect(() => {
     // Restricted paths
-    const restrictedPaths = [
-      "/payment/order",
-      "/payment/success",
-      "/payment/cancel",
-    ];
     const currentPath = pathname;
 
-    if (restrictedPaths.includes(currentPath) && !isAddressSubmitted) {
-      router.push("/payment/shipping");
+    if (
+      restrictedPaths.includes(currentPath) &&
+      !isAddressSubmitted &&
+      paymentState !== "SUCCESSFUL"
+    ) {
+      router.push("/");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, router]);
@@ -55,6 +66,14 @@ function PaymentLayout({ children }: PaymentLayoutProps) {
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
     );
+  }
+
+  if (
+    restrictedPaths.includes(pathname) &&
+    !isAddressSubmitted &&
+    paymentState !== "SUCCESSFUL"
+  ) {
+    return <RedirectingIndicator />;
   }
 
   return (

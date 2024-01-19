@@ -102,7 +102,7 @@ export default function CartItem({ cart, session }: CartItemProps) {
           const errorAddOrDeleteCart = errorMap[item.product._id];
           const isLoading = loadingMap[item.product._id] || false;
 
-          console.log("item.product", item.product);
+          // console.log("item.product", item.product);
 
           return (
             <div key={item._id}>

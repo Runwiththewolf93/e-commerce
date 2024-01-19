@@ -41,6 +41,7 @@ export default function FormComponent({ jwt, cartId }: FormComponentProps) {
   } = useAppSelector(state => state.user);
   const { isLoadingOrderAddress, messageOrderAddress, errorOrderAddress } =
     useAppSelector(state => state.order);
+  console.log("🚀 ~ file: FormComponent.tsx:42 ~ FormComponent ~ user:", user);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -55,7 +56,7 @@ export default function FormComponent({ jwt, cartId }: FormComponentProps) {
 
   useEffect(() => {
     // Check if user data is not present and jwt token is available
-    if ((!user || Object.keys(user).length === 0) && jwt) {
+    if (!user._id && jwt) {
       dispatch(getUser({ jwt }));
     }
   }, [jwt, user, dispatch]);
@@ -88,7 +89,7 @@ export default function FormComponent({ jwt, cartId }: FormComponentProps) {
       userAddress.fulfilled.match(results[0]) &&
       orderAddress.fulfilled.match(results[1])
     ) {
-      dispatch(setIsAddressSubmitted());
+      dispatch(setIsAddressSubmitted(true));
       setFormData({
         name: "",
         surname: "",
@@ -115,6 +116,9 @@ export default function FormComponent({ jwt, cartId }: FormComponentProps) {
 
   return (
     <form className="max-w-xl mx-auto mt-10" onSubmit={onSubmitHandler}>
+      {/* <button onClick={() => dispatch(setIsAddressSubmitted(false))}>
+        address
+      </button> */}
       <h3 className="mb-5 text-lg">Your details for shipping:</h3>
       {successMessage && (
         <Alert

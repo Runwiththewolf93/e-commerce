@@ -5,7 +5,7 @@ import ProfileOverview from "./components/ProfileOverview";
 import OrderOverview from "./components/OrderOverview";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { useSession } from "next-auth/react";
+import { useCustomSession } from "../hooks/useCustomSession";
 
 /**
  * Renders the profile page.
@@ -13,7 +13,7 @@ import { useSession } from "next-auth/react";
  * @return {JSX.Element} The rendered profile page.
  */
 export default function ProfilePage() {
-  const { data: session } = useSession();
+  const { data: session } = useCustomSession();
 
   return (
     <>

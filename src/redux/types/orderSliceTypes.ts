@@ -23,6 +23,7 @@ export interface OrderCartArgs {
 export interface OrderCartResponse {
   status: string;
   message: string;
+  order?: OrderType;
 }
 
 // paymentCheckout types
@@ -114,6 +115,7 @@ export interface CartTypeOrder {
 
 // OrderItemType
 export interface OrderItemType {
+  _id: string;
   product: string;
   name: string;
   price: number;
@@ -130,10 +132,16 @@ export enum OrderStatusType {
   Cancelled = "Cancelled",
 }
 
+// UserInfoType
+interface UserInfoType {
+  _id: string;
+  email: string;
+}
+
 // OrderType
 export interface OrderType {
   _id: string;
-  userId: string;
+  userId: string | UserInfoType;
   cartId: string;
   totalAmount: number;
   totalAmountDiscount: number;
@@ -163,5 +171,16 @@ export type GetOrdersResponse = {
   orders?: OrderType[];
   message?: string;
 };
+
+// paymentStates types
+export const PaymentStates = {
+  INITIATED: "INITIATED",
+  CANCELLED: "CANCELLED",
+  SUCCESSFUL: "SUCCESSFUL",
+  NONE: "NONE",
+} as const;
+
+export type PaymentStateType =
+  (typeof PaymentStates)[keyof typeof PaymentStates];
 
 export type ErrorOrderState = string | null;
